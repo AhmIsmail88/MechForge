@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
+import com.mechforge.app.ui.util.UiFormat
 import com.mechforge.app.export.ReportBlock
 import com.mechforge.app.export.ReportWriter
 import com.mechforge.app.data.Snapshots
@@ -80,7 +81,7 @@ fun CalculatorScreen(
                 val restored = restoreInputs?.get(spec.id)
                 if (restored != null) {
                     val unit = Units.byId(restored.displayUnitId)
-                    InputUi(spec.id, Fmt.n(unit.fromBase(restored.baseValue), 6), restored.displayUnitId)
+                    InputUi(spec.id, UiFormat.n(unit.fromBase(restored.baseValue)), restored.displayUnitId)
                 } else {
                     val unitId = spec.defaultUnitId ?: Units.defaultUnit(spec.family).id
                     InputUi(spec.id, "", unitId)
@@ -164,7 +165,7 @@ fun CalculatorScreen(
                         // Convert the typed value to the new unit (README: value converts on unit change)
                         val newText = ui.text.toDoubleOrNull()?.let { value ->
                             val base = Units.byId(ui.unitId).toBase(value)
-                            Fmt.n(Units.byId(newUnitId).fromBase(base), 6)
+                            UiFormat.n(Units.byId(newUnitId).fromBase(base))
                         } ?: ui.text
                         inputsUi = inputsUi.map {
                             if (it.specId == spec.id) it.copy(unitId = newUnitId, text = newText) else it
@@ -263,7 +264,7 @@ fun CalculatorScreen(
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
                                 Text(
-                                    "${Fmt.n(displayValue, 4)} ${Units.byId(displayUnitId).symbol}",
+                                    "${UiFormat.n(displayValue)} ${Units.byId(displayUnitId).symbol}",
                                     style = if (r.isPrimary || r.isRecommended) {
                                         MaterialTheme.typography.headlineSmall
                                     } else {

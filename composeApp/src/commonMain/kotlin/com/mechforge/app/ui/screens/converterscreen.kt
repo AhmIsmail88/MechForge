@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.core.units.UnitFamily
 import com.mechforge.core.units.Units
+import com.mechforge.app.ui.util.UiFormat
 import com.mechforge.core.util.Fmt
 
 /** Global unit converter (README v2 §16): family tabs, from/to pickers, live conversion. */
@@ -100,8 +101,8 @@ fun ConverterScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     if (result.isSuccess) {
                         Text(
-                            "${Fmt.n(parsed, 6)} ${Units.byId(fromUnitId).symbol}  =  " +
-                                "${Fmt.n(result.getOrThrow(), 6)} ${Units.byId(toUnitId).symbol}",
+                            "${UiFormat.n(parsed)} ${Units.byId(fromUnitId).symbol}  =  " +
+                                "${UiFormat.n(result.getOrThrow())} ${Units.byId(toUnitId).symbol}",
                             style = MaterialTheme.typography.headlineSmall,
                         )
                     } else {
@@ -129,7 +130,7 @@ fun ConverterScreen() {
                                     modifier = Modifier.weight(1f),
                                 )
                                 Text(
-                                    Fmt.n(converted.getOrDefault(Double.NaN), 6),
+                                    UiFormat.n(converted.getOrDefault(Double.NaN)),
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                             }
