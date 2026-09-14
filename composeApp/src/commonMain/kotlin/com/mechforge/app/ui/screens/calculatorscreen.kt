@@ -313,16 +313,6 @@ fun CalculatorScreen(
                             label = { Text("Save to history") },
                             leadingIcon = { Icon(Icons.Filled.Save, null) },
                         )
-                        AssistChip(
-                            onClick = {
-                                val content = ReportWriter.build(calc, lastInputs ?: emptyMap(), out, restoreTitle)
-                                scope.launch {
-                                    val path = deps.exporter.save(def.id, content)
-                                    savedMessage = if (path != null) "Report saved: $path" else "Export cancelled."
-                                }
-                            },
-                            label = { Text("Export txt") },
-                        )
                     }
                 }
             }
