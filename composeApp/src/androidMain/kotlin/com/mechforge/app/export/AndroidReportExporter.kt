@@ -1,16 +1,23 @@
 package com.mechforge.app.export
 
+import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Android report export (README v2 §36).
+ * Android report export.
  *
- * The pilot Android shell has no document picker, so the report is written into the
- * app's own files directory and the resulting path is shown in the UI. The report
- * text can also be copied to the clipboard with the "Copy" action.
+ * Text reports keep the old behaviour (app-private files directory). PDF reports are
+ * written into the public **Downloads/MechForge** collection through MediaStore, so
+ * the file is visible in any file manager / Google Files without any storage
+ * permission, and a share sheet is opened right after the export so the report can
+ * be opened, sent or saved to Drive/WhatsApp immediately.
  */
 class AndroidReportExporter(private val context: Context) : ReportExporter {
 
@@ -18,12 +25,84 @@ class AndroidReportExporter(private val context: Context) : ReportExporter {
         withContext(Dispatchers.IO) {
             val root = context.getExternalFilesDir(null) ?: context.filesDir
             val dir = File(root, "reports").apply { mkdirs() }
-            val file = nextFreeFile(dir, defaultName)
+            val file = nextFreeFile(dir, defaultName, "txt")
             file.writeText(content, Charsets.UTF_8)
             file.absolutePath
         }
 
-    /** Never overwrites an earlier report: appends _1, _2, … when the name is taken. */
+    /** Writes a paginated A4 PDF into Downloads/MechForge and offers the share sheet. */
+    override suspend fun savePdf(
+        defaultName: String,
+        title: String,
+        meta: List<Pair<String, String>>,
+        blocks: List<ReportBlock>,
+    ): String? = withContext(Dispatchers.IO) {
+        val safeName = defaultName.replace(Regex("[^A-Za-z0-9._-]"), "_")
+        val fileName = safeName + "_" + System.currentTimeMillis() + ".pdf"
+
+        val cache = File(context.cacheDir, "reports").apply { mkdirs() }
+        val tmp = File(cache, fileName)
+        val rendered = AndroidPdfReport().write(tmp, title, meta, blocks)
+        if (!rendered || !tmp.exists()) {
+            tmp.delete()
+            return@withContext null
+        }
+
+        val uri: Uri? = try {
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
+                put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    Environment.DIRECTORY_DOWNLOADS + "/MechForge",
+                )
+            }
+            val target = context.contentResolver.insert(
+                MediaStore.Files.getContentUri("external"),
+                values,
+            )
+            if (target != null) {
+                context.contentResolver.openOutputStream(target)?.use { out ->
+                    tmp.inputStream().use { it.copyTo(out) }
+                }
+            }
+            target
+        } catch (t: Throwable) {
+            null
+        }
+
+        if (uri == null) {
+            // MediaStore unavailable: keep the file in app storage instead of failing.
+            val fallbackDir = File(context.getExternalFilesDir(null) ?: context.filesDir, "reports")
+                .apply { mkdirs() }
+            val fallback = File(fallbackDir, fileName)
+            tmp.copyTo(fallback, overwrite = true)
+            tmp.delete()
+            return@withContext fallback.absolutePath
+        }
+
+        tmp.delete()
+        offerShare(uri)
+        "Downloads/MechForge/$fileName"
+    }
+
+    /** Opens the system share sheet so the report can be opened or sent straight away. */
+    private fun offerShare(uri: Uri) {
+        try {
+            val send = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            val chooser = Intent.createChooser(send, "MechForge report")
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(chooser)
+        } catch (_: Throwable) {
+            // Sharing is a convenience; never fail the export because of it.
+        }
+    }
+
+    /** Never overwrites an earlier report: appends _1, _2, ... when the name is taken. */
     private fun nextFreeFile(dir: File, defaultName: String, extension: String = "txt"): File {
         val safeName = defaultName.replace(Regex("[^A-Za-z0-9._-]"), "_")
         var candidate = File(dir, "$safeName.$extension")
@@ -33,17 +112,5 @@ class AndroidReportExporter(private val context: Context) : ReportExporter {
             index++
         }
         return candidate
-    }
-
-    override suspend fun savePdf(
-        defaultName: String,
-        title: String,
-        meta: List<Pair<String, String>>,
-        blocks: List<ReportBlock>,
-    ): String? = withContext(Dispatchers.IO) {
-        val root = context.getExternalFilesDir(null) ?: context.filesDir
-        val dir = File(root, "reports").apply { mkdirs() }
-        val file = nextFreeFile(dir, defaultName, "pdf")
-        if (AndroidPdfReport().write(file, title, meta, blocks)) file.absolutePath else null
     }
 }
