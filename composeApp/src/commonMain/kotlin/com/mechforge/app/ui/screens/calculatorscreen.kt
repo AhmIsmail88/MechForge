@@ -1,5 +1,6 @@
 package com.mechforge.app.ui.screens
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -303,7 +304,10 @@ fun CalculatorScreen(
                     }
 
                     Spacer(Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
                         AssistChip(
                             onClick = { clipboard.setText(AnnotatedString(ReportWriter.build(calc, lastInputs ?: emptyMap(), out, restoreTitle))) },
                             label = { Text("Copy") },
