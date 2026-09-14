@@ -16,15 +16,6 @@ import java.util.Locale
  * Structured content of one engineering calculation sheet, shared by both platforms.
  * A platform renderer only has to know how to draw these blocks.
  */
-sealed interface ReportBlock {
-    data class Heading(val text: String) : ReportBlock
-    data class Paragraph(val text: String) : ReportBlock
-    data class KeyValue(val label: String, val value: String) : ReportBlock
-    data class TableRow(val cells: List<String>) : ReportBlock
-    data object Divider : ReportBlock
-    data class Warning(val text: String) : ReportBlock
-}
-
 /**
  * Android PDF renderer: A4 portrait (595 x 842 pt), header band, optional company
  * logo, project meta block, content blocks, and a footer with page numbering on

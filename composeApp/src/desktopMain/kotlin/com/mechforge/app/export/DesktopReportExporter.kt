@@ -26,4 +26,25 @@ class DesktopReportExporter : ReportExporter {
             target.writeText(content, Charsets.UTF_8)
             target.absolutePath
         }
+
+    /** Writes a paginated A4 PDF report through the native save dialog. */
+    override suspend fun savePdf(
+        defaultName: String,
+        title: String,
+        meta: List<Pair<String, String>>,
+        blocks: List<ReportBlock>,
+    ): String? = withContext(Dispatchers.Swing) {
+        val chooser = JFileChooser().apply {
+            dialogTitle = "Export PDF report"
+            selectedFile = File("$defaultName.pdf")
+            fileFilter = FileNameExtensionFilter("PDF report (*.pdf)", "pdf")
+        }
+        val choice = chooser.showSaveDialog(null)
+        if (choice != JFileChooser.APPROVE_OPTION) return@withContext null
+        var target = chooser.selectedFile
+        if (!target.name.endsWith(".pdf", ignoreCase = true)) {
+            target = File(target.parentFile, "${target.name}.pdf")
+        }
+        if (DesktopPdfReport().write(target, title, meta, blocks)) target.absolutePath else null
+    }
 }

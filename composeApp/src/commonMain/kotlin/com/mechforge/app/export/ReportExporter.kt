@@ -16,4 +16,17 @@ interface ReportExporter {
      * @return the path written, or `null` if the user cancelled.
      */
     suspend fun save(defaultName: String, content: String): String?
+
+    /**
+     * Writes a paginated A4 PDF report built from the shared [ReportBlock] model.
+     *
+     * @return the path written, or 
+ull when the user cancelled or rendering failed.
+     */
+    suspend fun savePdf(
+        defaultName: String,
+        title: String,
+        meta: List<Pair<String, String>>,
+        blocks: List<ReportBlock>,
+    ): String?
 }
