@@ -4,7 +4,7 @@ import com.mechforge.core.engine.CalcOutput
 import com.mechforge.core.engine.Calculator
 import com.mechforge.core.engine.InputValue
 import com.mechforge.core.units.Units
-import com.mechforge.core.util.Fmt
+import com.mechforge.app.ui.util.UiFormat
 
 /**
  * Plain-text calculation report (README v2 §36 text export for the pilot).
@@ -33,7 +33,7 @@ object ReportWriter {
         for (spec in calculator.def.inputs) {
             val iv = inputs[spec.id] ?: continue
             val unit = Units.byId(iv.displayUnitId)
-            appendLine("${spec.symbol} ${spec.label} = ${Fmt.n(unit.fromBase(iv.baseValue), 4)} ${unit.symbol}")
+            appendLine("${spec.symbol} ${spec.label} = ${UiFormat.n(unit.fromBase(iv.baseValue))} ${unit.symbol}")
         }
         appendLine()
         appendLine("FORMULA")
@@ -52,7 +52,7 @@ object ReportWriter {
                 r.isPrimary -> "  [primary]"
                 else -> ""
             }
-            appendLine("${r.label} = ${Fmt.n(r.value, 4)} ${Units.byId(r.unitId).symbol}$marker")
+            appendLine("${r.label} = ${UiFormat.n(r.value)} ${Units.byId(r.unitId).symbol}$marker")
         }
         if (output.warnings.isNotEmpty()) {
             appendLine()
