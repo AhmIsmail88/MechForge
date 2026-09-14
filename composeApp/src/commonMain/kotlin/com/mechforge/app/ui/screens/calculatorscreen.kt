@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Star
@@ -21,7 +21,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -108,7 +108,7 @@ fun CalculatorScreen(
             .padding(24.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, "Back") }
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
             Column(modifier = Modifier.weight(1f)) {
                 Text(def.name, style = MaterialTheme.typography.headlineSmall)
                 Text(
@@ -283,7 +283,7 @@ fun CalculatorScreen(
                     }
 
                     Spacer(Modifier.height(8.dp))
-                    Divider()
+                    HorizontalDivider()
                     Spacer(Modifier.height(8.dp))
                     Text("Formula", style = MaterialTheme.typography.labelMedium)
                     Text(def.formulaDisplay, style = MaterialTheme.typography.bodyLarge)
