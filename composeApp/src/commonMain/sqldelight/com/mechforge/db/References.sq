@@ -1,0 +1,21 @@
+CREATE TABLE engineering_references (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,
+  source TEXT NOT NULL,
+  edition TEXT NOT NULL,
+  license_type TEXT NOT NULL,
+  license_notes TEXT NOT NULL,
+  date_added INTEGER NOT NULL,
+  verified_by TEXT NOT NULL
+);
+
+insertEngineeringReference:
+INSERT INTO engineering_references(title, category, source, edition, license_type, license_notes, date_added, verified_by)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAllReferences:
+SELECT * FROM engineering_references ORDER BY id DESC;
+
+countAllReferences:
+SELECT COUNT(*) FROM engineering_references;

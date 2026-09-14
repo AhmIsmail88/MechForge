@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MechForge launcher icon foreground (README v2 §30): a geometric gear with a
+  stylised M. Deep-blue/cyan brand direction per §31. Deliberately minimal detail so
+  the silhouette stays readable at launcher sizes; content stays inside the 66dp
+  adaptive-icon safe zone.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Gear body: ring of radius 24 (stroke 6), centre 54,54 -->
+    <path
+        android:pathData="M54,30 a24,24 0 1,0 0.01,0"
+        android:strokeColor="#3FD0E0"
+        android:strokeWidth="6" />
+
+    <!-- Gear teeth: one rounded tooth, rotated in 45° steps -->
+    <group android:pivotX="54" android:pivotY="54" android:rotation="0">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="45">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="90">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="135">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="180">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="225">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="270">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+    <group android:pivotX="54" android:pivotY="54" android:rotation="315">
+        <path
+            android:fillColor="#3FD0E0"
+            android:pathData="M50.5,23 h7 a1.5,1.5 0 0 1 1.5,1.5 v7.5 a1.5,1.5 0 0 1 -1.5,1.5 h-7 a1.5,1.5 0 0 1 -1.5,-1.5 v-7.5 a1.5,1.5 0 0 1 1.5,-1.5 z" />
+    </group>
+
+    <!-- Stylised M (Mechanical / MechForge), centred in the gear -->
+    <path
+        android:pathData="M41,64 L41,44 L54,57 L67,44 L67,64"
+        android:strokeColor="#3FD0E0"
+        android:strokeWidth="6.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+</vector>

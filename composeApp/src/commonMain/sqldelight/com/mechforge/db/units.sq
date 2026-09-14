@@ -1,0 +1,17 @@
+CREATE TABLE units (
+  id TEXT NOT NULL PRIMARY KEY,
+  family TEXT NOT NULL,
+  symbol TEXT NOT NULL,
+  factor REAL NOT NULL,
+  offset REAL NOT NULL,
+  is_base INTEGER NOT NULL
+);
+
+upsertUnit:
+INSERT OR REPLACE INTO units(id, family, symbol, factor, offset, is_base) VALUES (?, ?, ?, ?, ?, ?);
+
+selectAllUnits:
+SELECT * FROM units ORDER BY family, id;
+
+countUnits:
+SELECT COUNT(*) FROM units;

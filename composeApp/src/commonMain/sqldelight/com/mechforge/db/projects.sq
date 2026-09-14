@@ -1,0 +1,19 @@
+CREATE TABLE projects (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+insertProject:
+INSERT INTO projects(name, description, created_at) VALUES (?, ?, ?);
+
+updateProjectName:
+UPDATE projects SET name = ? WHERE id = ?;
+
+deleteProject:
+DELETE FROM projects WHERE id = ?;
+
+selectAllProjects:
+SELECT projects.*, (SELECT COUNT(*) FROM saved_calculations WHERE saved_calculations.project_id = projects.id) AS saved_count
+FROM projects ORDER BY created_at DESC;

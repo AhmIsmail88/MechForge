@@ -1,0 +1,16 @@
+CREATE TABLE favorites (
+  calculator_id TEXT NOT NULL PRIMARY KEY,
+  timestamp INTEGER NOT NULL
+);
+
+upsertFavorite:
+INSERT OR REPLACE INTO favorites(calculator_id, timestamp) VALUES (?, ?);
+
+deleteFavorite:
+DELETE FROM favorites WHERE calculator_id = ?;
+
+selectAllFavorites:
+SELECT * FROM favorites ORDER BY timestamp DESC;
+
+getFavorite:
+SELECT * FROM favorites WHERE calculator_id = ?;

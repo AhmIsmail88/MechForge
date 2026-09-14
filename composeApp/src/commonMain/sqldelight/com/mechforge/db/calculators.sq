@@ -1,0 +1,17 @@
+CREATE TABLE calculators (
+  id TEXT NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  description TEXT NOT NULL,
+  formula TEXT NOT NULL,
+  reference TEXT NOT NULL,
+  version INTEGER NOT NULL,
+  active INTEGER NOT NULL
+);
+
+upsertCalculator:
+INSERT OR REPLACE INTO calculators(id, name, category, description, formula, reference, version, active)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+countCalculators:
+SELECT COUNT(*) FROM calculators;

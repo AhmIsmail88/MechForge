@@ -1,0 +1,16 @@
+CREATE TABLE saved_calculations (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  calculator_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  timestamp INTEGER NOT NULL,
+  inputs_json TEXT NOT NULL,
+  results_json TEXT NOT NULL,
+  project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL
+);
+
+insertSaved:
+INSERT INTO saved_calculations(calculator_id, name, timestamp, inputs_json, results_json, project_id)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectAllSaved:
+SELECT * FROM saved_calculations ORDER BY timestamp DESC;

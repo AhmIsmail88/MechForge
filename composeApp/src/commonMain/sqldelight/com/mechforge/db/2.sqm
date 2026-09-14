@@ -1,0 +1,15 @@
+-- Migration v2 -> v3: add the units registry mirror and the app_metadata table
+-- (README v2 §21 conceptual schema). Data-preserving: no existing table is altered.
+CREATE TABLE app_metadata (
+  key TEXT NOT NULL PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+CREATE TABLE units (
+  id TEXT NOT NULL PRIMARY KEY,
+  family TEXT NOT NULL,
+  symbol TEXT NOT NULL,
+  factor REAL NOT NULL,
+  offset REAL NOT NULL,
+  is_base INTEGER NOT NULL
+);

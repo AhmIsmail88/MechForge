@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- README v2 §30/§31: deep engineering blue background, electric cyan foreground.
+         Values mirror the Compose theme in com/mechforge/app/ui/theme/theme.kt. -->
+    <color name="ic_launcher_background">#0E2A47</color>
+    <color name="mechforge_background_light">#F7F8FA</color>
+    <color name="mechforge_background_dark">#121417</color>
+</resources>

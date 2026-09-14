@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Plain platform theme (no AppCompat dependency). The Compose UI supplies all
+      styling; this only avoids a flash of the wrong colour before the first frame.
+    -->
+    <style name="Theme.MechForge" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/mechforge_background_light</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

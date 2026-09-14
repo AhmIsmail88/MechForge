@@ -1,0 +1,10 @@
+CREATE TABLE user_settings (
+  key TEXT NOT NULL PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+upsertSetting:
+INSERT OR REPLACE INTO user_settings(key, value) VALUES (?, ?);
+
+getSetting:
+SELECT * FROM user_settings WHERE key = ?;

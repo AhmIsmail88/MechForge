@@ -1,0 +1,32 @@
+CREATE TABLE calculation_history (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  calculator_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  timestamp INTEGER NOT NULL,
+  inputs_json TEXT NOT NULL,
+  results_json TEXT NOT NULL
+);
+
+insertHistory:
+INSERT INTO calculation_history(calculator_id, title, timestamp, inputs_json, results_json)
+VALUES (?, ?, ?, ?, ?);
+
+selectAllHistory:
+SELECT * FROM calculation_history ORDER BY timestamp DESC;
+
+getHistoryById:
+SELECT * FROM calculation_history WHERE id = ?;
+
+updateHistoryTitle:
+UPDATE calculation_history SET title = ? WHERE id = ?;
+
+deleteHistory:
+DELETE FROM calculation_history WHERE id = ?;
+
+duplicateHistory:
+INSERT INTO calculation_history(calculator_id, title, timestamp, inputs_json, results_json)
+SELECT calculator_id, title || ' (copy)', ?, inputs_json, results_json FROM calculation_history WHERE id = ?;
+
+recentCalculators:
+SELECT calculator_id, MAX(timestamp) AS last_used FROM calculation_history
+GROUP BY calculator_id ORDER BY last_used DESC LIMIT ?;
