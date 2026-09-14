@@ -44,6 +44,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
+import com.mechforge.app.export.ReportBlock
 import com.mechforge.app.export.ReportWriter
 import com.mechforge.app.data.Snapshots
 import com.mechforge.core.engine.CalcOutput
@@ -312,6 +313,27 @@ fun CalculatorScreen(
                             onClick = { showSaveDialog = true },
                             label = { Text("Save to history") },
                             leadingIcon = { Icon(Icons.Filled.Save, null) },
+                        )
+                        AssistChip(
+                            onClick = {
+                                val reportText = ReportWriter.build(calc, lastInputs ?: emptyMap(), out, restoreTitle)
+                                scope.launch {
+                                    val blocks = reportText.lines().mapNotNull { raw ->
+                                        val t = raw.trim()
+                                        when {
+                                            t.isEmpty() -> ReportBlock.Divider
+                                            t.length <= 60 && t.endsWith(":") && t.none { it.isDigit() } ->
+                                                ReportBlock.Heading(t.trimEnd(':'))
+                                            t.startsWith("- ") || t.startsWith("Warning") ->
+                                                ReportBlock.Warning(t.removePrefix("- ").removePrefix("Warning: "))
+                                            else -> ReportBlock.Paragraph(t)
+                                        }
+                                    }
+                                    val path = deps.exporter.savePdf(def.id, def.name, emptyList(), blocks)
+                                    savedMessage = if (path != null) "PDF saved: " + path else "Export cancelled."
+                                }
+                            },
+                            label = { Text("Export PDF") },
                         )
                     }
                 }
