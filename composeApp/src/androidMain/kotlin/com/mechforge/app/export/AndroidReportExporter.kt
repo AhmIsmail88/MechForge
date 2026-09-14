@@ -1,11 +1,16 @@
 package com.mechforge.app.export
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -83,6 +88,7 @@ class AndroidReportExporter(private val context: Context) : ReportExporter {
 
         tmp.delete()
         offerShare(uri)
+        notifyReady(uri, fileName)
         "Downloads/MechForge/$fileName"
     }
 
@@ -112,5 +118,51 @@ class AndroidReportExporter(private val context: Context) : ReportExporter {
             index++
         }
         return candidate
+    }
+    /** Posts a notification with Open and Share actions so the report stays reachable. */
+    private fun notifyReady(uri: Uri, fileName: String) {
+        try {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    CHANNEL_ID,
+                    "MechForge reports",
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ).apply { description = "Calculation reports exported as PDF" }
+                nm.createNotificationChannel(channel)
+            }
+            val openIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/pdf")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            val openPending = PendingIntent.getActivity(
+                context, 1, openIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            val sharePending = PendingIntent.getActivity(
+                context, 2, shareIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setContentTitle("MechForge report ready")
+                .setContentText(fileName)
+                .setAutoCancel(true)
+                .setContentIntent(openPending)
+                .addAction(0, "Share", sharePending)
+                .build()
+            nm.notify(1001, notification)
+        } catch (t: Throwable) {
+            // a notification is a convenience; never fail the export because of it
+        }
+    }
+
+    private companion object {
+        const val CHANNEL_ID = "mechforge_reports"
     }
 }

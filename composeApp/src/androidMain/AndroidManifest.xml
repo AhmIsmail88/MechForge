@@ -8,6 +8,8 @@
       app's private SQLite database.
     -->
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".MechForgeApplication"
         android:allowBackup="false"
