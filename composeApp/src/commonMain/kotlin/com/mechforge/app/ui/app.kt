@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
@@ -56,6 +57,7 @@ import com.mechforge.app.ui.screens.FavoritesScreen
 import com.mechforge.app.ui.screens.HistoryScreen
 import com.mechforge.app.ui.screens.HomeScreen
 import com.mechforge.app.ui.screens.ProjectsScreen
+import com.mechforge.app.ui.screens.ReferencesScreen
 import com.mechforge.app.ui.screens.SettingsScreen
 import kotlinx.coroutines.launch
 
@@ -67,6 +69,7 @@ sealed interface Screen {
     data object Favorites : Screen
     data object Projects : Screen
     data object Settings : Screen
+    data object References : Screen
     data object About : Screen
     data class Calculator(
         val calculatorId: String,
@@ -188,6 +191,7 @@ private fun ScreenHost(screen: Screen, deps: AppDependencies, onNavigate: (Scree
         Screen.History -> HistoryScreen(deps, onNavigate)
         Screen.Favorites -> FavoritesScreen(deps, onNavigate)
         Screen.Projects -> ProjectsScreen(deps)
+        Screen.References -> ReferencesScreen(deps)
         Screen.Settings -> SettingsScreen(deps)
         Screen.About -> AboutScreen()
         is Screen.Calculator -> CalculatorScreen(

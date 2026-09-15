@@ -1,0 +1,21 @@
+-- Migration v3 -> v4: reference library tables (README v2 16/17/18).
+-- Data-preserving: no existing table is altered.
+CREATE TABLE reference_datasets (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  source TEXT NOT NULL,
+  license_type TEXT NOT NULL,
+  license_notes TEXT NOT NULL,
+  imported_at INTEGER NOT NULL,
+  row_count INTEGER NOT NULL
+);
+
+CREATE TABLE reference_rows (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  dataset_id INTEGER NOT NULL,
+  row_key TEXT NOT NULL,
+  value TEXT NOT NULL,
+  unit TEXT NOT NULL,
+  notes TEXT NOT NULL
+);

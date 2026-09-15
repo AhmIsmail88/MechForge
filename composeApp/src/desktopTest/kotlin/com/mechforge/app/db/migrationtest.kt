@@ -53,6 +53,18 @@ class MigrationTest {
         assertEquals(1L, db.referencesQueries.countAllReferences().executeAsOne())
         assertTrue(db.referencesQueries.selectAllReferences().executeAsList().isNotEmpty())
 
+        // v3 -> v4: the reference library tables exist on the migrated database and are usable.
+        assertEquals(0L, db.referenceDatasetsQueries.countDatasets().executeAsOne())
+        db.referenceDatasetsQueries.insertDataset(
+            "Post-migration dataset", "Test", "unit test", "n/a", "test fixture",
+            1726200000000L, 1L,
+        )
+        val datasetId = db.referenceDatasetsQueries.selectAllDatasets().executeAsList().first().id
+        db.referenceRowsQueries.insertRow(datasetId, "row key", "42", "mm", "from the migration test")
+        assertEquals(1L, db.referenceDatasetsQueries.countDatasets().executeAsOne())
+        assertEquals(1L, db.referenceRowsQueries.countRowsByDataset(datasetId).executeAsOne())
+        assertEquals("42", db.referenceRowsQueries.selectRowsByDataset(datasetId).executeAsList().first().value_)
+
         driver.close()
     }
 }

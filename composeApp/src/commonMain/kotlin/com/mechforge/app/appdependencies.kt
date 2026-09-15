@@ -3,6 +3,7 @@ package com.mechforge.app
 import com.mechforge.app.data.FavoritesRepository
 import com.mechforge.app.data.HistoryRepository
 import com.mechforge.app.data.ProjectsRepository
+import com.mechforge.app.data.ReferencesRepository
 import com.mechforge.app.data.SettingsRepository
 import com.mechforge.app.export.LogoStore
 import com.mechforge.app.export.ReportExporter
@@ -33,10 +34,12 @@ class AppDependencies(
     val history = HistoryRepository(database)
     val favorites = FavoritesRepository(database)
     val projects = ProjectsRepository(database)
+    val references = ReferencesRepository(database)
 
     init {
         seedCalculators()
         seedUnitsAndMetadata()
+        seedReferenceLibrary()
     }
 
     /** Mirror the code registry into the calculators table (idempotent upserts). */
@@ -75,6 +78,13 @@ class AppDependencies(
                 database.metadataQueries.upsertMetadata("app_version", APP_VERSION)
                 database.metadataQueries.upsertMetadata("calculator_count", CalculatorRegistry.all.size.toString())
             }
+        }
+    }
+
+    /** Built-in generic reference datasets (idempotent by name). */
+    private fun seedReferenceLibrary() {
+        scope.launch(Dispatchers.IO) {
+            references.seedBuiltIn(System.currentTimeMillis())
         }
     }
 

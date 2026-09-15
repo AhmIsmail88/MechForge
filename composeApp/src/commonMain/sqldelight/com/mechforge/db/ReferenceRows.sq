@@ -1,0 +1,20 @@
+CREATE TABLE reference_rows (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  dataset_id INTEGER NOT NULL,
+  row_key TEXT NOT NULL,
+  value TEXT NOT NULL,
+  unit TEXT NOT NULL,
+  notes TEXT NOT NULL
+);
+
+insertRow:
+INSERT INTO reference_rows(dataset_id, row_key, value, unit, notes) VALUES (?, ?, ?, ?, ?);
+
+selectRowsByDataset:
+SELECT * FROM reference_rows WHERE dataset_id = ? ORDER BY id;
+
+deleteRowsByDataset:
+DELETE FROM reference_rows WHERE dataset_id = ?;
+
+countRowsByDataset:
+SELECT COUNT(*) FROM reference_rows WHERE dataset_id = ?;

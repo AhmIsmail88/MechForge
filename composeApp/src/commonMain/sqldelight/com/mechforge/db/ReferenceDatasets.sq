@@ -1,0 +1,32 @@
+-- Reference library (README v2 16/17/18): user-importable engineering datasets.
+-- Each dataset carries its own source and licence metadata, and the rows are generic
+-- key/value/unit entries, so no copyrighted table is embedded in the application.
+CREATE TABLE reference_datasets (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  source TEXT NOT NULL,
+  license_type TEXT NOT NULL,
+  license_notes TEXT NOT NULL,
+  imported_at INTEGER NOT NULL,
+  row_count INTEGER NOT NULL
+);
+
+insertDataset:
+INSERT INTO reference_datasets(name, category, source, license_type, license_notes, imported_at, row_count)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+selectAllDatasets:
+SELECT * FROM reference_datasets ORDER BY imported_at DESC;
+
+getDataset:
+SELECT * FROM reference_datasets WHERE id = ?;
+
+deleteDataset:
+DELETE FROM reference_datasets WHERE id = ?;
+
+countDatasets:
+SELECT COUNT(*) FROM reference_datasets;
+
+countDatasetByName:
+SELECT COUNT(*) FROM reference_datasets WHERE name = ?;
