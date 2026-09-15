@@ -58,7 +58,7 @@ class RegistryTest {
 
     @Test
     fun calculatorCountMatchesMvpTarget() {
-        assertEquals(60, CalculatorRegistry.all.size)
+        assertEquals(62, CalculatorRegistry.all.size)
     }
 
     @Test
@@ -75,7 +75,7 @@ class RegistryTest {
         assertEquals(8, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.MECHANICAL_DESIGN).size)
         assertEquals(6, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.PIPING).size)
         assertEquals(5, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.WATER_WASTEWATER).size)
-        assertEquals(5, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.FIRE_PROTECTION).size)
+        assertEquals(7, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.FIRE_PROTECTION).size)
         assertEquals(5, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.EQUIPMENT).size)
         assertEquals(5, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.UNIT_CONVERSION).size)
     }
@@ -96,6 +96,8 @@ class RegistryTest {
         assertTrue(CalculatorRegistry.search("pump").any { it.def.id == "pump-power" })
         assertTrue(CalculatorRegistry.search("reynolds").any { it.def.id == "reynolds-number" })
         assertTrue(CalculatorRegistry.search("hydraulics").size >= 4)
+        assertTrue(CalculatorRegistry.search("fm-200").any { it.def.id == "fm200-agent-quantity" })
+        assertTrue(CalculatorRegistry.search("co2").any { it.def.id == "co2-agent-quantity" })
         assertTrue(CalculatorRegistry.search("zzz-no-match").isEmpty())
     }
 }

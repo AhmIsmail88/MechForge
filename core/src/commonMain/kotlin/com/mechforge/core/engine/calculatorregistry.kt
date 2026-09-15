@@ -5,8 +5,10 @@ import com.mechforge.core.calcs.AirflowConverterCalculator
 import com.mechforge.core.calcs.BeamCantileverPointCalculator
 import com.mechforge.core.calcs.BeamSsUdlCalculator
 import com.mechforge.core.calcs.BearingL10Calculator
+import com.mechforge.core.calcs.Co2AgentQuantityCalculator
 import com.mechforge.core.calcs.CompressionRatioCalculator
 import com.mechforge.core.calcs.FanLawsCalculator
+import com.mechforge.core.calcs.Fm200AgentQuantityCalculator
 import com.mechforge.core.calcs.FirePumpHeadCalculator
 import com.mechforge.core.calcs.FirePumpPowerCalculator
 import com.mechforge.core.calcs.HeatExchangerDutyCalculator
@@ -63,7 +65,7 @@ import com.mechforge.core.calcs.ValveKvCalculator
 
 /**
  * Registry of all calculators.
- * Pilot v0.1 (12 calculators, README v2 §7.1) + MVP expansion (README v2 §7.2) = 50.
+ * Pilot v0.1 (12) + MVP expansion (38) + fire protection and equipment (10) + clean agent flooding (2) = 62.
  */
 object CalculatorRegistry {
 
@@ -119,12 +121,14 @@ object CalculatorRegistry {
         ChlorineDoseCalculator,
         PeakFlowCalculator,
         HydraulicLoadingCalculator,
-        // Fire protection (5)
+        // Fire protection (7)
         SprinklerDischargeCalculator,
         HoseNozzleFlowCalculator,
         FirePumpHeadCalculator,
         FirePumpPowerCalculator,
         WaterHammerCalculator,
+        Fm200AgentQuantityCalculator,
+        Co2AgentQuantityCalculator,
         // Equipment (5)
         HeatExchangerDutyCalculator,
         HxEffectivenessNtuCalculator,

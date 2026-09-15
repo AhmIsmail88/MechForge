@@ -377,6 +377,33 @@ def expectation(calc, scenario, raw):
         return {"q2": x("q1") * r * 3600.0, "dp2": x("dp1") * r * r * dr,
                 "p2": x("p1") / 1000.0 * r ** 3 * dr, "rp": r, "rd": dr}
 
+    if calc == "fm200-agent-quantity":
+        # W = (V/S)*(C/(100-C)); S = R*T/(P*M) for HFC-227ea, M = 170.03 g/mol
+        M = 0.17003
+        s = x("s") if "s" in raw else R_UNIVERSAL * x("t") / (101325.0 * M)
+        # hazard index -> typical design concentration (NFPA 2001 HFC-227ea values)
+        c = x("c") * 100.0 if "c" in raw else {0: 7.0, 1: 8.7, 2: 6.25}[int(x("hazard"))]
+        ratio = c / (100.0 - c)
+        w = (x("v") / s) * ratio
+        f = w / x("v")
+        out = {"w": w, "wLb": w / 0.45359237, "f": f, "fLb": f / 16.0184634,
+               "vapourVolume": w * s, "sUsed": s, "cUsed": c}
+        if "mcyl" in raw:
+            out["cylinders"] = float(math.ceil(w / x("mcyl")))
+        return out
+
+    if calc == "co2-agent-quantity":
+        # f = rho_vapour(T) * C/(100-C); rho_vapour = P*M/(R*T), M = 44.01 g/mol
+        rho = 101325.0 * 0.04401 / (R_UNIVERSAL * x("t"))
+        # hazard index -> design concentration (NFPA 12: 34 % surface, 50 % deep-seated)
+        c = x("c") * 100.0 if "c" in raw else {0: 34.0, 1: 34.0, 2: 34.0, 3: 50.0}[int(x("hazard"))]
+        ratio = c / (100.0 - c)
+        f = rho * ratio
+        w = x("v") * f
+        charge = x("mcyl") if "mcyl" in raw else 45.0
+        return {"w": w, "wLb": w / 0.45359237, "f": f, "fLb": f / 16.0184634,
+                "rhoVapour": rho, "cylinders": float(math.ceil(w / charge)), "cUsed": c}
+
     if calc == "compression-ratio":
         ratio = x("p2") / x("p1")
         crmax = x("crmax") if "crmax" in raw else 4.0
@@ -445,6 +472,8 @@ SCALING = [
     ("fan-laws", "n2-1200", "n2-1000", "q2", 1.2, "fan laws: Q2 ~ N2"),
     ("heat-exchanger-duty", "m-2kgs", "m-1kgs", "q", 2.0, "HX duty ~ m_dot"),
     ("compression-ratio", "16bar", "4bar", "cr", 4.0, "CR ~ P2/P1"),
+    ("fm200-agent-quantity", "class-a-v200", "class-a-v100", "w", 2.0, "FM-200 mass ~ V at fixed class/concentration"),
+    ("co2-agent-quantity", "class-a-v250", "class-a-v100", "w", 2.5, "CO2 mass ~ V at fixed class/concentration"),
 ]
 
 

@@ -56,6 +56,7 @@ import com.mechforge.app.data.RefRow
 import com.mechforge.app.data.SettingsRepository
 import com.mechforge.app.data.Snapshots
 import com.mechforge.core.engine.CalcOutput
+import com.mechforge.core.engine.InputOption
 import com.mechforge.core.engine.InputValue
 import com.mechforge.core.engine.ValidationException
 import com.mechforge.core.units.Units
@@ -90,7 +91,7 @@ fun CalculatorScreen(
                     InputUi(spec.id, UiFormat.n(unit.fromBase(restored.baseValue)), restored.displayUnitId)
                 } else {
                     val unitId = spec.defaultUnitId ?: Units.defaultUnit(spec.family).id
-                    InputUi(spec.id, "", unitId)
+                    InputUi(spec.id, spec.defaultValue?.let { UiFormat.n(it) } ?: "", unitId)
                 }
             }
         )
@@ -152,33 +153,52 @@ fun CalculatorScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
+                val options = spec.options
                 OutlinedTextField(
-                    value = ui.text,
+                    value = if (options != null) {
+                        options.getOrNull(ui.text.toIntOrNull() ?: 0)?.label ?: ""
+                    } else {
+                        ui.text
+                    },
                     onValueChange = { text ->
                         inputsUi = inputsUi.map { if (it.specId == spec.id) it.copy(text = text) else it }
                         fieldErrors = fieldErrors - spec.id
                     },
                     label = { Text("${spec.symbol} — ${spec.label}${if (spec.required) "" else " (optional)"}") },
                     isError = fieldErrors.containsKey(spec.id),
+                    readOnly = options != null,
                     supportingText = fieldErrors[spec.id]?.let { msg -> { Text(msg, color = MaterialTheme.colorScheme.error) } },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                 )
-                UnitDropdown(
-                    family = spec.family,
-                    allowedUnitIds = spec.allowedUnitIds,
-                    selectedUnitId = ui.unitId,
-                    onSelected = { newUnitId ->
-                        // Convert the typed value to the new unit (README: value converts on unit change)
-                        val newText = ui.text.toDoubleOrNull()?.let { value ->
-                            val base = Units.byId(ui.unitId).toBase(value)
-                            UiFormat.n(Units.byId(newUnitId).fromBase(base))
-                        } ?: ui.text
-                        inputsUi = inputsUi.map {
-                            if (it.specId == spec.id) it.copy(unitId = newUnitId, text = newText) else it
-                        }
-                    },
-                )
+                if (options != null) {
+                    OptionSelect(
+                        options = options,
+                        selectedIndex = ui.text.toIntOrNull() ?: 0,
+                        onSelected = { index ->
+                            inputsUi = inputsUi.map {
+                                if (it.specId == spec.id) it.copy(text = index.toString()) else it
+                            }
+                            fieldErrors = fieldErrors - spec.id
+                        },
+                    )
+                } else {
+                    UnitDropdown(
+                        family = spec.family,
+                        allowedUnitIds = spec.allowedUnitIds,
+                        selectedUnitId = ui.unitId,
+                        onSelected = { newUnitId ->
+                            // Convert the typed value to the new unit (README: value converts on unit change)
+                            val newText = ui.text.toDoubleOrNull()?.let { value ->
+                                val base = Units.byId(ui.unitId).toBase(value)
+                                UiFormat.n(Units.byId(newUnitId).fromBase(base))
+                            } ?: ui.text
+                            inputsUi = inputsUi.map {
+                                if (it.specId == spec.id) it.copy(unitId = newUnitId, text = newText) else it
+                            }
+                        },
+                    )
+                }
                 // Reference-library picker (README v2 17): fill the input from a dataset.
                 spec.libraryKey?.let { key ->
                     val datasetName = LibraryCatalog.datasetNames[key]
@@ -235,7 +255,11 @@ fun CalculatorScreen(
             }) { Text("Calculate") }
             OutlinedButton(onClick = {
                 inputsUi = def.inputs.map { spec ->
-                    InputUi(spec.id, "", spec.defaultUnitId ?: Units.defaultUnit(spec.family).id)
+                    InputUi(
+                        spec.id,
+                        spec.defaultValue?.let { UiFormat.n(it) } ?: "",
+                        spec.defaultUnitId ?: Units.defaultUnit(spec.family).id,
+                    )
                 }
                 output = null
                 lastInputs = null
@@ -449,6 +473,32 @@ private fun LibraryValueChip(rows: () -> List<RefRow>, onPick: (RefRow) -> Unit)
                     onClick = {
                         expanded = false
                         onPick(row)
+                    },
+                )
+            }
+        }
+    }
+}
+
+/** Dropdown for a pick-one input (hazard class and similar). */
+@Composable
+private fun OptionSelect(
+    options: List<InputOption>,
+    selectedIndex: Int,
+    onSelected: (Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        OutlinedButton(onClick = { expanded = true }) {
+            Text(options.getOrNull(selectedIndex)?.id?.uppercase() ?: "Choose")
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEachIndexed { index, option ->
+                DropdownMenuItem(
+                    text = { Text(option.label) },
+                    onClick = {
+                        expanded = false
+                        onSelected(index)
                     },
                 )
             }

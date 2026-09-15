@@ -4,7 +4,7 @@
 
 MechForge is a local-first mechanical-engineering toolkit. This repository currently
 contains the **Desktop (JVM) app** and an **Android app** — both built from the same
-shared engine and the same Compose UI: 50 verified calculators, SQLite persistence via
+shared engine and the same Compose UI: 62 verified calculators, SQLite persistence via
 SQLDelight, history, favorites, projects, converter and search.
 
 ## Requirements
@@ -107,7 +107,7 @@ same equations — see **[tools/verification/README.md](tools/verification/READM
 ## Project layout
 
 ```
-core/        Kotlin Multiplatform engine: units, validation, 50 calculators (no UI/DB deps)
+core/        Kotlin Multiplatform engine: units, validation, 62 calculators (no UI/DB deps)
 composeApp/  Compose Multiplatform app:
              commonMain/  shared UI + data layer (used by both platforms)
              androidMain/ Android entry point, manifest, icons, Android SQLite driver

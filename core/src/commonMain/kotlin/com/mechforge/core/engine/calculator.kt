@@ -2,6 +2,7 @@ package com.mechforge.core.engine
 
 import com.mechforge.core.units.Units
 import com.mechforge.core.util.Fmt
+import kotlin.math.floor
 
 /**
  * Base class for every calculator. Subclasses implement only the math on
@@ -60,6 +61,15 @@ abstract class Calculator(val def: CalculatorDefinition) {
                     if (tooLow) {
                         val bound = if (spec.exclusiveMin) "greater than" else "at least"
                         errors += InputError(spec.id, "${spec.label} must be $bound ${boundText(min, unit.symbol, unit.id)}.")
+                    }
+                }
+                spec.options?.let { options ->
+                    val index = iv.baseValue
+                    if (index < 0.0 || index > (options.size - 1).toDouble() || index != floor(index)) {
+                        errors += InputError(
+                            spec.id,
+                            "${spec.label} must be one of the listed options (0..${options.size - 1}).",
+                        )
                     }
                 }
                 spec.maxValue?.let { max ->
