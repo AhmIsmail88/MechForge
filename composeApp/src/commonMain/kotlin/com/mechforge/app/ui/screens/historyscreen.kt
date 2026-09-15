@@ -38,12 +38,14 @@ import com.mechforge.db.Calculation_history
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import com.mechforge.app.ui.i18n.LocalStrings
 
 private val historyDateFormatter =
     DateTimeFormatter.ofPattern("dd MMM yyyy  HH:mm").withZone(ZoneId.systemDefault())
 
 @Composable
 fun HistoryScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
+    val strings = LocalStrings.current
     val history by deps.history.all().collectAsState(initial = emptyList<Calculation_history>())
     var renameTarget by remember { mutableStateOf<Long?>(null) }
     var renameText by remember { mutableStateOf("") }
@@ -53,13 +55,12 @@ fun HistoryScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
             .fillMaxSize()
             .padding(24.dp),
     ) {
-        Text("History", style = MaterialTheme.typography.headlineMedium)
+        Text(strings.historyTitle, style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(12.dp))
 
         if (history.isEmpty()) {
-            Text(
-                "No calculations yet. Open any calculator and press Calculate.",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            Text(strings.historyEmpty, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(strings.historyEmptyHint, color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -98,7 +99,7 @@ fun HistoryScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                             renameText = row.title
                         }) { Icon(Icons.Filled.Edit, "Rename") }
                         IconButton(onClick = { deps.history.duplicate(row.id, System.currentTimeMillis()) }) {
-                            Text("(copy)", style = MaterialTheme.typography.labelSmall)
+                            Text(strings.historyCopyName, style = MaterialTheme.typography.labelSmall)
                         }
                         IconButton(onClick = { deps.history.delete(row.id) }) {
                             Icon(Icons.Filled.Delete, "Delete")
@@ -112,7 +113,7 @@ fun HistoryScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
     renameTarget?.let { id ->
         AlertDialog(
             onDismissRequest = { renameTarget = null },
-            title = { Text("Rename") },
+            title = { Text(strings.rename) },
             text = {
                 OutlinedTextField(value = renameText, onValueChange = { renameText = it }, singleLine = true)
             },
@@ -120,9 +121,9 @@ fun HistoryScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                 TextButton(onClick = {
                     deps.history.rename(id, renameText.ifBlank { "Untitled" })
                     renameTarget = null
-                }) { Text("Save") }
+                }) { Text(strings.save) }
             },
-            dismissButton = { TextButton(onClick = { renameTarget = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { renameTarget = null }) { Text(strings.cancel) } },
         )
     }
 }

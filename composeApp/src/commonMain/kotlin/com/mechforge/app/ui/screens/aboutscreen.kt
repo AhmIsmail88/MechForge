@@ -12,49 +12,43 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.mechforge.app.ui.i18n.LocalStrings
 
 @Composable
 fun AboutScreen() {
+    val strings = LocalStrings.current
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
     ) {
-        Text("⚙ MechForge", style = MaterialTheme.typography.headlineLarge)
+        Text(strings.appName, style = MaterialTheme.typography.headlineLarge)
         Text(
-            "Mechanical Engineering Toolkit",
+            strings.appTagline,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
         )
         Spacer(Modifier.height(12.dp))
-        Text("Version 0.1.0 — Pilot (Desktop)", style = MaterialTheme.typography.bodyMedium)
+        Text(strings.aboutVersion, style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(20.dp))
 
-        Text("Calculate. Check. Engineer.", style = MaterialTheme.typography.titleLarge)
+        Text(strings.aboutMissionTitle, style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(12.dp))
 
-        Text(
-            "MechForge gives mechanical engineers one reliable, offline toolkit for the " +
-                "calculations they use every day: hydraulics, HVAC, thermodynamics, mechanical " +
-                "design and piping. Every calculator shows its formula, its steps and its " +
-                "engineering reference — a result you can check, not just a number.",
+        Text(strings.aboutMissionBody,
             style = MaterialTheme.typography.bodyMedium,
         )
         Spacer(Modifier.height(16.dp))
 
-        Text("Local-first", style = MaterialTheme.typography.titleMedium)
-        Text(
-            "All data stays in a local SQLite database on this machine. No account, " +
-                "no telemetry, no internet required.",
+        Text(strings.aboutLocalFirstTitle, style = MaterialTheme.typography.titleMedium)
+        Text(strings.aboutLocalFirstBody,
             style = MaterialTheme.typography.bodyMedium,
         )
         Spacer(Modifier.height(16.dp))
 
-        Text("References & licensing", style = MaterialTheme.typography.titleMedium)
-        Text(
-            "Formulas are implemented and cited; copyrighted standard tables are NOT embedded. " +
-                "Results are engineering calculations, not code compliance.",
+        Text(strings.aboutReferencesTitle, style = MaterialTheme.typography.titleMedium)
+        Text(strings.aboutReferencesBody,
             style = MaterialTheme.typography.bodyMedium,
         )
     }

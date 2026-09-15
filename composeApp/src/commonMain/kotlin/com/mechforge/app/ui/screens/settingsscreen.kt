@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.data.LanguageMode
+import com.mechforge.app.data.ReportLanguage
 import com.mechforge.app.data.SettingsRepository
 import com.mechforge.app.data.ThemeMode
 import com.mechforge.app.ui.i18n.LocalStrings
@@ -47,6 +48,7 @@ import com.mechforge.app.ui.util.LogoPickerButton
 fun SettingsScreen(deps: AppDependencies) {
     val theme by deps.settings.theme.collectAsState()
     val language by deps.settings.language.collectAsState()
+    val reportLanguage by deps.settings.reportLanguage.collectAsState()
     val strings = LocalStrings.current
 
     Column(
@@ -88,14 +90,42 @@ fun SettingsScreen(deps: AppDependencies) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        Spacer(Modifier.height(16.dp))
+
+        // Report language: the exported calculation sheet has its own language, so an
+        // English interface can still issue an Arabic report (and the other way round).
+        Text(strings.settingsReportLanguage, style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(4.dp))
+        OptionRow(
+            selected = reportLanguage == ReportLanguage.FOLLOW_APP,
+            label = strings.reportLanguageFollowApp,
+            onClick = { deps.settings.setReportLanguage(ReportLanguage.FOLLOW_APP) },
+        )
+        OptionRow(
+            selected = reportLanguage == ReportLanguage.ARABIC,
+            label = strings.reportLanguageArabic,
+            onClick = { deps.settings.setReportLanguage(ReportLanguage.ARABIC) },
+        )
+        OptionRow(
+            selected = reportLanguage == ReportLanguage.ENGLISH,
+            label = strings.reportLanguageEnglish,
+            onClick = { deps.settings.setReportLanguage(ReportLanguage.ENGLISH) },
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            strings.reportLanguageNote,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
         Spacer(Modifier.height(24.dp))
         HorizontalDivider()
         Spacer(Modifier.height(16.dp))
 
         // Project data printed on every exported calculation sheet (letterhead).
-        Text("Report details", style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
+        Text(strings.settingsReportDetails, style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
         Text(
-            "These values are printed on the letterhead of each exported PDF report.",
+            strings.settingsReportDetailsNote,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -104,34 +134,34 @@ fun SettingsScreen(deps: AppDependencies) {
         var clientName by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT)) }
         var engineerName by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)) }
         var locationName by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION)) }
-        ReportField("Project", projectName) {
+        ReportField(strings.settingsReportProject, projectName) {
             projectName = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_PROJECT, it)
         }
-        ReportField("Client", clientName) {
+        ReportField(strings.settingsReportClient, clientName) {
             clientName = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_CLIENT, it)
         }
-        ReportField("Engineer", engineerName) {
+        ReportField(strings.settingsReportEngineer, engineerName) {
             engineerName = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_ENGINEER, it)
         }
-        ReportField("Location", locationName) {
+        ReportField(strings.settingsReportLocation, locationName) {
             locationName = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_LOCATION, it)
         }
         var reportNo by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO)) }
         var reportRev by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV)) }
         var checkedBy by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_CHECKED)) }
-        ReportField("Report no.", reportNo) {
+        ReportField(strings.settingsReportNo, reportNo) {
             reportNo = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_NO, it)
         }
-        ReportField("Revision", reportRev) {
+        ReportField(strings.settingsReportRevision, reportRev) {
             reportRev = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_REV, it)
         }
-        ReportField("Checked by", checkedBy) {
+        ReportField(strings.settingsReportCheckedBy, checkedBy) {
             checkedBy = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_CHECKED, it)
         }
@@ -139,16 +169,16 @@ fun SettingsScreen(deps: AppDependencies) {
         Spacer(Modifier.height(16.dp))
 
         // Company / office logo used on the PDF letterhead.
-        Text("Company logo (report letterhead)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
+        Text(strings.settingsLogo, style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
         var logoBytes by remember { mutableStateOf(deps.logoStore.load()?.size ?: 0) }
         Text(
-            if (logoBytes > 0) "Logo selected - it will appear on exported reports." else "No logo selected yet.",
+            if (logoBytes > 0) strings.settingsLogoSelected else strings.settingsLogoNone,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            LogoPickerButton("Choose image...") { bytes ->
+            LogoPickerButton(strings.settingsChooseLogo) { bytes ->
                 if (deps.logoStore.save(bytes)) logoBytes = bytes.size
             }
             if (logoBytes > 0) {
@@ -156,7 +186,7 @@ fun SettingsScreen(deps: AppDependencies) {
                 TextButton(onClick = {
                     deps.logoStore.clear()
                     logoBytes = 0
-                }) { Text("Remove") }
+                }) { Text(strings.remove) }
             }
         }
 

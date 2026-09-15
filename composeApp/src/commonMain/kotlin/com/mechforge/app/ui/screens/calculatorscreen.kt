@@ -51,6 +51,7 @@ import com.mechforge.app.export.ReportLabels
 import com.mechforge.app.export.ReportSheet
 import com.mechforge.app.export.ReportWriter
 import com.mechforge.app.data.LanguageMode
+import com.mechforge.app.data.ReportLanguage
 import com.mechforge.app.data.LibraryCatalog
 import com.mechforge.app.data.RefRow
 import com.mechforge.app.data.SettingsRepository
@@ -62,6 +63,7 @@ import com.mechforge.core.engine.ValidationException
 import com.mechforge.core.units.Units
 import com.mechforge.core.util.Fmt
 import kotlinx.coroutines.launch
+import com.mechforge.app.ui.i18n.LocalStrings
 
 private data class InputUi(
     val specId: String,
@@ -77,6 +79,7 @@ fun CalculatorScreen(
     restoreTitle: String? = null,
     onBack: () -> Unit,
 ) {
+    val strings = LocalStrings.current
     val calc = remember(calculatorId) {
         com.mechforge.core.engine.CalculatorRegistry.byIdOrThrow(calculatorId)
     }
@@ -144,7 +147,7 @@ fun CalculatorScreen(
         Spacer(Modifier.height(16.dp))
 
         // ---- Inputs ----
-        Text("Inputs", style = MaterialTheme.typography.titleMedium)
+        Text(strings.calculatorInputs, style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         for (spec in def.inputs) {
             val ui = inputsUi.first { it.specId == spec.id }
@@ -164,7 +167,7 @@ fun CalculatorScreen(
                         inputsUi = inputsUi.map { if (it.specId == spec.id) it.copy(text = text) else it }
                         fieldErrors = fieldErrors - spec.id
                     },
-                    label = { Text("${spec.symbol} — ${spec.label}${if (spec.required) "" else " (optional)"}") },
+                    label = { Text("${spec.symbol} — ${spec.label}${if (spec.required) "" else " (" + strings.optionalSuffix + ")"}") },
                     isError = fieldErrors.containsKey(spec.id),
                     readOnly = options != null,
                     supportingText = fieldErrors[spec.id]?.let { msg -> { Text(msg, color = MaterialTheme.colorScheme.error) } },
@@ -252,7 +255,7 @@ fun CalculatorScreen(
                     output = null
                     globalError = "Calculation error: ${e.message}"
                 }
-            }) { Text("Calculate") }
+            }) { Text(strings.calculate) }
             OutlinedButton(onClick = {
                 inputsUi = def.inputs.map { spec ->
                     InputUi(
@@ -266,7 +269,7 @@ fun CalculatorScreen(
                 fieldErrors = emptyMap()
                 globalError = null
                 savedMessage = null
-            }) { Text("Reset") }
+            }) { Text(strings.reset) }
         }
 
         globalError?.let {
@@ -287,7 +290,7 @@ fun CalculatorScreen(
                 ),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Results", style = MaterialTheme.typography.titleMedium)
+                    Text(strings.calculatorResults, style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
                     for (r in out.results) {
                         val displayUnitId = resultUnits.value[r.id] ?: r.unitId
@@ -337,11 +340,11 @@ fun CalculatorScreen(
                     Spacer(Modifier.height(8.dp))
                     HorizontalDivider()
                     Spacer(Modifier.height(8.dp))
-                    Text("Formula", style = MaterialTheme.typography.labelMedium)
+                    Text(strings.calculatorFormula, style = MaterialTheme.typography.labelMedium)
                     Text(def.formulaDisplay, style = MaterialTheme.typography.bodyLarge)
                     if (out.steps.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
-                        Text("Step by step", style = MaterialTheme.typography.labelMedium)
+                        Text(strings.calculatorSteps, style = MaterialTheme.typography.labelMedium)
                         for (step in out.steps) {
                             Text(step, style = MaterialTheme.typography.bodySmall)
                         }
@@ -360,18 +363,18 @@ fun CalculatorScreen(
                     ) {
                         AssistChip(
                             onClick = { clipboard.setText(AnnotatedString(ReportWriter.build(calc, lastInputs ?: emptyMap(), out, restoreTitle))) },
-                            label = { Text("Copy") },
+                            label = { Text(strings.copy) },
                             leadingIcon = { Icon(Icons.Filled.ContentCopy, null) },
                         )
                         AssistChip(
                             onClick = { showSaveDialog = true },
-                            label = { Text("Save to history") },
+                            label = { Text(strings.calculatorSaveToHistory) },
                             leadingIcon = { Icon(Icons.Filled.Save, null) },
                         )
                         AssistChip(
                             onClick = {
                                 scope.launch {
-                                    val rtl = deps.settings.language.value == LanguageMode.ARABIC
+                                    val rtl = deps.settings.reportIsArabic()
                                     val labels = ReportLabels.of(rtl)
                                     val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
                                     val meta = listOfNotNull(
@@ -390,10 +393,10 @@ fun CalculatorScreen(
                                     )
                                     val blocks = ReportSheet.build(calc, lastInputs ?: emptyMap(), out, restoreTitle, labels, signature)
                                     val path = deps.exporter.savePdf(def.id, def.name, meta, blocks, deps.logoStore.load(), rtl)
-                                    savedMessage = if (path != null) "PDF saved: " + path else "Export cancelled."
+                                    savedMessage = if (path != null) strings.calculatorReportSaved + " " + path else strings.calculatorExportCancelled
                                 }
                             },
-                            label = { Text("Export PDF") },
+                            label = { Text(strings.exportPdf) },
                         )
                     }
                 }
@@ -401,10 +404,10 @@ fun CalculatorScreen(
         }
 
         Spacer(Modifier.height(20.dp))
-        Text("Reference: ${def.reference}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(strings.calculatorReference + ": " + def.reference, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (def.notes.isNotBlank()) {
             Spacer(Modifier.height(4.dp))
-            Text("Notes: ${def.notes}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(strings.calculatorNotes + ": " + def.notes, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 
@@ -433,33 +436,35 @@ private fun SaveToHistoryDialog(
     onDismiss: () -> Unit,
     onSave: (String) -> Unit,
 ) {
+    val strings = LocalStrings.current
     var title by remember { mutableStateOf(defaultTitle) }
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Save to history") },
+        title = { Text(strings.calculatorSaveDialogTitle) },
         text = {
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Title") },
+                label = { Text(strings.title) },
                 singleLine = true,
             )
         },
-        confirmButton = { TextButton(onClick = { onSave(title.ifBlank { "Untitled" }) }) { Text("Save") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        confirmButton = { TextButton(onClick = { onSave(title.ifBlank { "Untitled" }) }) { Text(strings.save) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(strings.cancel) } },
     )
 }
 
 /** Small chip that lists a reference dataset so its values can be dropped into an input. */
 @Composable
 private fun LibraryValueChip(rows: () -> List<RefRow>, onPick: (RefRow) -> Unit) {
+    val strings = LocalStrings.current
     var expanded by remember { mutableStateOf(false) }
     Box {
-        AssistChip(onClick = { expanded = true }, label = { Text("Library") })
+        AssistChip(onClick = { expanded = true }, label = { Text(strings.libraryPick) })
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             val items = rows()
             if (items.isEmpty()) {
-                DropdownMenuItem(text = { Text("(no data)") }, onClick = { expanded = false })
+                DropdownMenuItem(text = { Text(strings.libraryNoData) }, onClick = { expanded = false })
             }
             for (row in items) {
                 DropdownMenuItem(

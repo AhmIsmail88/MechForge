@@ -154,6 +154,56 @@ interface UiStrings {
     val converterAllUnits: String
 
     /** "3 fields need attention" / "٣ حقول بحاجة إلى تصحيح". */
+    val settingsReportDetailsNote: String
+    val settingsReportProject: String
+    val settingsReportClient: String
+    val settingsReportEngineer: String
+    val settingsReportLocation: String
+    val settingsReportNo: String
+    val settingsReportRevision: String
+    val settingsReportCheckedBy: String
+    val settingsLogoSelected: String
+    val settingsLogoNone: String
+    val settingsChooseLogo: String
+    val close: String
+    val remove: String
+    val exportPdf: String
+    val libraryPick: String
+    val libraryNoData: String
+    val historyCopyName: String
+    val referencesTitle: String
+    val referencesIntro: String
+    val referencesImportCsv: String
+    val referencesImportJson: String
+    val referencesHint: String
+    val referencesEmpty: String
+    val referencesEmptyHint: String
+    val referencesShowRows: String
+    val referencesHideRows: String
+    val referencesImportTitle: String
+    val referencesName: String
+    val referencesCategory: String
+    val referencesSource: String
+    val referencesLicence: String
+    val referencesChooseCsv: String
+    val referencesChooseJson: String
+    val referencesSourceLine: String
+    val referencesLicenceLine: String
+    val settingsReportDetails: String
+    val settingsReportLanguage: String
+    val settingsLogo: String
+    val reportLanguageFollowApp: String
+    val reportLanguageArabic: String
+    val reportLanguageEnglish: String
+    val reportLanguageNote: String
+    val referencesImportProblem: String
+    val referencesDeleted: String
+    val referencesColumnsHint: String
+    val referencesDefaultName: String
+    fun referencesImported(name: String, rows: Int): String
+
+    fun referencesRows(count: Int): String
+
     fun blockedFields(count: Int): String
 
     /** "2 saved calculations". */
@@ -293,6 +343,60 @@ object ArStrings : UiStrings {
     override val converterEnterNumber = "أدخل رقماً."
     override val converterIncompatibleUnits = "وحدات غير متوافقة."
     override val converterAllUnits = "كل وحدات"
+
+    override val settingsReportDetailsNote = "تُطبع هذه القيم في ترويسة كل تقرير PDF مُصدَّر."
+    override val settingsReportProject = "المشروع"
+    override val settingsReportClient = "العميل"
+    override val settingsReportEngineer = "المهندس"
+    override val settingsReportLocation = "الموقع"
+    override val settingsReportNo = "رقم التقرير"
+    override val settingsReportRevision = "المراجعة"
+    override val settingsReportCheckedBy = "المراجَع بواسطة"
+    override val settingsLogoSelected = "تم اختيار شعار — سيظهر على التقارير المُصدَّرة."
+    override val settingsLogoNone = "لم يتم اختيار شعار بعد."
+    override val settingsChooseLogo = "اختر صورة..."
+    override val close = "إغلاق"
+    override val remove = "إزالة"
+    override val exportPdf = "تصدير PDF"
+    override val libraryPick = "المكتبة"
+    override val libraryNoData = "(لا توجد بيانات)"
+    override val historyCopyName = "(نسخة)"
+    override val referencesTitle = "مكتبة المراجع"
+    override val referencesIntro = "بيانات هندسية بمصدرها وترخيصها. لا يُدمج MechForge أي جداول محمية بحقوق نشر: المجموعات المدمجة قيم هندسية عامة، وأي بيانات مرخّصة تستوردها أنت."
+    override val referencesImportCsv = "استيراد CSV..."
+    override val referencesImportJson = "استيراد JSON..."
+    override val referencesHint = "CSV: key,value,unit,notes   |   JSON: [{ key, value, unit, notes }]"
+    override val referencesEmpty = "لا توجد مجموعات بعد."
+    override val referencesEmptyHint = "استورد ملف CSV أو JSON، أو استخدم إحدى المجموعات المدمجة."
+    override val referencesShowRows = "عرض الصفوف"
+    override val referencesHideRows = "إخفاء الصفوف"
+    override val referencesImportTitle = "استيراد مجموعة بيانات"
+    override val referencesName = "اسم المجموعة"
+    override val referencesCategory = "التصنيف"
+    override val referencesSource = "المصدر (كود، مرجع، مُصنِّع)"
+    override val referencesLicence = "نوع الترخيص"
+    override val referencesChooseCsv = "اختر ملف CSV..."
+    override val referencesChooseJson = "اختر ملف JSON..."
+    override val referencesSourceLine = "المصدر:"
+    override val referencesLicenceLine = "الترخيص:"
+    override val settingsReportDetails = "بيانات التقرير"
+    override val settingsReportLanguage = "لغة التقرير"
+    override val settingsLogo = "شعار الشركة (ترويسة التقرير)"
+    override val reportLanguageFollowApp = "حسب لغة التطبيق"
+    override val reportLanguageArabic = "العربية"
+    override val reportLanguageEnglish = "English"
+    override val reportLanguageNote = "يمكن تصدير التقرير بالعربية أو الإنجليزية بمعزل عن لغة التطبيق. الأرقام والوحدات والمعادلات تبقى دائمًا بالصيغة الدولية."
+    override val referencesImportProblem = "مشكلة في الاستيراد:"
+    override val referencesDeleted = "تم حذف المجموعة."
+    override val referencesColumnsHint = "الأعمدة: key,value,unit,notes (سطر العنوان اختياري)."
+    override val referencesDefaultName = "مجموعة مستوردة"
+    override fun referencesImported(name: String, rows: Int): String = "تم استيراد \"$name\" بعدد $rows صف."
+
+    override fun referencesRows(count: Int): String = when (count) {
+        1 -> "صف واحد"
+        2 -> "صفّان"
+        else -> "$count صفوف"
+    }
 
     override fun blockedFields(count: Int): String = when (count) {
         1 -> "حقل واحد بحاجة إلى تصحيح."
@@ -441,6 +545,59 @@ object EnStrings : UiStrings {
     override val converterEnterNumber = "Enter a number."
     override val converterIncompatibleUnits = "Incompatible units."
     override val converterAllUnits = "All units"
+
+    override val settingsReportDetailsNote = "These values are printed on the letterhead of each exported PDF report."
+    override val settingsReportProject = "Project"
+    override val settingsReportClient = "Client"
+    override val settingsReportEngineer = "Engineer"
+    override val settingsReportLocation = "Location"
+    override val settingsReportNo = "Report no."
+    override val settingsReportRevision = "Revision"
+    override val settingsReportCheckedBy = "Checked by"
+    override val settingsLogoSelected = "Logo selected - it will appear on exported reports."
+    override val settingsLogoNone = "No logo selected yet."
+    override val settingsChooseLogo = "Choose image..."
+    override val close = "Close"
+    override val remove = "Remove"
+    override val exportPdf = "Export PDF"
+    override val libraryPick = "Library"
+    override val libraryNoData = "(no data)"
+    override val historyCopyName = "(copy)"
+    override val referencesTitle = "Reference library"
+    override val referencesIntro = "Engineering data with its source and licence. MechForge embeds no copyrighted table: the built-in sets are generic engineering values, and any licensed data is imported by you."
+    override val referencesImportCsv = "Import CSV..."
+    override val referencesImportJson = "Import JSON..."
+    override val referencesHint = "CSV: key,value,unit,notes   |   JSON: [{ key, value, unit, notes }]"
+    override val referencesEmpty = "No datasets yet."
+    override val referencesEmptyHint = "Import a CSV or JSON file, or use one of the built-in sets."
+    override val referencesShowRows = "Show rows"
+    override val referencesHideRows = "Hide rows"
+    override val referencesImportTitle = "Import a dataset"
+    override val referencesName = "Dataset name"
+    override val referencesCategory = "Category"
+    override val referencesSource = "Source (standard, handbook, vendor)"
+    override val referencesLicence = "Licence type"
+    override val referencesChooseCsv = "Choose CSV file..."
+    override val referencesChooseJson = "Choose JSON file..."
+    override val referencesSourceLine = "Source:"
+    override val referencesLicenceLine = "Licence:"
+    override val settingsReportDetails = "Report details"
+    override val settingsReportLanguage = "Report language"
+    override val settingsLogo = "Company logo (report letterhead)"
+    override val reportLanguageFollowApp = "Follow the app language"
+    override val reportLanguageArabic = "Arabic"
+    override val reportLanguageEnglish = "English"
+    override val reportLanguageNote = "The exported report can be Arabic or English, independently of the app language. Numbers, units and formulas always stay in the international form."
+    override val referencesImportProblem = "Import problem:"
+    override val referencesDeleted = "Dataset deleted."
+    override val referencesColumnsHint = "Columns: key,value,unit,notes (header optional)."
+    override val referencesDefaultName = "Imported dataset"
+    override fun referencesImported(name: String, rows: Int): String = "Imported \"$name\" with $rows rows."
+
+    override fun referencesRows(count: Int): String = when (count) {
+        1 -> "1 row"
+        else -> "$count rows"
+    }
 
     override fun blockedFields(count: Int): String = when (count) {
         1 -> "1 field needs attention."

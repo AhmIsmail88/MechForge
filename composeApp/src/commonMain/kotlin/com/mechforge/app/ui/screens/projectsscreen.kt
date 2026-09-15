@@ -32,9 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
+import com.mechforge.app.ui.i18n.LocalStrings
 
 @Composable
 fun ProjectsScreen(deps: AppDependencies) {
+    val strings = LocalStrings.current
     val projects by deps.projects.all().collectAsState(initial = emptyList())
     var showCreate by remember { mutableStateOf(false) }
     var createName by remember { mutableStateOf("") }
@@ -47,17 +49,16 @@ fun ProjectsScreen(deps: AppDependencies) {
             .padding(24.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Projects", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+            Text(strings.projectsTitle, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
             FloatingActionButton(onClick = { showCreate = true }) {
-                Icon(Icons.Filled.Add, "New project")
+                Icon(Icons.Filled.Add, strings.projectsNew)
             }
         }
         Spacer(Modifier.height(12.dp))
 
         if (projects.isEmpty()) {
-            Text(
-                "No projects yet. Create one to group saved calculations.",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            Text(strings.projectsEmpty, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(strings.projectsEmptyHint, color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -71,7 +72,7 @@ fun ProjectsScreen(deps: AppDependencies) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(project.name, style = MaterialTheme.typography.titleSmall)
                             Text(
-                                "${project.saved_count} saved calculation(s)",
+                                strings.savedCalculations(project.saved_count.toInt()),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -92,7 +93,7 @@ fun ProjectsScreen(deps: AppDependencies) {
     if (showCreate) {
         AlertDialog(
             onDismissRequest = { showCreate = false },
-            title = { Text("New project") },
+            title = { Text(strings.projectsNew) },
             text = {
                 OutlinedTextField(value = createName, onValueChange = { createName = it }, singleLine = true)
             },
@@ -103,16 +104,16 @@ fun ProjectsScreen(deps: AppDependencies) {
                     }
                     createName = ""
                     showCreate = false
-                }) { Text("Create") }
+                }) { Text(strings.create) }
             },
-            dismissButton = { TextButton(onClick = { showCreate = false }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { showCreate = false }) { Text(strings.cancel) } },
         )
     }
 
     renameTarget?.let { id ->
         AlertDialog(
             onDismissRequest = { renameTarget = null },
-            title = { Text("Rename project") },
+            title = { Text(strings.projectsRenameTitle) },
             text = {
                 OutlinedTextField(value = renameText, onValueChange = { renameText = it }, singleLine = true)
             },
@@ -120,9 +121,9 @@ fun ProjectsScreen(deps: AppDependencies) {
                 TextButton(onClick = {
                     deps.projects.rename(id, renameText.ifBlank { "Untitled" })
                     renameTarget = null
-                }) { Text("Save") }
+                }) { Text(strings.save) }
             },
-            dismissButton = { TextButton(onClick = { renameTarget = null }) { Text("Cancel") } },
+            dismissButton = { TextButton(onClick = { renameTarget = null }) { Text(strings.cancel) } },
         )
     }
 }

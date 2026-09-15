@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.Screen
 import com.mechforge.core.engine.CalculatorRegistry
+import com.mechforge.app.ui.i18n.LocalStrings
 
 @Composable
 fun FavoritesScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
+    val strings = LocalStrings.current
     val favorites by deps.favorites.all().collectAsState(initial = emptyList())
 
     Column(
@@ -31,14 +33,13 @@ fun FavoritesScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
             .fillMaxSize()
             .padding(24.dp),
     ) {
-        Text("Favorites", style = MaterialTheme.typography.headlineMedium)
+        Text(strings.favoritesTitle, style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(12.dp))
 
         val favoriteCalcs = favorites.mapNotNull { CalculatorRegistry.byId(it.calculator_id) }
         if (favoriteCalcs.isEmpty()) {
-            Text(
-                "No favorites yet — tap the star on any calculator.",
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            Text(strings.favoritesEmpty, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(strings.favoritesEmptyHint, color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -50,7 +51,7 @@ fun FavoritesScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                         .clickable { onNavigate(Screen.Calculator(calc.def.id)) },
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
-                        Text("⭐ ${calc.def.name}", style = MaterialTheme.typography.titleSmall)
+                        Text(calc.def.name, style = MaterialTheme.typography.titleSmall)
                         Text(
                             calc.def.category.displayName,
                             style = MaterialTheme.typography.labelSmall,

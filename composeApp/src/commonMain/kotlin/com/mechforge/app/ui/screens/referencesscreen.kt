@@ -1,6 +1,5 @@
 package com.mechforge.app.ui.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,17 +29,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.data.ImportResult
+import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.ui.util.DatasetFilePickerButton
 
 /**
  * Engineering reference library (README v2 16/17/18).
  *
  * Shows the datasets with their source and licence metadata, lets the user import their
- * own CSV data, and previews the rows. The application itself ships only self-authored
- * generic values (see BuiltInDatasets); licensed tables are imported by the user.
+ * own CSV or JSON data, and previews the rows. The application itself ships only
+ * self-authored generic values (see BuiltInDatasets); licensed tables are imported by
+ * the user. Every string comes from UiStrings, so the screen follows the app language.
  */
 @Composable
 fun ReferencesScreen(deps: AppDependencies) {
+    val strings = LocalStrings.current
     val datasets by deps.references.datasets().collectAsState(initial = emptyList())
     var openId by remember { mutableStateOf<Long?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
@@ -52,20 +54,19 @@ fun ReferencesScreen(deps: AppDependencies) {
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
     ) {
-        Text("Reference library", style = MaterialTheme.typography.headlineMedium)
+        Text(strings.referencesTitle, style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(6.dp))
         Text(
-            "Engineering data with its source and licence. MechForge embeds no copyrighted table: " +
-                "the built-in sets are generic engineering values, and any licensed data is imported by you.",
+            strings.referencesIntro,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = { showImport = true }) { Text("Import CSV...") }
+            TextButton(onClick = { showImport = true }) { Text(strings.referencesImportCsv) }
             Spacer(Modifier.width(8.dp))
             Text(
-                "CSV: key,value,unit,notes   |   JSON: [{ key, value, unit, notes }]",
+                strings.referencesHint,
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -77,7 +78,8 @@ fun ReferencesScreen(deps: AppDependencies) {
         Spacer(Modifier.height(12.dp))
 
         if (datasets.isEmpty()) {
-            Text("No datasets yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(strings.referencesEmpty, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(strings.referencesEmptyHint, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
         for (dataset in datasets) {
@@ -90,29 +92,31 @@ fun ReferencesScreen(deps: AppDependencies) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(dataset.name, style = MaterialTheme.typography.titleSmall)
                             Text(
-                                "${dataset.category}  |  ${dataset.rowCount} rows",
+                                dataset.category + "  |  " + strings.referencesRows(dataset.rowCount.toInt()),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                             )
                             Text(
-                                "Source: ${dataset.source}",
+                                strings.referencesSourceLine + " " + dataset.source,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                "Licence: ${dataset.licenseType} - ${dataset.licenseNotes}",
+                                strings.referencesLicenceLine + " " + dataset.licenseType + " - " + dataset.licenseNotes,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         TextButton(
                             onClick = { openId = if (openId == dataset.id) null else dataset.id },
-                        ) { Text(if (openId == dataset.id) "Hide rows" else "Show rows") }
+                        ) {
+                            Text(if (openId == dataset.id) strings.referencesHideRows else strings.referencesShowRows)
+                        }
                         TextButton(onClick = {
                             deps.references.deleteDataset(dataset.id)
                             if (openId == dataset.id) openId = null
-                            message = "Dataset deleted."
-                        }) { Text("Delete") }
+                            message = strings.referencesDeleted
+                        }) { Text(strings.delete) }
                     }
 
                     if (openId == dataset.id) {
@@ -151,14 +155,16 @@ fun ReferencesScreen(deps: AppDependencies) {
             onDismiss = { showImport = false },
             onImported = { result ->
                 message = if (result.ok) {
-                    "Imported '${result.name}' with ${result.rowsImported} rows."
+                    strings.referencesImported(result.name, result.rowsImported)
                 } else {
-                    "Import problem: ${result.errors.joinToString("; ")}"
+                    strings.referencesImportProblem + " " + result.errors.joinToString("; ")
                 }
                 showImport = false
             },
             csvAction = { name, category, source, licence, csv ->
-                deps.references.importCsv(name, category, source, licence, "Imported by the user (CSV)", csv, System.currentTimeMillis())
+                deps.references.importCsv(
+                    name, category, source, licence, "Imported by the user (CSV)", csv, System.currentTimeMillis(),
+                )
             },
             jsonAction = { name, category, source, licence, json ->
                 deps.references.importJson(name, category, source, licence, json, System.currentTimeMillis())
@@ -174,6 +180,7 @@ private fun ImportDialog(
     csvAction: (String, String, String, String, String) -> ImportResult,
     jsonAction: (String, String, String, String, String) -> ImportResult,
 ) {
+    val strings = LocalStrings.current
     var name by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Project data") }
     var source by remember { mutableStateOf("") }
@@ -181,30 +188,42 @@ private fun ImportDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Import a CSV dataset") },
+        title = { Text(strings.referencesImportTitle) },
         text = {
             Column {
                 Text(
-                    "Columns: key,value,unit,notes (header optional).",
+                    strings.referencesColumnsHint,
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Dataset name") }, singleLine = true)
-                OutlinedTextField(value = category, onValueChange = { category = it }, label = { Text("Category") }, singleLine = true)
-                OutlinedTextField(value = source, onValueChange = { source = it }, label = { Text("Source (standard, handbook, vendor)") }, singleLine = true)
-                OutlinedTextField(value = licence, onValueChange = { licence = it }, label = { Text("Licence type") }, singleLine = true)
+                OutlinedTextField(
+                    value = name, onValueChange = { name = it },
+                    label = { Text(strings.referencesName) }, singleLine = true,
+                )
+                OutlinedTextField(
+                    value = category, onValueChange = { category = it },
+                    label = { Text(strings.referencesCategory) }, singleLine = true,
+                )
+                OutlinedTextField(
+                    value = source, onValueChange = { source = it },
+                    label = { Text(strings.referencesSource) }, singleLine = true,
+                )
+                OutlinedTextField(
+                    value = licence, onValueChange = { licence = it },
+                    label = { Text(strings.referencesLicence) }, singleLine = true,
+                )
                 Spacer(Modifier.height(8.dp))
-                DatasetFilePickerButton("Choose CSV file...", listOf("csv", "txt")) { text ->
-                    if (name.isBlank()) name = "Imported dataset"
+                DatasetFilePickerButton(strings.referencesChooseCsv, listOf("csv", "txt")) { text ->
+                    if (name.isBlank()) name = strings.referencesDefaultName
                     onImported(csvAction(name, category, source.ifBlank { "User import" }, licence, text))
                 }
                 Spacer(Modifier.height(6.dp))
-                DatasetFilePickerButton("Choose JSON file...", listOf("json")) { text ->
-                    if (name.isBlank()) name = "Imported dataset"
+                DatasetFilePickerButton(strings.referencesChooseJson, listOf("json")) { text ->
+                    if (name.isBlank()) name = strings.referencesDefaultName
                     onImported(jsonAction(name, category, source.ifBlank { "User import" }, licence, text))
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(strings.close) } },
     )
 }

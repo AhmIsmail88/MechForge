@@ -32,11 +32,13 @@ import com.mechforge.core.units.UnitFamily
 import com.mechforge.core.units.Units
 import com.mechforge.app.ui.util.UiFormat
 import com.mechforge.core.util.Fmt
+import com.mechforge.app.ui.i18n.LocalStrings
 
 /** Global unit converter (README v2 §16): family tabs, from/to pickers, live conversion. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ConverterScreen() {
+    val strings = LocalStrings.current
     var family by remember { mutableStateOf(UnitFamily.PRESSURE) }
     var valueText by remember { mutableStateOf("1") }
     var fromUnitId by remember { mutableStateOf(Units.defaultUnit(UnitFamily.PRESSURE).id) }
@@ -48,7 +50,7 @@ fun ConverterScreen() {
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
     ) {
-        Text("Unit Converter", style = MaterialTheme.typography.headlineMedium)
+        Text(strings.converterTitle, style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(12.dp))
 
         // Family selector — wraps on narrow screens instead of clipping
@@ -79,7 +81,7 @@ fun ConverterScreen() {
         OutlinedTextField(
             value = valueText,
             onValueChange = { valueText = it },
-            label = { Text("Value") },
+            label = { Text(strings.converterValueLabel) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -94,7 +96,7 @@ fun ConverterScreen() {
 
         val parsed = valueText.trim().toDoubleOrNull()
         if (parsed == null) {
-            Text("Enter a number.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(strings.converterEnterNumber, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             val result = runCatching { Units.convert(parsed, fromUnitId, toUnitId) }
             Card {
@@ -106,9 +108,7 @@ fun ConverterScreen() {
                             style = MaterialTheme.typography.headlineSmall,
                         )
                     } else {
-                        Text(
-                            "Incompatible units.",
-                            color = MaterialTheme.colorScheme.error,
+                        Text(strings.converterIncompatibleUnits, color = MaterialTheme.colorScheme.error,
                         )
                     }
                 }
@@ -116,7 +116,7 @@ fun ConverterScreen() {
             Spacer(Modifier.height(16.dp))
 
             // Full family table
-            Text("All ${family.displayName} units", style = MaterialTheme.typography.titleMedium)
+            Text(strings.converterAllUnits, style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
             Card {
                 Column(modifier = Modifier.padding(16.dp)) {

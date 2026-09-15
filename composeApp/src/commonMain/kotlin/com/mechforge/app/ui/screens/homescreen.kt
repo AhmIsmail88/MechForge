@@ -96,7 +96,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
             // Favorites
             val favoriteCalcs = CalculatorRegistry.all.filter { it.def.id in favoriteIds }
             if (favoriteCalcs.isNotEmpty()) {
-                Text("⭐ Favorites", style = MaterialTheme.typography.titleMedium)
+                Text(strings.homeSectionFavorites, style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(6.dp))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),

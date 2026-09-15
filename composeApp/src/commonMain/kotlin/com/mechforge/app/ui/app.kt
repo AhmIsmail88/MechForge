@@ -150,7 +150,7 @@ fun MechForgeApp(deps: AppDependencies) {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            title = { Text("⚙ MechForge") },
+title = { Text(strings.appName) },
                             navigationIcon = {
                                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                     Icon(Icons.Filled.Menu, contentDescription = strings.openNavigation)
