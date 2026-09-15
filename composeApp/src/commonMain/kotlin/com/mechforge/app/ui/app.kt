@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.ui.i18n.UiStrings
+import com.mechforge.app.ui.theme.Glass
 import com.mechforge.app.ui.theme.GlassBackdrop
 import com.mechforge.app.ui.theme.glassChrome
 import com.mechforge.app.ui.theme.glassPanel
@@ -122,6 +123,9 @@ fun MechForgeApp(deps: AppDependencies) {
                 drawerState = drawerState,
                 drawerContent = {
                     ModalDrawerSheet(
+                        // Frosted pane with a dense fill: the menu stays readable and the
+                        // backdrop only glows through it (a nearly transparent menu looked broken).
+                        drawerContainerColor = Glass.fillStrong(),
                         // Keep the drawer off the far edge on phones: the Material default (360dp)
                         // covers almost the whole width on a ~370dp-wide screen.
                         modifier = Modifier.widthIn(max = 300.dp),

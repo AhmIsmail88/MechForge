@@ -43,7 +43,7 @@ internal object Glass {
     val Cyan = Color(0xFF00A5C4)
 
     // Backdrop base, dark and light.
-    private val DarkBase = listOf(Color(0xFF060A14), Color(0xFF0C1729), Color(0xFF05070E))
+    private val DarkBase = listOf(Color(0xFF05070D), Color(0xFF0A1220), Color(0xFF04060B))
     private val LightBase = listOf(Color(0xFFE8EEFA), Color(0xFFF7F9FD), Color(0xFFEDF1F9))
 
     /** True when the active colour scheme is the dark one. */
@@ -52,25 +52,28 @@ internal object Glass {
 
     /** Panel fill: translucent white, stronger in light mode where white reads as glass. */
     @Composable
-    fun fill(): Color = if (isDark()) Color.White.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.52f)
+    fun fill(): Color =
+        if (isDark()) Color(0xFF0E1626).copy(alpha = 0.90f) else Color.White.copy(alpha = 0.82f)
 
     /** Fill for surfaces that carry content (result blocks, dialogs, menu sheets). */
     @Composable
-    fun fillStrong(): Color = if (isDark()) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.70f)
+    fun fillStrong(): Color =
+        if (isDark()) Color(0xFF131D31).copy(alpha = 0.95f) else Color.White.copy(alpha = 0.92f)
 
     /** Fill for chrome (bars, drawer, sidebar) - a touch denser so text stays legible. */
     @Composable
-    fun fillChrome(): Color = if (isDark()) Color.White.copy(alpha = 0.05f) else Color.White.copy(alpha = 0.62f)
+    fun fillChrome(): Color =
+        if (isDark()) Color(0xFF0B1220).copy(alpha = 0.94f) else Color.White.copy(alpha = 0.88f)
 
     /** Hairline highlight that catches the light along the top-left edge of a pane. */
     @Composable
     fun border(): Brush = if (isDark()) {
         Brush.linearGradient(
-            listOf(Color.White.copy(alpha = 0.26f), Color.White.copy(alpha = 0.04f)),
+            listOf(Color.White.copy(alpha = 0.34f), Color.White.copy(alpha = 0.08f)),
         )
     } else {
         Brush.linearGradient(
-            listOf(Color.White.copy(alpha = 0.95f), Color.White.copy(alpha = 0.40f)),
+            listOf(Color.White.copy(alpha = 1.00f), Color.White.copy(alpha = 0.55f)),
         )
     }
 
@@ -96,7 +99,7 @@ fun GlassBackdrop(modifier: Modifier = Modifier) {
                 .background(
                     Brush.radialGradient(
                         listOf(
-                            Glass.Blue.copy(alpha = if (dark) 0.55f else 0.28f),
+                            Glass.Blue.copy(alpha = if (dark) 0.34f else 0.16f),
                             Color.Transparent,
                         ),
                     ),
@@ -109,7 +112,7 @@ fun GlassBackdrop(modifier: Modifier = Modifier) {
                 .background(
                     Brush.radialGradient(
                         listOf(
-                            Glass.Cyan.copy(alpha = if (dark) 0.30f else 0.18f),
+                            Glass.Cyan.copy(alpha = if (dark) 0.20f else 0.10f),
                             Color.Transparent,
                         ),
                     ),
