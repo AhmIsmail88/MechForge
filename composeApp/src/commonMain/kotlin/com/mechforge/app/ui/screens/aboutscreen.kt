@@ -51,5 +51,11 @@ fun AboutScreen() {
         Text(strings.aboutReferencesBody,
             style = MaterialTheme.typography.bodyMedium,
         )
+        Spacer(Modifier.height(24.dp))
+        Text(
+            "By Ahmed Ismail",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }

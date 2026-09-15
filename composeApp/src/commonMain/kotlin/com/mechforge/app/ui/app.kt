@@ -139,6 +139,12 @@ fun MechForgeApp(deps: AppDependencies) {
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 24.dp),
                             )
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    "By Ahmed Ismail",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
                             Spacer(Modifier.height(12.dp))
                             for (item in navItems(strings)) {
                                 NavigationDrawerItem(
@@ -273,5 +279,11 @@ private fun Sidebar(current: Screen, onNavigate: (Screen) -> Unit) {
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "By Ahmed Ismail",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
     }
 }
