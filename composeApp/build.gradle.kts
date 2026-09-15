@@ -143,9 +143,15 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Exe)
             packageName = "MechForge"
-            packageVersion = "0.1.0"
+            packageVersion = "0.2.0"
             description = "MechForge — Mechanical Engineering Toolkit"
             vendor = "MechForge"
+
+            // The app persists through SQLite over JDBC: the trimmed runtime jpackage
+            // builds must carry java.sql (and jdk.unsupported, which the driver touches),
+            // otherwise the packaged app dies at startup with
+            // NoClassDefFoundError: java/sql/DriverManager.
+            modules("java.sql", "jdk.unsupported")
         }
     }
 }

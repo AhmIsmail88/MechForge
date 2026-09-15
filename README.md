@@ -152,6 +152,22 @@ the Android target the Android SDK (via `ANDROID_HOME`, or `sdk.dir` in the giti
 
 On Windows, `run-mechforge.bat` starts the desktop app with the JBR already set.
 
+### Desktop package (Windows .exe)
+
+```bash
+# jpackage (a full JDK 17+, or a JetBrains Runtime 21+) must be the active JAVA_HOME
+./gradlew :composeApp:createDistributable
+```
+
+The result is a self-contained app image at
+`composeApp/build/compose/binaries/main/app/MechForge/`, with `MechForge.exe` next to a
+bundled runtime - no Java installation is needed on the target machine. Two notes:
+
+- The app persists through SQLite over JDBC, so the trimmed runtime must carry
+  `java.sql`; that is declared in `nativeDistributions { modules(...) }`. Without it the
+  packaged app dies at startup with `NoClassDefFoundError: java/sql/DriverManager`.
+- `Msi` output additionally needs the WiX toolset; the `Exe` app image does not.
+
 ## Data and privacy
 
 - Desktop database: `~/.mechforge/mechforge.db` (history, favourites, projects, settings,
