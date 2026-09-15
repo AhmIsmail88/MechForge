@@ -279,7 +279,7 @@ private fun Sidebar(current: Screen, onNavigate: (Screen) -> Unit) {
         }
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            "v0.1 pilot — Calculate. Check. Engineer.",
+            "v0.2.0 — Calculate. Check. Engineer.",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

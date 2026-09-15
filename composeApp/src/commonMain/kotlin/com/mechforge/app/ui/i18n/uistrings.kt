@@ -323,7 +323,7 @@ object ArStrings : UiStrings {
             "لا حساب ولا اتصال بالإنترنت ولا تخزين سحابي مطلوب لأي وظيفة أساسية."
 
     override val aboutTitle = "حول التطبيق"
-    override val aboutVersion = "الإصدار 0.1.0 — pilot"
+    override val aboutVersion = "الإصدار 0.2.0"
     override val aboutMissionTitle = "احسب. تحقّق. اهندس."
     override val aboutMissionBody =
         "يمنح MechForge المهندس الميكانيكي مجموعة واحدة موثوقة تعمل دون اتصال " +
@@ -526,7 +526,7 @@ object EnStrings : UiStrings {
             "for any core feature."
 
     override val aboutTitle = "About"
-    override val aboutVersion = "Version 0.1.0 — Pilot"
+    override val aboutVersion = "Version 0.2.0"
     override val aboutMissionTitle = "Calculate. Check. Engineer."
     override val aboutMissionBody =
         "MechForge gives mechanical engineers one reliable, offline toolkit for the " +

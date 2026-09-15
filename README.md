@@ -2,10 +2,30 @@
 
 > Product specification: see **[MechForge_README_v2.md](MechForge_README_v2.md)** (authoritative) and `MechForge_README.md` (v1, kept for history).
 
-MechForge is a local-first mechanical-engineering toolkit. This repository currently
-contains the **Desktop (JVM) app** and an **Android app** — both built from the same
-shared engine and the same Compose UI: 62 verified calculators, SQLite persistence via
-SQLDelight, history, favorites, projects, converter and search.
+MechForge is a local-first mechanical-engineering toolkit. This repository contains the
+**Desktop (JVM) app** and an **Android app**, both built from the same shared engine and
+the same Compose UI: 62 verified calculators, SQLite persistence via SQLDelight, history,
+favorites, projects, converter, search, a reference library, and engineering report
+export (PDF + Excel).
+
+**Current version: 0.2.0** (`versionName` in `composeApp/build.gradle.kts`).
+
+## What is in 0.2.0
+
+- **62 calculators** across hydraulics, HVAC, thermodynamics, mechanical design, piping,
+  water & wastewater, fire protection, equipment and unit conversion.
+- **Arabic and English interface**, plus an independent **report language** setting
+  (follow the app language / Arabic / English) that also drives the right-to-left layout
+  of an exported report.
+- **Engineering reports**: a paginated **PDF** and a formatted **Excel workbook (.xlsx)**
+  with the same block order - letterhead, inputs, formula, calculation steps, results,
+  warnings, notes, reference and a signature block (with an optional company logo on the
+  PDF).
+- **Reference library**: built-in generic datasets with source and licence metadata, plus
+  CSV/JSON import; a dataset can fill a calculator input directly.
+- **Glass interface**: frosted panes over a deep engineering backdrop, light and dark.
+- **Verification**: 259 engine tests + 16 app tests, and an independent Python
+  re-implementation that cross-checks the engine output (see below).
 
 ## Requirements
 
