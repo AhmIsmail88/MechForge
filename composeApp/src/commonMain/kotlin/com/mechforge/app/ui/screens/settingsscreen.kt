@@ -65,7 +65,11 @@ fun SettingsScreen(deps: AppDependencies) {
         for (mode in ThemeMode.entries) {
             OptionRow(
                 selected = theme == mode,
-                label = mode.displayName,
+                label = when (mode) {
+                    ThemeMode.SYSTEM -> strings.themeSystem
+                    ThemeMode.LIGHT -> strings.themeLight
+                    ThemeMode.DARK -> strings.themeDark
+                },
                 onClick = { deps.settings.setTheme(mode) },
             )
         }
@@ -79,7 +83,13 @@ fun SettingsScreen(deps: AppDependencies) {
         for (mode in LanguageMode.entries) {
             OptionRow(
                 selected = language == mode,
-                label = mode.displayName,
+                // Arabic and English stay as endonyms (readable in any language); "System"
+                // is translated because it is not an endonym.
+                label = when (mode) {
+                    LanguageMode.SYSTEM -> strings.languageSystem
+                    LanguageMode.ARABIC -> strings.languageArabic
+                    LanguageMode.ENGLISH -> strings.languageEnglish
+                },
                 onClick = { deps.settings.setLanguage(mode) },
             )
         }
