@@ -86,6 +86,7 @@ private fun navItems(strings: UiStrings): List<NavItem> = listOf(
     NavItem(Screen.History, strings.navHistory, Icons.Filled.History),
     NavItem(Screen.Favorites, strings.navFavorites, Icons.Filled.Star),
     NavItem(Screen.Projects, strings.navProjects, Icons.Filled.Folder),
+    NavItem(Screen.References, "References", Icons.Filled.List),
     NavItem(Screen.Settings, strings.navSettings, Icons.Filled.Settings),
     NavItem(Screen.About, strings.navAbout, Icons.Filled.Info),
 )
