@@ -64,5 +64,8 @@ class SettingsRepository(private val db: MechForgeDatabase) {
         const val KEY_REPORT_CLIENT = "report_client"
         const val KEY_REPORT_ENGINEER = "report_engineer"
         const val KEY_REPORT_LOCATION = "report_location"
+        const val KEY_REPORT_NO = "report_no"
+        const val KEY_REPORT_REV = "report_rev"
+        const val KEY_REPORT_CHECKED = "report_checked"
     }
 }

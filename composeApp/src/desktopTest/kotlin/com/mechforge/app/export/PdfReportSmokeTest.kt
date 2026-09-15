@@ -1,6 +1,9 @@
 package com.mechforge.app.export
 
 import java.io.File
+import com.mechforge.core.engine.CalculatorRegistry
+import com.mechforge.core.engine.InputValue
+import com.mechforge.core.units.Units
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -60,12 +63,17 @@ class PdfReportSmokeTest {
         val out = File.createTempFile("mechforge-letterhead-", ".pdf")
         out.delete()
 
-        val blocks = listOf(
-            ReportBlock.Heading("Inputs"),
-            ReportBlock.TableRow(listOf("Q  Flow rate", "100 m3/h")),
-            ReportBlock.Heading("Results"),
-            ReportBlock.TableRow(listOf("Shaft Power", "17.0254 kW")),
-            ReportBlock.Warning("Efficiency above 85% is optimistic."),
+        // A real sheet with Arabic labels and a signature block: exercises Arabic shaping and RTL.
+        val calc = CalculatorRegistry.byIdOrThrow("pump-power")
+        val inputs = mapOf(
+            "q" to InputValue("q", Units.byId("m3h").toBase(100.0), "m3h"),
+            "h" to InputValue("h", Units.byId("m").toBase(50.0), "m"),
+            "eta" to InputValue("eta", Units.byId("pct").toBase(80.0), "pct"),
+        )
+        val blocks = ReportSheet.build(
+            calc, inputs, calc.run(inputs), "Pump duty point",
+            ReportLabels.ARABIC,
+            listOf("Prepared" to "M. Ahmed", "Checked" to "", "Approved" to ""),
         )
         val ok = DesktopPdfReport(bos.toByteArray(), rtl = true).write(
             out,

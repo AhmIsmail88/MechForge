@@ -33,8 +33,14 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
 
     private val pages = mutableListOf<BufferedImage>()
 
+    // Arabic reports need a font with Arabic glyphs; the logical SANS_SERIF covers Latin only
+    // on some JVMs. Segoe UI ships with Windows and shapes Arabic correctly.
     private fun font(size: Int, bold: Boolean = false) =
-        Font(Font.SANS_SERIF, if (bold) Font.BOLD else Font.PLAIN, size)
+        Font(
+            if (rtl) "Segoe UI" else Font.SANS_SERIF,
+            if (bold) Font.BOLD else Font.PLAIN,
+            size,
+        )
 
     private fun newPage(): Pair<BufferedImage, Graphics2D> {
         val img = BufferedImage(W, H, BufferedImage.TYPE_INT_RGB)

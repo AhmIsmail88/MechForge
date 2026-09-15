@@ -10,10 +10,9 @@ import com.mechforge.core.units.Units
  * Builds the structured content of one engineering calculation sheet from the
  * calculator definition, the entered inputs and the computed output.
  *
- * This replaces the earlier approach of parsing the plain-text report line by line:
- * the PDF now gets real tables (inputs, results), a formula block, the calculation
- * steps, warnings, notes and the reference - i.e. a complete engineering sheet
- * rather than a dumped text file.
+ * The PDF/report therefore gets real tables (inputs, results), a formula block, the
+ * calculation steps, warnings, notes, the reference and a signature block - a complete
+ * engineering sheet rather than a dumped text file.
  */
 object ReportSheet {
 
@@ -22,12 +21,14 @@ object ReportSheet {
         inputs: Map<String, InputValue>,
         output: CalcOutput,
         title: String?,
+        labels: ReportLabels = ReportLabels.ENGLISH,
+        signature: List<Pair<String, String>> = emptyList(),
     ): List<ReportBlock> {
         val blocks = mutableListOf<ReportBlock>()
 
         if (!title.isNullOrBlank() && title != calculator.def.name) {
-            blocks += ReportBlock.Heading("Title")
-            blocks += ReportBlock.TableRow(listOf("Title", title))
+            blocks += ReportBlock.Heading(labels.documentTitle)
+            blocks += ReportBlock.TableRow(listOf(labels.documentTitle, title))
         }
 
         // Inputs -------------------------------------------------------------
@@ -39,17 +40,17 @@ object ReportSheet {
             ReportBlock.TableRow(listOf(label, value))
         }
         if (inputRows.isNotEmpty()) {
-            blocks += ReportBlock.Heading("Inputs")
+            blocks += ReportBlock.Heading(labels.inputs)
             blocks += inputRows.map { ReportBlock.TableRow(it.cells) }
         }
 
         // Formula ------------------------------------------------------------
-        blocks += ReportBlock.Heading("Formula")
+        blocks += ReportBlock.Heading(labels.formula)
         blocks += ReportBlock.Paragraph(calculator.def.formulaDisplay)
 
         // Calculation steps --------------------------------------------------
         if (output.steps.isNotEmpty()) {
-            blocks += ReportBlock.Heading("Calculation steps")
+            blocks += ReportBlock.Heading(labels.calculationSteps)
             for (step in output.steps) {
                 blocks += ReportBlock.Paragraph(step)
             }
@@ -57,23 +58,18 @@ object ReportSheet {
 
         // Results ------------------------------------------------------------
         if (output.results.isNotEmpty()) {
-            blocks += ReportBlock.Heading("Results")
+            blocks += ReportBlock.Heading(labels.results)
             for (r in output.results) {
                 val unit = Units.byId(r.unitId)
-                val marker = when {
-                    r.isRecommended -> "★ "
-                    r.isPrimary -> ""
-                    else -> ""
-                }
-                val label = marker + r.label
+                val marker = if (r.isRecommended) "* " else ""
                 val value = "${UiFormat.n(r.value)} ${unit.symbol}"
-                blocks += ReportBlock.TableRow(listOf(label, value))
+                blocks += ReportBlock.TableRow(listOf(marker + r.label, value))
             }
         }
 
         // Warnings -----------------------------------------------------------
         if (output.warnings.isNotEmpty()) {
-            blocks += ReportBlock.Heading("Warnings")
+            blocks += ReportBlock.Heading(labels.warnings)
             for (w in output.warnings) {
                 blocks += ReportBlock.Warning(w)
             }
@@ -81,11 +77,23 @@ object ReportSheet {
 
         // Notes + reference ---------------------------------------------------
         if (calculator.def.notes.isNotBlank()) {
-            blocks += ReportBlock.Heading("Engineering notes")
+            blocks += ReportBlock.Heading(labels.notes)
             blocks += ReportBlock.Paragraph(calculator.def.notes)
         }
-        blocks += ReportBlock.Heading("Reference")
+        blocks += ReportBlock.Heading(labels.reference)
         blocks += ReportBlock.Paragraph(calculator.def.reference)
+
+        // Signatures ----------------------------------------------------------
+        if (signature.isNotEmpty()) {
+            blocks += ReportBlock.Heading(labels.signatures)
+            for ((role, name) in signature) {
+                blocks += ReportBlock.TableRow(listOf(role, name.ifBlank { "............................" }))
+            }
+            blocks += ReportBlock.Paragraph(
+                "${labels.signatureLine}: ..............................        " +
+                    "${labels.dateLine}: .................."
+            )
+        }
 
         return blocks
     }

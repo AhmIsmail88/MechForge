@@ -29,7 +29,15 @@ class SampleReportTest {
             "rho" to iv("rho", 1000.0, "kgm3"),
         )
         val output = calc.run(inputs)
-        val blocks = ReportSheet.build(calc, inputs, output, "Pump duty point - Example")
+        val blocks = ReportSheet.build(
+            calc, inputs, output, "Pump duty point - Example",
+            ReportLabels.ENGLISH,
+            listOf(
+                "Prepared by" to "M. Ahmed",
+                "Checked by" to "A. Ismail",
+                "Approved by" to "",
+            ),
+        )
 
         // synthetic letterhead logo (blue box with a lighter band)
         val img = java.awt.image.BufferedImage(240, 80, java.awt.image.BufferedImage.TYPE_INT_RGB)
