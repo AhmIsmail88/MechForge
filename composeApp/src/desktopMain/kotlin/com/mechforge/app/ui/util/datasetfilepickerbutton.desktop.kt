@@ -13,13 +13,15 @@ import javax.swing.filechooser.FileNameExtensionFilter
 
 /** Desktop actual: native file dialog reading the CSV as text. */
 @Composable
-actual fun CsvPickerButton(label: String, onPicked: (String) -> Unit) {
+actual fun DatasetFilePickerButton(label: String, extensions: List<String>, onPicked: (String) -> Unit) {
     val scope = rememberCoroutineScope()
     Button(onClick = {
         scope.launch(Dispatchers.Swing) {
             val chooser = JFileChooser().apply {
                 dialogTitle = "Choose a CSV dataset"
-                fileFilter = FileNameExtensionFilter("Comma separated values (*.csv, *.txt)", "csv", "txt")
+                fileFilter = FileNameExtensionFilter(
+                    extensions.joinToString(", ") { "*.$it" }, *extensions.toTypedArray(),
+                )
             }
             if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                 val file: File = chooser.selectedFile

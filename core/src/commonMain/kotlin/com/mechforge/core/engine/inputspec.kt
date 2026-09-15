@@ -18,6 +18,11 @@ data class InputSpec(
     val exclusiveMax: Boolean = false,
     val allowedUnitIds: List<String>? = null,
     val defaultUnitId: String? = null,
+    /**
+     * Optional key of a reference-library dataset that can fill this input
+     * (for example "roughness" or "density"). The app maps the key to a dataset.
+     */
+    val libraryKey: String? = null,
 )
 
 /** One user-provided input value, kept both in base SI and the unit it was entered in. */

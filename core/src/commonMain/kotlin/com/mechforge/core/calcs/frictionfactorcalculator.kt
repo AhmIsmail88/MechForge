@@ -24,7 +24,7 @@ private val Def = CalculatorDefinition(
     keywords = listOf("friction factor", "colebrook", "moody", "roughness", "darcy"),
     inputs = listOf(
         InputSpec("re", "Reynolds number", "Re", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
-        InputSpec("eps", "Absolute roughness", "ε", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "mm"),
+        InputSpec("eps", "Absolute roughness", "ε", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "mm", libraryKey = "roughness"),
         InputSpec("d", "Internal diameter", "D", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
     ),
 )

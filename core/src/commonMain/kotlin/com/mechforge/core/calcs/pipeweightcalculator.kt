@@ -23,7 +23,7 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("od", "Outside diameter", "OD", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("t", "Wall thickness", "t", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
-        InputSpec("rho", "Material density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
+        InputSpec("rho", "Material density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
     ),
 )
 

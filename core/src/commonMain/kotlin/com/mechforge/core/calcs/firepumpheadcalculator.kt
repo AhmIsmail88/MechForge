@@ -24,7 +24,7 @@ private val Def = CalculatorDefinition(
         InputSpec("pavail", "Available supply pressure", "P_avail", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "bar"),
         InputSpec("hstatic", "Static elevation gain", "H_static", UnitFamily.LENGTH, defaultUnitId = "m"),
         InputSpec("hf", "Friction and minor losses", "H_friction", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = false, defaultUnitId = "m"),
-        InputSpec("rho", "Water density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
+        InputSpec("rho", "Water density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
     ),
 )
 

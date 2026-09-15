@@ -29,7 +29,7 @@ private val Def = CalculatorDefinition(
         InputSpec("tout", "Leaving dry-bulb", "T_out", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("win", "Entering humidity ratio", "w_in", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 0.2, defaultUnitId = "dash"),
         InputSpec("wout", "Leaving humidity ratio", "w_out", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 0.2, defaultUnitId = "dash"),
-        InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
+        InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
     ),
 )
 

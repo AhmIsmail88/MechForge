@@ -88,6 +88,103 @@ class ReferencesImportTest {
     }
 
     @Test
+    fun importsJsonInArrayAndObjectForm() {
+        val db = freshDb()
+        val repo = ReferencesRepository(db)
+
+        val arrayJson = """[{"key":"Carbon steel","value":"7850","unit":"kg/m3"},""" +
+            """{"name":"Air (20 C)","value":"1.204","unit":"kg/m3","notes":"standard air"}]"""
+        val first = repo.importJson("From JSON", "Materials", "Vendor", "User-licensed", arrayJson, 1_000L)
+        assertTrue(first.ok, first.errors.toString())
+        assertEquals(2, first.rowsImported)
+
+        val objectJson = """{"name":"Steel roughness","category":"Piping","source":"Catalogue",""" +
+            """"license":"User-licensed","rows":[{"key":"Commercial steel","value":"0.045","unit":"mm"}]}"""
+        val second = repo.importJson("fallback", "Test", "Vendor", "n/a", objectJson, 2_000L)
+        assertTrue(second.ok, second.errors.toString())
+
+        val byName = db.referenceDatasetsQueries.selectAllDatasets().executeAsList().associateBy { it.name }
+        assertEquals("From JSON", byName.keys.firstOrNull { it == "From JSON" })
+        val arrayDataset = byName.getValue("From JSON")
+        assertEquals(2L, arrayDataset.row_count)
+        val rows = repo.rows(arrayDataset.id)
+        assertEquals("Carbon steel", rows[0].key)
+        assertEquals("Air (20 C)", rows[1].key)
+        assertEquals("standard air", rows[1].notes)
+
+        val objectDataset = byName.getValue("Steel roughness")
+        assertEquals("Piping", objectDataset.category)
+        assertEquals("Catalogue", objectDataset.source)
+        assertEquals(1L, objectDataset.row_count)
+        assertEquals("Commercial steel", repo.rows(objectDataset.id).first().key)
+    }
+
+    @Test
+    fun rejectsInvalidJson() {
+        val db = freshDb()
+        val repo = ReferencesRepository(db)
+        val result = repo.importJson("Broken", "Test", "n/a", "n/a", "{ not json ", 1L)
+        assertFalse(result.ok)
+        assertEquals(0L, db.referenceDatasetsQueries.countDatasets().executeAsOne())
+    }
+
+    /**
+     * Regression: every dataset must own its own rows. The first implementation resolved the
+     * new dataset id by list order while all built-in datasets shared one timestamp, so every
+     * row was attached to whichever dataset happened to sort first.
+     */
+    @Test
+    fun eachBuiltInDatasetOwnsItsOwnRows() {
+        val db = freshDb()
+        val repo = ReferencesRepository(db)
+        repo.seedBuiltIn(1_000L)
+
+        val byName = db.referenceDatasetsQueries.selectAllDatasets().executeAsList().associateBy { it.name }
+        for (expected in BuiltInDatasets.all) {
+            val dataset = byName.getValue(expected.name)
+            assertEquals(expected.rows.size.toLong(), dataset.row_count, "row_count mismatch for ${expected.name}")
+            val rows = repo.rows(dataset.id)
+            assertEquals(expected.rows.size, rows.size, "rows mismatch for ${expected.name}")
+            assertEquals(expected.rows.first()[0], rows.first().key)
+            assertEquals(expected.rows.last()[0], rows.last().key)
+        }
+
+        val densities = repo.rows(byName.getValue("Material densities (typical)").id)
+        assertTrue(densities.any { it.key == "Carbon steel" && it.value == "7850" })
+        val motors = repo.rows(byName.getValue("IEC standard motor ratings").id)
+        assertTrue(motors.any { it.key == "Motor rating 15 kW" && it.value == "15" })
+        assertFalse(motors.any { it.key == "Carbon steel" }, "density rows must not leak into the motor dataset")
+    }
+
+    /**
+     * The earlier build attached every row to the first dataset. Seeding must detect such a
+     * dataset (row count / first key differ from the built-in definition) and repair it.
+     */
+    @Test
+    fun seedingRepairsADatasetHoldingWrongRows() {
+        val db = freshDb()
+        val repo = ReferencesRepository(db)
+
+        db.referenceDatasetsQueries.insertDataset(
+            "Material densities (typical)", "Materials", "old", "generic", "old", 1L, 2L,
+        )
+        val brokenId = db.referenceDatasetsQueries.lastInsertRowId().executeAsOne()
+        db.referenceRowsQueries.insertRow(brokenId, "Motor rating 15 kW", "15", "kW", "")
+        db.referenceRowsQueries.insertRow(brokenId, "Motor rating 22 kW", "22", "kW", "")
+
+        repo.seedBuiltIn(1_000L)
+
+        val repaired = db.referenceDatasetsQueries.selectAllDatasets().executeAsList()
+            .first { it.name == "Material densities (typical)" }
+        val rows = repo.rows(repaired.id)
+        val expected = BuiltInDatasets.all.first { it.name == "Material densities (typical)" }
+        assertEquals(expected.rows.size, rows.size)
+        assertTrue(rows.any { it.key == "Carbon steel" && it.value == "7850" }, "density rows must be restored")
+        assertFalse(rows.any { it.key.startsWith("Motor rating") }, "wrong rows must be gone")
+        assertEquals(BuiltInDatasets.all.size, db.referenceDatasetsQueries.countDatasets().executeAsOne().toInt())
+    }
+
+    @Test
     fun deleteRemovesDatasetAndItsRows() {
         val db = freshDb()
         val repo = ReferencesRepository(db)

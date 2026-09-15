@@ -20,7 +20,7 @@ private val Def = CalculatorDefinition(
     notes = "c is the pressure-wave speed (about 1000-1250 m/s in steel water pipes, lower in plastic). The Joukowsky value is the maximum (instantaneous closure); slower closure reduces the surge. Pipe length is optional and only used for the critical time.",
     keywords = listOf("water hammer", "surge", "joukowsky", "transient", "valve closure", "fire"),
     inputs = listOf(
-        InputSpec("rho", "Fluid density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
+        InputSpec("rho", "Fluid density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
         InputSpec("c", "Pressure wave speed", "c", UnitFamily.VELOCITY, minValue = 0.0, exclusiveMin = true, defaultUnitId = "ms"),
         InputSpec("dv", "Velocity change", "dv", UnitFamily.VELOCITY, minValue = 0.0, exclusiveMin = true, defaultUnitId = "ms"),
         InputSpec("l", "Pipe length (optional)", "L", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m"),

@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.data.ImportResult
-import com.mechforge.app.ui.util.CsvPickerButton
+import com.mechforge.app.ui.util.DatasetFilePickerButton
 
 /**
  * Engineering reference library (README v2 16/17/18).
@@ -65,7 +65,7 @@ fun ReferencesScreen(deps: AppDependencies) {
             TextButton(onClick = { showImport = true }) { Text("Import CSV...") }
             Spacer(Modifier.width(8.dp))
             Text(
-                "columns: key,value,unit,notes",
+                "CSV: key,value,unit,notes   |   JSON: [{ key, value, unit, notes }]",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -157,8 +157,11 @@ fun ReferencesScreen(deps: AppDependencies) {
                 }
                 showImport = false
             },
-            importAction = { name, category, source, licence, csv ->
-                deps.references.importCsv(name, category, source, licence, "Imported by the user", csv, System.currentTimeMillis())
+            csvAction = { name, category, source, licence, csv ->
+                deps.references.importCsv(name, category, source, licence, "Imported by the user (CSV)", csv, System.currentTimeMillis())
+            },
+            jsonAction = { name, category, source, licence, json ->
+                deps.references.importJson(name, category, source, licence, json, System.currentTimeMillis())
             },
         )
     }
@@ -168,7 +171,8 @@ fun ReferencesScreen(deps: AppDependencies) {
 private fun ImportDialog(
     onDismiss: () -> Unit,
     onImported: (ImportResult) -> Unit,
-    importAction: (String, String, String, String, String) -> ImportResult,
+    csvAction: (String, String, String, String, String) -> ImportResult,
+    jsonAction: (String, String, String, String, String) -> ImportResult,
 ) {
     var name by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Project data") }
@@ -190,9 +194,14 @@ private fun ImportDialog(
                 OutlinedTextField(value = source, onValueChange = { source = it }, label = { Text("Source (standard, handbook, vendor)") }, singleLine = true)
                 OutlinedTextField(value = licence, onValueChange = { licence = it }, label = { Text("Licence type") }, singleLine = true)
                 Spacer(Modifier.height(8.dp))
-                CsvPickerButton("Choose CSV file...") { text ->
+                DatasetFilePickerButton("Choose CSV file...", listOf("csv", "txt")) { text ->
                     if (name.isBlank()) name = "Imported dataset"
-                    onImported(importAction(name, category, source.ifBlank { "User import" }, licence, text))
+                    onImported(csvAction(name, category, source.ifBlank { "User import" }, licence, text))
+                }
+                Spacer(Modifier.height(6.dp))
+                DatasetFilePickerButton("Choose JSON file...", listOf("json")) { text ->
+                    if (name.isBlank()) name = "Imported dataset"
+                    onImported(jsonAction(name, category, source.ifBlank { "User import" }, licence, text))
                 }
             }
         },

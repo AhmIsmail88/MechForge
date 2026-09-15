@@ -23,7 +23,7 @@ private val Def = CalculatorDefinition(
         InputSpec("q", "Flow rate", "Q", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "lmin"),
         InputSpec("h", "Total head", "H", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m"),
         InputSpec("eta", "Pump efficiency", "eta", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct"),
-        InputSpec("rho", "Water density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
+        InputSpec("rho", "Water density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
     ),
 )
 

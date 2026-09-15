@@ -17,7 +17,10 @@ INSERT INTO reference_datasets(name, category, source, license_type, license_not
 VALUES (?, ?, ?, ?, ?, ?, ?);
 
 selectAllDatasets:
-SELECT * FROM reference_datasets ORDER BY imported_at DESC;
+SELECT * FROM reference_datasets ORDER BY imported_at DESC, id DESC;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
 
 getDataset:
 SELECT * FROM reference_datasets WHERE id = ?;

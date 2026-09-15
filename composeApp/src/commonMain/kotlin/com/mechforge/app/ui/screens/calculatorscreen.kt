@@ -33,6 +33,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,8 @@ import com.mechforge.app.export.ReportLabels
 import com.mechforge.app.export.ReportSheet
 import com.mechforge.app.export.ReportWriter
 import com.mechforge.app.data.LanguageMode
+import com.mechforge.app.data.LibraryCatalog
+import com.mechforge.app.data.RefRow
 import com.mechforge.app.data.SettingsRepository
 import com.mechforge.app.data.Snapshots
 import com.mechforge.core.engine.CalcOutput
@@ -99,6 +102,7 @@ fun CalculatorScreen(
     var savedMessage by remember(calculatorId) { mutableStateOf<String?>(null) }
     var showSaveDialog by remember(calculatorId) { mutableStateOf(false) }
     val isFavorite = remember(calculatorId) { mutableStateOf(deps.favorites.isFavorite(calculatorId)) }
+    val libraryDatasets by deps.references.datasets().collectAsState(initial = emptyList())
     val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
 
@@ -175,6 +179,24 @@ fun CalculatorScreen(
                         }
                     },
                 )
+                // Reference-library picker (README v2 17): fill the input from a dataset.
+                spec.libraryKey?.let { key ->
+                    val datasetName = LibraryCatalog.datasetNames[key]
+                    val dataset = datasetName?.let { name -> libraryDatasets.firstOrNull { it.name == name } }
+                    if (dataset != null) {
+                        LibraryValueChip(
+                            rows = { deps.references.rows(dataset.id) },
+                            onPick = { row ->
+                                val unitId = Units.byFamily(spec.family)
+                                    .firstOrNull { it.symbol == LibraryCatalog.normaliseUnitSymbol(row.unit) }?.id
+                                inputsUi = inputsUi.map {
+                                    if (it.specId == spec.id) it.copy(text = row.value, unitId = unitId ?: it.unitId) else it
+                                }
+                                fieldErrors = fieldErrors - spec.id
+                            },
+                        )
+                    }
+                }
             }
             Spacer(Modifier.height(8.dp))
         }
@@ -402,6 +424,36 @@ private fun SaveToHistoryDialog(
         confirmButton = { TextButton(onClick = { onSave(title.ifBlank { "Untitled" }) }) { Text("Save") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
+}
+
+/** Small chip that lists a reference dataset so its values can be dropped into an input. */
+@Composable
+private fun LibraryValueChip(rows: () -> List<RefRow>, onPick: (RefRow) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        AssistChip(onClick = { expanded = true }, label = { Text("Library") })
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            val items = rows()
+            if (items.isEmpty()) {
+                DropdownMenuItem(text = { Text("(no data)") }, onClick = { expanded = false })
+            }
+            for (row in items) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            listOf(row.key, row.value, row.unit)
+                                .filter { it.isNotBlank() }
+                                .joinToString("   "),
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onPick(row)
+                    },
+                )
+            }
+        }
+    }
 }
 
 @Composable

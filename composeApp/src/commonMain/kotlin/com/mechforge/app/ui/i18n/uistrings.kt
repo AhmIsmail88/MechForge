@@ -34,6 +34,7 @@ interface UiStrings {
     val navHistory: String
     val navFavorites: String
     val navProjects: String
+    val navReferences: String
     val navSettings: String
     val navAbout: String
     val openNavigation: String
@@ -172,6 +173,7 @@ object ArStrings : UiStrings {
     override val navHistory = "السجل"
     override val navFavorites = "المفضلة"
     override val navProjects = "المشاريع"
+    override val navReferences = "المراجع"
     override val navSettings = "الإعدادات"
     override val navAbout = "حول التطبيق"
     override val openNavigation = "فتح قائمة التنقل"
@@ -318,6 +320,7 @@ object EnStrings : UiStrings {
     override val navHistory = "History"
     override val navFavorites = "Favorites"
     override val navProjects = "Projects"
+    override val navReferences = "References"
     override val navSettings = "Settings"
     override val navAbout = "About"
     override val openNavigation = "Open navigation"

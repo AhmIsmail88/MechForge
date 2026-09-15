@@ -30,7 +30,7 @@ private val Def = CalculatorDefinition(
             "eta", "Pump efficiency", "η", UnitFamily.DIMENSIONLESS,
             minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct",
         ),
-        InputSpec("rho", "Fluid density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
+        InputSpec("rho", "Fluid density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
     ),
 )
 

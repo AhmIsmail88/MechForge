@@ -6,6 +6,11 @@ import com.mechforge.db.MechForgeDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 /** A reference dataset as shown in the UI (mapped from the generated table row). */
 data class RefDataset(
@@ -92,12 +97,86 @@ class ReferencesRepository(private val db: MechForgeDatabase) {
             return ImportResult(name, 0, errors)
         }
 
+        insertDataset(name, category, source, licenseType, licenseNotes, parsed, now)
+        return ImportResult(name, parsed.size, errors)
+    }
+
+    /**
+     * Imports a JSON dataset. Accepted shapes:
+     *
+     *     [ { "key": "Carbon steel", "value": "7850", "unit": "kg/m3", "notes": "" }, ... ]
+     *     { "name": "...", "category": "...", "source": "...", "license": "...",
+     *       "rows": [ { "key": ..., "value": ..., "unit": ..., "notes": ... } ] }
+     */
+    fun importJson(
+        nameFallback: String,
+        categoryFallback: String,
+        sourceFallback: String,
+        licenseFallback: String,
+        text: String,
+        now: Long,
+    ): ImportResult {
+        val element = runCatching { jsonFormat.parseToJsonElement(text) }.getOrNull()
+            ?: return ImportResult(nameFallback, 0, listOf("the file is not valid JSON"))
+
+        val root = element as? JsonObject
+        val rowsArray = when {
+            root?.get("rows") is JsonArray -> root["rows"] as JsonArray
+            element is JsonArray -> element
+            else -> return ImportResult(
+                nameFallback, 0,
+                listOf("expected an array of rows, or an object containing a \"rows\" array"),
+            )
+        }
+
+        fun textOf(obj: JsonObject?, vararg keys: String): String? =
+            keys.firstNotNullOfOrNull { (obj?.get(it) as? JsonPrimitive)?.contentOrNull }
+
+        val name = textOf(root, "name") ?: nameFallback
+        val category = textOf(root, "category") ?: categoryFallback
+        val source = textOf(root, "source") ?: sourceFallback
+        val licence = textOf(root, "license", "licence") ?: licenseFallback
+
+        val rows = rowsArray.mapNotNull { it as? JsonObject }
+            .map { obj ->
+                listOf(
+                    textOf(obj, "key", "name", "title") ?: "",
+                    textOf(obj, "value", "val") ?: "",
+                    textOf(obj, "unit", "units") ?: "",
+                    textOf(obj, "notes", "note", "comment") ?: "",
+                )
+            }
+            .filter { it[0].isNotBlank() && it[1].isNotBlank() }
+
+        if (rows.isEmpty()) return ImportResult(name, 0, listOf("no usable rows found"))
+
+        insertDataset(name, category, source, licence, "Imported by the user (JSON)", rows, now)
+        return ImportResult(name, rows.size, emptyList())
+    }
+
+    /**
+     * Inserts one dataset and its rows, and returns the new dataset id.
+     *
+     * last_insert_rowid() is connection-scoped: inside the transaction it is exactly the
+     * dataset just inserted. (Resolving it by list order was wrong: the built-in datasets
+     * shared one timestamp, so their order was undefined and every row ended up attached to
+     * whichever dataset happened to sort first.)
+     */
+    private fun insertDataset(
+        name: String,
+        category: String,
+        source: String,
+        licenseType: String,
+        licenseNotes: String,
+        rows: List<List<String>>,
+        now: Long,
+    ) {
         db.referenceDatasetsQueries.transaction {
             db.referenceDatasetsQueries.insertDataset(
-                name, category, source, licenseType, licenseNotes, now, parsed.size.toLong(),
+                name, category, source, licenseType, licenseNotes, now, rows.size.toLong(),
             )
-            val datasetId = db.referenceDatasetsQueries.selectAllDatasets().executeAsList().first().id
-            for (fields in parsed) {
+            val datasetId = db.referenceDatasetsQueries.lastInsertRowId().executeAsOne()
+            for (fields in rows) {
                 db.referenceRowsQueries.insertRow(
                     datasetId,
                     fields[0].trim(),
@@ -107,19 +186,54 @@ class ReferencesRepository(private val db: MechForgeDatabase) {
                 )
             }
         }
-        return ImportResult(name, parsed.size, errors)
     }
 
-    /** Inserts the built-in generic datasets once (idempotent by name). */
+    private companion object {
+        val jsonFormat = Json { ignoreUnknownKeys = true; isLenient = true }
+    }
+
+    /**
+     * Inserts the built-in generic datasets once (idempotent by name), and repairs a dataset
+     * whose stored rows do not match the built-in definition (that is how a database seeded by
+     * the earlier version - where every row was attached to the first dataset - heals itself).
+     */
     fun seedBuiltIn(now: Long) {
-        for (dataset in BuiltInDatasets.all) {
-            if (db.referenceDatasetsQueries.countDatasetByName(dataset.name).executeAsOne() > 0L) continue
+        BuiltInDatasets.all.forEachIndexed { index, dataset ->
+            val existing = db.referenceDatasetsQueries.selectAllDatasets().executeAsList()
+                .firstOrNull { it.name == dataset.name }
+            if (existing != null) {
+                val storedRows = db.referenceRowsQueries.selectRowsByDataset(existing.id).executeAsList()
+                val mismatched = storedRows.size != dataset.rows.size ||
+                    storedRows.firstOrNull()?.row_key != dataset.rows.first()[0]
+                if (mismatched) {
+                    db.referenceDatasetsQueries.transaction {
+                        db.referenceRowsQueries.deleteRowsByDataset(existing.id)
+                        for (row in dataset.rows) {
+                            db.referenceRowsQueries.insertRow(existing.id, row[0], row[1], row[2], row[3])
+                        }
+                        db.referenceDatasetsQueries.insertDataset(
+                            dataset.name, dataset.category, dataset.source, dataset.licenseType,
+                            dataset.licenseNotes, now + index, dataset.rows.size.toLong(),
+                        )
+                        val newId = db.referenceDatasetsQueries.lastInsertRowId().executeAsOne()
+                        // move the repaired rows onto the freshly inserted (correct) dataset
+                        val fresh = db.referenceRowsQueries.selectRowsByDataset(existing.id).executeAsList()
+                        for (r in fresh) {
+                            db.referenceRowsQueries.insertRow(newId, r.row_key, r.value_, r.unit, r.notes)
+                        }
+                        db.referenceRowsQueries.deleteRowsByDataset(existing.id)
+                        db.referenceDatasetsQueries.deleteDataset(existing.id)
+                    }
+                }
+                return@forEachIndexed
+            }
             db.referenceDatasetsQueries.transaction {
+                // distinct timestamps keep the list order stable and meaningful
                 db.referenceDatasetsQueries.insertDataset(
                     dataset.name, dataset.category, dataset.source,
-                    dataset.licenseType, dataset.licenseNotes, now, dataset.rows.size.toLong(),
+                    dataset.licenseType, dataset.licenseNotes, now + index, dataset.rows.size.toLong(),
                 )
-                val datasetId = db.referenceDatasetsQueries.selectAllDatasets().executeAsList().first().id
+                val datasetId = db.referenceDatasetsQueries.lastInsertRowId().executeAsOne()
                 for (row in dataset.rows) {
                     db.referenceRowsQueries.insertRow(datasetId, row[0], row[1], row[2], row[3])
                 }

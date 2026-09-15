@@ -22,7 +22,7 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("patm", "Absolute pressure at surface", "p_atm", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
         InputSpec("pv", "Vapour pressure of liquid", "p_v", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "kpa"),
-        InputSpec("rho", "Liquid density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
+        InputSpec("rho", "Liquid density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
         InputSpec("hs", "Static suction head", "h_static", UnitFamily.LENGTH, defaultUnitId = "m"),
         InputSpec("hf", "Suction line losses", "h_friction", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = false, defaultUnitId = "m"),
     ),
