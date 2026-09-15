@@ -3,6 +3,7 @@ package com.mechforge.app
 import android.app.Application
 import com.mechforge.app.db.DatabaseFactory
 import com.mechforge.app.export.AndroidReportExporter
+import com.mechforge.app.export.LogoStore
 
 /**
  * Process-wide dependency container for the Android shell (README v2 §41, Phase 1).
@@ -17,6 +18,7 @@ class MechForgeApplication : Application() {
         AppDependencies(
             database = DatabaseFactory.create(this),
             exporter = AndroidReportExporter(this),
+            logoStore = LogoStore(this),
         )
     }
 }

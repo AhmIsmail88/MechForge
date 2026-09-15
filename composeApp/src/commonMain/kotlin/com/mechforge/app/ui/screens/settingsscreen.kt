@@ -10,21 +10,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.data.LanguageMode
+import com.mechforge.app.data.SettingsRepository
 import com.mechforge.app.data.ThemeMode
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.ui.util.LogoPickerButton
 
 /**
  * Settings. All chrome text comes from the UI strings layer (Part C), so switching
@@ -82,12 +91,83 @@ fun SettingsScreen(deps: AppDependencies) {
         Spacer(Modifier.height(24.dp))
         HorizontalDivider()
         Spacer(Modifier.height(16.dp))
+
+        // Project data printed on every exported calculation sheet (letterhead).
+        Text("Report details", style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
+        Text(
+            "These values are printed on the letterhead of each exported PDF report.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        var projectName by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT)) }
+        var clientName by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT)) }
+        var engineerName by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)) }
+        var locationName by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION)) }
+        ReportField("Project", projectName) {
+            projectName = it
+            deps.settings.setReportValue(SettingsRepository.KEY_REPORT_PROJECT, it)
+        }
+        ReportField("Client", clientName) {
+            clientName = it
+            deps.settings.setReportValue(SettingsRepository.KEY_REPORT_CLIENT, it)
+        }
+        ReportField("Engineer", engineerName) {
+            engineerName = it
+            deps.settings.setReportValue(SettingsRepository.KEY_REPORT_ENGINEER, it)
+        }
+        ReportField("Location", locationName) {
+            locationName = it
+            deps.settings.setReportValue(SettingsRepository.KEY_REPORT_LOCATION, it)
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Company / office logo used on the PDF letterhead.
+        Text("Company logo (report letterhead)", style = MaterialTheme.typography.titleMedium, modifier = Modifier.fillMaxWidth())
+        var logoBytes by remember { mutableStateOf(deps.logoStore.load()?.size ?: 0) }
+        Text(
+            if (logoBytes > 0) "Logo selected - it will appear on exported reports." else "No logo selected yet.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            LogoPickerButton("Choose image...") { bytes ->
+                if (deps.logoStore.save(bytes)) logoBytes = bytes.size
+            }
+            if (logoBytes > 0) {
+                Spacer(Modifier.width(8.dp))
+                TextButton(onClick = {
+                    deps.logoStore.clear()
+                    logoBytes = 0
+                }) { Text("Remove") }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(Modifier.height(16.dp))
         Text(
             strings.settingsPrivacyNote,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
+}
+
+/** One text field of the report letterhead; writes through to settings on every keystroke. */
+@Composable
+private fun ReportField(label: String, value: String, onChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        label = { Text(label) },
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+    )
 }
 
 /** One selectable option: whole row tappable, radio is decorative. */

@@ -49,8 +49,20 @@ class SettingsRepository(private val db: MechForgeDatabase) {
 
     fun setLanguage(mode: LanguageMode) = set(KEY_LANGUAGE, mode.name)
 
+    /**
+     * Project data printed on an exported calculation sheet (all optional).
+     * Stored as plain settings so the last used values are pre-filled next time.
+     */
+    fun reportValue(key: String): String = raw(key) ?: ""
+
+    fun setReportValue(key: String, value: String) = set(key, value)
+
     companion object {
         const val KEY_THEME = "theme"
         const val KEY_LANGUAGE = "language"
+        const val KEY_REPORT_PROJECT = "report_project"
+        const val KEY_REPORT_CLIENT = "report_client"
+        const val KEY_REPORT_ENGINEER = "report_engineer"
+        const val KEY_REPORT_LOCATION = "report_location"
     }
 }

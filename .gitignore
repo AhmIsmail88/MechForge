@@ -35,3 +35,6 @@ signing/keystore.properties
 
 # Shareable build drop
 dist/
+
+# Local project archive (not part of the sources)
+MechForge.rar

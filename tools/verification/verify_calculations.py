@@ -248,8 +248,14 @@ def expectation(calc, scenario, raw):
                 "pmotor": pair / x("etaf") / etad / 1000.0}
 
     if calc == "air-changes-hour":
-        ach = x("q") * 3600.0 / x("vroom")
-        return {"ach": ach, "time": 3600.0 / ach}
+        if "q" in raw and "vroom" in raw:
+            q = x("q"); v = x("vroom"); ach = q * 3600.0 / v
+        elif "vroom" in raw and "ach" in raw:
+            v = x("vroom"); ach = x("ach"); q = ach * v / 3600.0
+        else:
+            q = x("q"); ach = x("ach"); v = q * 3600.0 / ach
+        return {"q": q * 3600.0, "qCfm": q / 4.719474432e-4, "qLs": q * 1000.0,
+                "ach": ach, "vroom": v, "time": 60.0 / ach}
 
     if calc == "pipe-sizing":
         d = math.sqrt(4.0 * x("q") / (math.pi * x("v")))
@@ -350,7 +356,7 @@ SCALING = [
     ("chlorine-dose", "5000-4", "5000-2", "mr", 2.0, "m ~ dose"),
     ("peak-flow", "pf5", "pf2.5", "qp", 2.0, "Qpeak ~ PF"),
     ("hydraulic-loading", "1000-500", "1000-250", "hlr", 0.5, "HLR ~ 1/A"),
-    ("air-changes-hour", "double-volume", "base", "ach", 0.5, "ACH ~ 1/V"),
+    ("air-changes-hour", "fan-480m3-ach15", "fan-240m3-ach15", "q", 2.0, "fan capacity ~ V at fixed ACH"),
 ]
 
 

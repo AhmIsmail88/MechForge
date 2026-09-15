@@ -5,6 +5,7 @@ import java.awt.Font
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
@@ -18,7 +19,7 @@ import javax.imageio.ImageIO
  * are then wrapped in a minimal PDF container written by hand using the JPEG
  * DCTDecode filter. Result: a real, printable PDF with no new dependency.
  */
-class DesktopPdfReport(private val logo: File? = null, private val rtl: Boolean = false) {
+class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl: Boolean = false) {
 
     companion object {
         private const val DPI = 150
@@ -97,9 +98,9 @@ class DesktopPdfReport(private val logo: File? = null, private val rtl: Boolean 
 
         // header + logo
         var headerY = MARGIN + 20
-        if (logo != null && logo.exists()) {
+        if (logoBytes != null && logoBytes.isNotEmpty()) {
             try {
-                val bmp = ImageIO.read(logo)
+                val bmp = ImageIO.read(ByteArrayInputStream(logoBytes))
                 if (bmp != null) {
                     val h = 70
                     val w = h * bmp.width / bmp.height
@@ -167,11 +168,19 @@ class DesktopPdfReport(private val logo: File? = null, private val rtl: Boolean 
                     y += 22
                 }
                 is ReportBlock.TableRow -> {
-                    need(24)
+                    need(26)
                     g.font = font(17)
-                    val line = b.cells.joinToString("   |   ")
-                    g.drawString(line, originX(g.fontMetrics.stringWidth(line)), y)
+                    val label = b.cells.getOrNull(0) ?: ""
+                    val value = b.cells.getOrNull(1) ?: ""
+                    val colW = ((W - 2 * MARGIN) * 0.62).toInt()
+                    val labelX = if (rtl) W - MARGIN - colW else MARGIN
+                    val valueX = if (rtl) MARGIN else MARGIN + colW + 10
+                    g.drawString(label, labelX, y)
+                    if (value.isNotEmpty()) g.drawString(value, valueX, y)
                     y += 22
+                    g.color = Color(0xDF, 0xE4, 0xEA)
+                    g.drawLine(MARGIN, y - 17, W - MARGIN, y - 17)
+                    g.color = INK
                 }
                 is ReportBlock.Divider -> {
                     need(20)

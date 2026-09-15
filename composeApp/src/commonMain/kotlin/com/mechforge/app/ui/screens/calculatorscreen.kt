@@ -46,8 +46,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.util.UiFormat
-import com.mechforge.app.export.ReportBlock
+import com.mechforge.app.export.ReportSheet
 import com.mechforge.app.export.ReportWriter
+import com.mechforge.app.data.LanguageMode
+import com.mechforge.app.data.SettingsRepository
 import com.mechforge.app.data.Snapshots
 import com.mechforge.core.engine.CalcOutput
 import com.mechforge.core.engine.InputValue
@@ -321,20 +323,17 @@ fun CalculatorScreen(
                         )
                         AssistChip(
                             onClick = {
-                                val reportText = ReportWriter.build(calc, lastInputs ?: emptyMap(), out, restoreTitle)
                                 scope.launch {
-                                    val blocks = reportText.lines().mapNotNull { raw ->
-                                        val t = raw.trim()
-                                        when {
-                                            t.isEmpty() -> ReportBlock.Divider
-                                            t.length <= 60 && t.endsWith(":") && t.none { it.isDigit() } ->
-                                                ReportBlock.Heading(t.trimEnd(':'))
-                                            t.startsWith("- ") || t.startsWith("Warning") ->
-                                                ReportBlock.Warning(t.removePrefix("- ").removePrefix("Warning: "))
-                                            else -> ReportBlock.Paragraph(t)
-                                        }
-                                    }
-                                    val path = deps.exporter.savePdf(def.id, def.name, emptyList(), blocks)
+                                    val meta = listOf(
+                                        "Project" to deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
+                                        "Client" to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT),
+                                        "Engineer" to deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER),
+                                        "Location" to deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION),
+                                        "Date" to java.time.LocalDate.now().toString(),
+                                    )
+                                    val blocks = ReportSheet.build(calc, lastInputs ?: emptyMap(), out, restoreTitle)
+                                    val rtl = deps.settings.language.value == LanguageMode.ARABIC
+                                    val path = deps.exporter.savePdf(def.id, def.name, meta, blocks, deps.logoStore.load(), rtl)
                                     savedMessage = if (path != null) "PDF saved: " + path else "Export cancelled."
                                 }
                             },

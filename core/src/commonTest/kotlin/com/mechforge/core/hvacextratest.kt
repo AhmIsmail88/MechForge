@@ -185,17 +185,22 @@ class FanPowerTest {
 class AirChangesTest {
 
     @Test
-    fun textbookCase() {
+    fun fanCapacityFromVolumeAndAch() {
+        // 240 m3 at 15 ACH -> 1 m3/s = 3600 m3/h = 2118.9 CFM
         val out = T.run(
             AirChangesCalculator,
-            T.iv("q", 1.0, "m3s"), T.iv("vroom", 240.0, "m3"),
+            T.iv("vroom", 240.0, "m3"), T.iv("ach", 15.0, "perh"),
         )
+        assertEquals(3600.0, out.results.first { it.id == "q" }.value, 1.0)
+        assertEquals(2118.88, out.results.first { it.id == "qCfm" }.value, 1.0)
+        assertEquals(1000.0, out.results.first { it.id == "qLs" }.value, 0.5)
         assertEquals(15.0, out.results.first { it.id == "ach" }.value, 0.01)
+        assertEquals(4.0, out.results.first { it.id == "time" }.value, 0.01)
     }
 
     @Test
-    fun imperialAirflowCase() {
-        // 2000 CFM = 3398.02 m³/h; V=300 m³ → 11.33 ACH
+    fun achFromAirflowAndVolume() {
+        // Reverse direction: 2000 CFM into 300 m3 -> 11.33 ACH
         val out = T.run(
             AirChangesCalculator,
             T.iv("q", 2000.0, "cfm"), T.iv("vroom", 300.0, "m3"),
@@ -204,9 +209,38 @@ class AirChangesTest {
     }
 
     @Test
+    fun volumeFromAirflowAndAch() {
+        // 1 m3/s at 15 ACH -> 240 m3
+        val out = T.run(
+            AirChangesCalculator,
+            T.iv("q", 1.0, "m3s"), T.iv("ach", 15.0, "perh"),
+        )
+        assertEquals(240.0, out.results.first { it.id == "vroom" }.value, 0.5)
+    }
+
+    @Test
+    fun exactlyTwoInputsRequired() {
+        try {
+            T.run(AirChangesCalculator, T.iv("vroom", 240.0, "m3"))
+            fail("expected ValidationException")
+        } catch (e: ValidationException) {
+            assertTrue(e.errors.any { it.inputId == "q" })
+        }
+    }
+
+    @Test
+    fun lowAchWarns() {
+        val out = T.run(
+            AirChangesCalculator,
+            T.iv("vroom", 240.0, "m3"), T.iv("ach", 1.5, "perh"),
+        )
+        assertTrue(out.warnings.any { it.contains("ventilation requirement") })
+    }
+
+    @Test
     fun zeroVolumeRejected() {
         try {
-            T.run(AirChangesCalculator, T.iv("q", 1.0, "m3s"), T.iv("vroom", 0.0, "m3"))
+            T.run(AirChangesCalculator, T.iv("vroom", 0.0, "m3"), T.iv("ach", 15.0, "perh"))
             fail("expected ValidationException")
         } catch (e: ValidationException) {
             assertTrue(e.errors.any { it.inputId == "vroom" })

@@ -8,6 +8,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.mechforge.app.db.DatabaseFactory
 import com.mechforge.app.export.DesktopReportExporter
+import com.mechforge.app.export.LogoStore
 import com.mechforge.app.ui.MechForgeApp
 import com.mechforge.app.ui.theme.MechForgeTheme
 
@@ -15,6 +16,7 @@ fun main() {
     val deps = AppDependencies(
         database = DatabaseFactory.create(),
         exporter = DesktopReportExporter(),
+        logoStore = LogoStore(),
     )
 
     application {

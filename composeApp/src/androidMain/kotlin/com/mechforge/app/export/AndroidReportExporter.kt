@@ -41,13 +41,15 @@ class AndroidReportExporter(private val context: Context) : ReportExporter {
         title: String,
         meta: List<Pair<String, String>>,
         blocks: List<ReportBlock>,
+        logo: ByteArray?,
+        rtl: Boolean,
     ): String? = withContext(Dispatchers.IO) {
         val safeName = defaultName.replace(Regex("[^A-Za-z0-9._-]"), "_")
         val fileName = safeName + "_" + System.currentTimeMillis() + ".pdf"
 
         val cache = File(context.cacheDir, "reports").apply { mkdirs() }
         val tmp = File(cache, fileName)
-        val rendered = AndroidPdfReport().write(tmp, title, meta, blocks)
+        val rendered = AndroidPdfReport(logo, rtl).write(tmp, title, meta, blocks)
         if (!rendered || !tmp.exists()) {
             tmp.delete()
             return@withContext null

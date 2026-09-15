@@ -33,6 +33,8 @@ class DesktopReportExporter : ReportExporter {
         title: String,
         meta: List<Pair<String, String>>,
         blocks: List<ReportBlock>,
+        logo: ByteArray?,
+        rtl: Boolean,
     ): String? = withContext(Dispatchers.Swing) {
         val chooser = JFileChooser().apply {
             dialogTitle = "Export PDF report"
@@ -45,6 +47,6 @@ class DesktopReportExporter : ReportExporter {
         if (!target.name.endsWith(".pdf", ignoreCase = true)) {
             target = File(target.parentFile, "${target.name}.pdf")
         }
-        if (DesktopPdfReport().write(target, title, meta, blocks)) target.absolutePath else null
+        if (DesktopPdfReport(logo, rtl).write(target, title, meta, blocks)) target.absolutePath else null
     }
 }

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-      MechForge is offline-first (README v2 §22, §39): the app deliberately declares
-      NO permissions at all — in particular no android.permission.INTERNET.
-      All engineering math runs in the shared :core module; all data stays in the
+      MechForge is offline-first (README v2 22, 39): neither INTERNET nor storage access is
+      requested. The only declared permission is POST_NOTIFICATIONS, used solely for the
+      "report exported" notification (Open / Share). All engineering math runs in the
       app's private SQLite database.
     -->
+
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 

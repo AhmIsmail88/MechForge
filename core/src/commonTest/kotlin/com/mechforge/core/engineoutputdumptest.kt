@@ -81,8 +81,9 @@ class EngineOutputDumpTest {
         dump("duct-pressure-loss", "rect", iv("v", 6.0, "ms"), iv("l", 10.0, "m"), iv("w", 500.0, "mm"), iv("h", 300.0, "mm"))
         dump("fan-power", "base", iv("q", 1.0, "m3s"), iv("dp", 500.0, "pa"), iv("etaf", 65.0, "pct"))
         dump("fan-power", "low-eff", iv("q", 1.0, "m3s"), iv("dp", 500.0, "pa"), iv("etaf", 50.0, "pct"))
-        dump("air-changes-hour", "base", iv("q", 1.0, "m3s"), iv("vroom", 240.0, "m3"))
-        dump("air-changes-hour", "double-volume", iv("q", 1.0, "m3s"), iv("vroom", 480.0, "m3"))
+        dump("air-changes-hour", "fan-240m3-ach15", iv("vroom", 240.0, "m3"), iv("ach", 15.0, "perh"))
+        dump("air-changes-hour", "fan-480m3-ach15", iv("vroom", 480.0, "m3"), iv("ach", 15.0, "perh"))
+        dump("air-changes-hour", "reverse-2000cfm", iv("q", 2000.0, "cfm"), iv("vroom", 300.0, "m3"))
 
         // --- Thermodynamics ---
         dump("ideal-gas", "air-20c", iv("p", 101.325, "kpa"), iv("t", 20.0, "c"), iv("m", 28.965, "gmol"))

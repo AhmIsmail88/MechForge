@@ -28,5 +28,7 @@ ull when the user cancelled or rendering failed.
         title: String,
         meta: List<Pair<String, String>>,
         blocks: List<ReportBlock>,
+        logo: ByteArray? = null,
+        rtl: Boolean = false,
     ): String?
 }

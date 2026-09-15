@@ -4,46 +4,107 @@ import com.mechforge.core.engine.Calculator
 import com.mechforge.core.engine.CalculatorCategory
 import com.mechforge.core.engine.CalculatorDefinition
 import com.mechforge.core.engine.CalcOutput
+import com.mechforge.core.engine.InputError
 import com.mechforge.core.engine.InputSpec
 import com.mechforge.core.engine.InputValue
+import com.mechforge.core.engine.ValidationException
 import com.mechforge.core.units.UnitFamily
 import com.mechforge.core.util.Fmt
 
-/** Air changes per hour: ACH = Q·3600/V_room. */
+/**
+ * Ventilation airflow from a target air-change rate (fan-capacity sizing):
+ *
+ *   ACH = Q*3600/V ;  Q = ACH*V/3600 ;  V = Q*3600/ACH
+ *
+ * Enter any TWO of airflow (Q), room volume (V) or air changes per hour (ACH);
+ * the third is computed. The primary result is the fan/airflow capacity.
+ */
 private val Def = CalculatorDefinition(
     id = "air-changes-hour",
-    name = "Air Changes per Hour (ACH)",
+    name = "Ventilation Airflow (Fan Capacity / ACH)",
     category = CalculatorCategory.HVAC,
-    description = "Air changes per hour for a space from ventilation airflow and room volume.",
-    formulaDisplay = "ACH = Q·3600 / V_room",
-    reference = "Standard ventilation metric; ACH requirements come from codes — this tool only computes the value.",
-    notes = "ACH is a screening metric. Compliance normally depends on occupancy, use and the applicable code or standard.",
-    keywords = listOf("ach", "air changes", "ventilation", "fresh air", "room"),
+    description = "Required ventilation airflow (fan capacity) from a target air-change rate and room volume, or the reverse: ACH from airflow.",
+    formulaDisplay = "Q = ACH*V/3600 ;  ACH = Q*3600/V ;  V = Q*3600/ACH",
+    reference = "Standard ventilation metric; the required ACH comes from the applicable code or design brief - this tool only sizes the airflow.",
+    notes = "Enter any TWO of Q, V or ACH; the third is computed. Typical ACH (practice guidance - verify against the applicable code): 2-6 comfort spaces, 6-12 toilets/kitchens, 10-15 plant rooms and equipment spaces.",
+    keywords = listOf("ach", "air changes", "ventilation", "fan capacity", "airflow", "fresh air", "room", "supply air"),
     inputs = listOf(
-        InputSpec("q", "Supply / ventilation airflow", "Q", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
-        InputSpec("vroom", "Room volume", "V", UnitFamily.VOLUME, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3"),
+        InputSpec("q", "Airflow (fan capacity)", "Q", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
+        InputSpec("vroom", "Room volume", "V", UnitFamily.VOLUME, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3"),
+        InputSpec("ach", "Air changes per hour", "ACH", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "perh"),
     ),
 )
 
 object AirChangesCalculator : Calculator(Def) {
 
     override fun calculate(inputs: Map<String, InputValue>): CalcOutput {
-        val q = value(inputs, "q")
-        val v = value(inputs, "vroom")
+        val hasQ = has(inputs, "q")
+        val hasV = has(inputs, "vroom")
+        val hasAch = has(inputs, "ach")
 
-        val ach = q * 3600.0 / v
+        if (listOf(hasQ, hasV, hasAch).count { it } != 2) {
+            throw ValidationException(
+                listOf(
+                    InputError(
+                        "q",
+                        "Enter exactly TWO of airflow (Q), room volume (V) or air changes per hour (ACH) - the third is computed.",
+                    )
+                )
+            )
+        }
+
+        val q: Double // m3/s
+        val v: Double // m3
+        val ach: Double // 1/h
+        when {
+            hasQ && hasV -> {
+                q = value(inputs, "q")
+                v = value(inputs, "vroom")
+                ach = q * 3600.0 / v
+            }
+            hasV && hasAch -> {
+                v = value(inputs, "vroom")
+                ach = value(inputs, "ach")
+                q = ach * v / 3600.0
+            }
+            else -> {
+                q = value(inputs, "q")
+                ach = value(inputs, "ach")
+                v = q * 3600.0 / ach
+            }
+        }
+
+        val minutesPerChange = 60.0 / ach
 
         return CalcOutput(
             results = listOf(
-                result("ach", "Air Changes per Hour (1/h)", ach, "perh", isPrimary = true),
-                result("time", "Air Change Time", 3600.0 / ach, "s"),
+                result("q", "Required Airflow (Fan Capacity)", q * 3600.0, "m3h", isPrimary = true),
+                result("qCfm", "Required Airflow (imperial)", q / 4.719474432e-4, "cfm", isPrimary = true),
+                result("qLs", "Required Airflow (L/s)", q * 1000.0, "ls"),
+                result("ach", "Air Changes per Hour", ach, "perh", isPrimary = true),
+                result("vroom", "Room Volume", v, "m3"),
+                result("time", "Time per Air Change", minutesPerChange, "min"),
             ),
             steps = listOf(
-                "Airflow: ${Fmt.n(q, 5)} m³/s = ${Fmt.n(q * 3600.0, 1)} m³/h",
-                "ACH = Q·3600/V = ${Fmt.n(q * 3600.0, 1)} / ${Fmt.n(v, 2)} = ${Fmt.n(ach, 2)} 1/h",
-                "One air change every ${Fmt.n(3600.0 / ach, 1)} s (${Fmt.n(60.0 / ach, 2)} min)",
+                if (hasQ && hasV) {
+                    "Airflow: ${Fmt.n(q * 3600.0, 1)} m3/h   Room volume: ${Fmt.n(v, 2)} m3"
+                } else if (hasV && hasAch) {
+                    "Room volume: ${Fmt.n(v, 2)} m3   Target ACH: ${Fmt.n(ach, 2)} 1/h"
+                } else {
+                    "Airflow: ${Fmt.n(q * 3600.0, 1)} m3/h   ACH: ${Fmt.n(ach, 2)} 1/h"
+                },
+                "Q = ACH*V/3600 = ${Fmt.n(ach, 2)} x ${Fmt.n(v, 2)} / 3600 = ${Fmt.n(q, 5)} m3/s",
+                "Fan capacity = ${Fmt.n(q * 3600.0, 1)} m3/h = ${Fmt.n(q / 4.719474432e-4, 0)} CFM = ${Fmt.n(q * 1000.0, 1)} L/s",
+                "ACH = Q*3600/V = ${Fmt.n(q * 3600.0, 1)} / ${Fmt.n(v, 2)} = ${Fmt.n(ach, 2)} 1/h (one air change every ${Fmt.n(minutesPerChange, 1)} min)",
             ),
-            warnings = if (ach < 2.0) listOf("Below 2 ACH — verify against the applicable ventilation requirement for this space.") else emptyList(),
+            warnings = buildList {
+                if (ach < 2.0) {
+                    add("Below 2 ACH - verify the target against the applicable ventilation requirement for this space.")
+                }
+                if (ach > 60.0) {
+                    add("Above 60 ACH is unusual - confirm the target rate and check acoustic and pressure-drop implications.")
+                }
+            },
         )
     }
 }

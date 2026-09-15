@@ -44,4 +44,37 @@ class PdfReportSmokeTest {
         assertTrue(text.contains("/Filter /DCTDecode"), "pages were not embedded as JPEG images")
         println("PDF_SMOKE_OK path=${out.absolutePath} bytes=${out.length()} pages=${Regex("/Type /Page[^s]").findAll(text).count()}")
     }
+
+    @Test
+    fun writesAPdfWithLogoAndRtlLayout() {
+        System.setProperty("java.awt.headless", "true")
+        // in-memory PNG logo
+        val img = java.awt.image.BufferedImage(80, 40, java.awt.image.BufferedImage.TYPE_INT_RGB)
+        val g = img.createGraphics()
+        g.color = java.awt.Color(0x1B, 0x4F, 0x8A)
+        g.fillRect(0, 0, 80, 40)
+        g.dispose()
+        val bos = java.io.ByteArrayOutputStream()
+        javax.imageio.ImageIO.write(img, "png", bos)
+
+        val out = File.createTempFile("mechforge-letterhead-", ".pdf")
+        out.delete()
+
+        val blocks = listOf(
+            ReportBlock.Heading("Inputs"),
+            ReportBlock.TableRow(listOf("Q  Flow rate", "100 m3/h")),
+            ReportBlock.Heading("Results"),
+            ReportBlock.TableRow(listOf("Shaft Power", "17.0254 kW")),
+            ReportBlock.Warning("Efficiency above 85% is optimistic."),
+        )
+        val ok = DesktopPdfReport(bos.toByteArray(), rtl = true).write(
+            out,
+            "Pump Hydraulic Power & Shaft Power",
+            listOf("Project" to "Pilot", "Engineer" to "M. Ahmed"),
+            blocks,
+        )
+        assertTrue(ok, "renderer reported failure with a logo")
+        assertTrue(out.exists() && out.length() > 2000, "pdf missing/too small: ${out.length()}")
+        println("PDF_LOGO_SMOKE_OK bytes=${out.length()}")
+    }
 }

@@ -22,7 +22,7 @@ import java.util.Locale
  * every page. Text is measured with [StaticLayout], so Arabic shaping and RTL are
  * handled by the platform text engine and words are never broken mid-word.
  */
-class AndroidPdfReport(private val logo: File? = null, private val rtl: Boolean = false) {
+class AndroidPdfReport(private val logoBytes: ByteArray? = null, private val rtl: Boolean = false) {
 
     companion object {
         private const val PAGE_W = 595
@@ -106,13 +106,32 @@ class AndroidPdfReport(private val logo: File? = null, private val rtl: Boolean 
         y += lay.height + gap
     }
 
+    /** Two-column row: label on the leading side, value against the opposite margin. */
+    private fun drawTableRow(cells: List<String>) {
+        val label = cells.getOrNull(0) ?: return
+        val value = cells.getOrNull(1) ?: ""
+        val colW = CONTENT_W * 0.62f
+        val valW = CONTENT_W - colW - 8f
+        val layLabel = layout(label, bodyPaint, colW.toInt())
+        val layValue = layout(value, bodyPaint, valW.toInt())
+        val h = maxOf(layLabel.height, layValue.height)
+        ensure(h + 6f)
+        val c = canvas ?: return
+        val labelX = if (rtl) MARGIN + valW + 8f else MARGIN
+        val valueX = if (rtl) MARGIN else MARGIN + colW + 8f
+        c.save(); c.translate(labelX, y); layLabel.draw(c); c.restore()
+        c.save(); c.translate(valueX, y); layValue.draw(c); c.restore()
+        y += h + 6f
+        c.drawLine(MARGIN, y - 3f, PAGE_W - MARGIN, y - 3f, hairPaint)
+    }
+
     fun write(out: File, title: String, meta: List<Pair<String, String>>, blocks: List<ReportBlock>): Boolean {
         openPage()
         val c0 = canvas!!
         var headerBottom = MARGIN
-        if (logo != null && logo.exists()) {
+        if (logoBytes != null && logoBytes.isNotEmpty()) {
             try {
-                val bmp = android.graphics.BitmapFactory.decodeFile(logo.absolutePath)
+                val bmp = android.graphics.BitmapFactory.decodeByteArray(logoBytes, 0, logoBytes.size)
                 if (bmp != null) {
                     val h = 34f
                     val w = h * bmp.width / bmp.height
@@ -149,7 +168,7 @@ class AndroidPdfReport(private val logo: File? = null, private val rtl: Boolean 
                 }
                 is ReportBlock.Paragraph -> draw(b.text, bodyPaint, gap = 4f)
                 is ReportBlock.KeyValue -> draw("${b.label}: ${b.value}", bodyPaint, gap = 2f)
-                is ReportBlock.TableRow -> draw(b.cells.joinToString("   |   "), bodyPaint, gap = 2f)
+                is ReportBlock.TableRow -> drawTableRow(b.cells)
                 is ReportBlock.Divider -> {
                     ensure(10f)
                     canvas?.let { it.drawLine(MARGIN, y, PAGE_W - MARGIN, y, hairPaint) }

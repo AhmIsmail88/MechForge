@@ -4,6 +4,7 @@ import com.mechforge.app.data.FavoritesRepository
 import com.mechforge.app.data.HistoryRepository
 import com.mechforge.app.data.ProjectsRepository
 import com.mechforge.app.data.SettingsRepository
+import com.mechforge.app.export.LogoStore
 import com.mechforge.app.export.ReportExporter
 import com.mechforge.core.engine.CalculatorRegistry
 import com.mechforge.core.units.UnitFamily
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 class AppDependencies(
     val database: MechForgeDatabase,
     val exporter: ReportExporter,
+    val logoStore: LogoStore,
     val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
     val settings = SettingsRepository(database)
