@@ -5,6 +5,7 @@ import com.mechforge.core.engine.CalculatorRegistry
 import com.mechforge.core.engine.InputValue
 import com.mechforge.core.units.Units
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -44,7 +45,11 @@ class PdfReportSmokeTest {
         assertTrue(head == "%PDF-", "missing PDF header, got: $head")
         val text = out.readText(Charsets.ISO_8859_1)
         assertTrue(text.contains("/Type /Catalog"), "missing catalog")
-        assertTrue(text.contains("/Filter /DCTDecode"), "pages were not embedded as JPEG images")
+        // The pages must be embedded losslessly at print resolution: a 150-dpi JPEG
+          // looked faded and soft, so the renderer moved to 300 dpi + FlateDecode.
+          assertTrue(text.contains("/Filter /FlateDecode"), "pages were not embedded losslessly")
+          assertTrue(text.contains("/Width 2480") && text.contains("/Height 3508"), "pages are not 300 dpi (A4)")
+          assertFalse(text.contains("/DCTDecode"), "a lossy JPEG page is still being embedded")
         println("PDF_SMOKE_OK path=${out.absolutePath} bytes=${out.length()} pages=${Regex("/Type /Page[^s]").findAll(text).count()}")
     }
 
@@ -84,5 +89,41 @@ class PdfReportSmokeTest {
         assertTrue(ok, "renderer reported failure with a logo")
         assertTrue(out.exists() && out.length() > 2000, "pdf missing/too small: ${out.length()}")
         println("PDF_LOGO_SMOKE_OK bytes=${out.length()}")
+    }
+
+    @Test
+    fun writesTheSampleSheetForReview() {
+        System.setProperty("java.awt.headless", "true")
+        val calc = CalculatorRegistry.byIdOrThrow("pump-power")
+        val inputs = mapOf(
+            "q" to InputValue("q", Units.byId("m3h").toBase(100.0), "m3h"),
+            "h" to InputValue("h", Units.byId("m").toBase(50.0), "m"),
+            "eta" to InputValue("eta", Units.byId("pct").toBase(80.0), "pct"),
+            "rho" to InputValue("rho", Units.byId("kgm3").toBase(1000.0), "kgm3"),
+        )
+        val labels = ReportLabels.ENGLISH
+        val blocks = ReportSheet.build(
+            calc, inputs, calc.run(inputs), "Pump duty point - Example", labels,
+            listOf(labels.preparedBy to "M. Ahmed", labels.checkedBy to "A. Ismail", labels.approvedBy to ""),
+        )
+        val dir = File("../dist").apply { mkdirs() }
+        val target = File(dir, "MechForge-sample-report.pdf")
+        val ok = DesktopPdfReport().write(
+            target,
+            "Pump Hydraulic Power & Shaft Power",
+            listOf(
+                "Project" to "Sample project",
+                "Client" to "Example client",
+                "Engineer" to "M. Ahmed",
+                "Date" to "2026-09-15",
+            ),
+            blocks,
+        )
+        assertTrue(ok, "sample renderer reported failure")
+        assertTrue(target.exists() && target.length() > 10_000, "sample pdf missing or too small")
+        val text = target.readText(Charsets.ISO_8859_1)
+        assertTrue(text.contains("/Width 2480"), "sample is not 300 dpi")
+        assertTrue(!text.contains("/DCTDecode"), "sample still uses lossy JPEG pages")
+        println("PDF_SAMPLE_OK bytes=${target.length()}")
     }
 }

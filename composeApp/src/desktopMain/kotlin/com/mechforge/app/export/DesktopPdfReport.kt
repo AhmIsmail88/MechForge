@@ -7,6 +7,7 @@ import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.util.zip.DeflaterOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -22,9 +23,15 @@ import javax.imageio.ImageIO
 class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl: Boolean = false) {
 
     companion object {
-        private const val DPI = 150
-        private const val W = 1240   // A4 @150dpi
-        private const val H = 1754
+        /**
+         * Rendered at 300 dpi and encoded losslessly: a 150-dpi JPEG page looked faded and
+         * soft next to the vector text the Android export produces. The drawing code still
+         * works in the original 150-dpi coordinate space through [SCALE].
+         */
+        private const val DPI = 300
+        private const val W = 2480   // A4 @300dpi
+        private const val H = 3508
+        private const val SCALE = 2f
         private const val MARGIN = 90
         private val ACCENT = Color(0x1B, 0x4F, 0x8A)
         private val INK = Color(0x14, 0x18, 0x1D)
@@ -49,6 +56,7 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g.color = Color.WHITE
         g.fillRect(0, 0, W, H)
+        g.scale(SCALE.toDouble(), SCALE.toDouble())
         g.color = INK
         return img to g
     }
@@ -228,7 +236,22 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
         }
     }
 
-    /** Minimal PDF: one page per rendered image, embedded as a DCTDecode XObject. */
+    /** Packed RGB bytes of a page, ready for the FlateDecode stream. */
+    private fun rgbBytes(img: BufferedImage): ByteArray {
+        val out = ByteArray(img.width * img.height * 3)
+        var i = 0
+        for (y in 0 until img.height) {
+            for (x in 0 until img.width) {
+                val rgb = img.getRGB(x, y)
+                out[i++] = ((rgb shr 16) and 0xFF).toByte()
+                out[i++] = ((rgb shr 8) and 0xFF).toByte()
+                out[i++] = (rgb and 0xFF).toByte()
+            }
+        }
+        return out
+    }
+
+    /** Minimal PDF: one page per rendered image, embedded as a lossless FlateDecode XObject. */
     private fun buildPdf(): ByteArray {
         val out = ByteArrayOutputStream()
         val offsets = mutableListOf<Int>()
@@ -263,7 +286,10 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
         obj(2, "<< /Type /Pages /Count ${pages.size} /Kids [$kids] >>")
 
         for (i in pages.indices) {
-            val jpg = ByteArrayOutputStream().also { ImageIO.write(pages[i], "jpg", it) }.toByteArray()
+            val raw = rgbBytes(pages[i])
+            val bytes = ByteArrayOutputStream().also { out ->
+                DeflaterOutputStream(out).use { it.write(raw) }
+            }.toByteArray()
             val pid = pageObjIds[i]
             val cid = pid + 1
             val iid = imgObjIds[i]
@@ -271,9 +297,9 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
                 "/Resources << /XObject << /Im0 $iid 0 R >> >> /Contents $cid 0 R >>")
             val content = "q 595 0 0 842 0 0 cm /Im0 Do Q".toByteArray(Charsets.ISO_8859_1)
             obj(cid, "<< /Length ${content.size} >>", content)
-            val dict = "<< /Type /XObject /Subtype /Image /Width ${W} /Height $H " +
-                "/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.size} >>"
-            obj(iid, dict, jpg)
+            val dict = "<< /Type /XObject /Subtype /Image /Width $W /Height $H " +
+                "/ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /Length ${bytes.size} >>"
+            obj(iid, dict, bytes)
         }
 
         val xrefPos = count()
