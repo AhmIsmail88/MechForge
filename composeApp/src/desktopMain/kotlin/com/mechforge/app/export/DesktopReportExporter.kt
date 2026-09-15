@@ -27,6 +27,30 @@ class DesktopReportExporter : ReportExporter {
             target.absolutePath
         }
 
+    /** Writes the same report as a formatted Excel workbook through the native save dialog. */
+    override suspend fun saveXlsx(
+        defaultName: String,
+        title: String,
+        meta: List<Pair<String, String>>,
+        blocks: List<ReportBlock>,
+        rtl: Boolean,
+    ): String? = withContext(Dispatchers.Swing) {
+        val chooser = JFileChooser().apply {
+            dialogTitle = "Export Excel report"
+            selectedFile = File("$defaultName.xlsx")
+            fileFilter = FileNameExtensionFilter("Excel workbook (*.xlsx)", "xlsx")
+        }
+        val choice = chooser.showSaveDialog(null)
+        if (choice != JFileChooser.APPROVE_OPTION) return@withContext null
+        var target = chooser.selectedFile
+        if (!target.name.endsWith(".xlsx", ignoreCase = true)) {
+            target = File(target.parentFile, "${target.name}.xlsx")
+        }
+        val bytes = XlsxReport.render(title, meta, blocks, ReportLabels.of(rtl), rtl)
+        target.writeBytes(bytes)
+        target.absolutePath
+    }
+
     /** Writes a paginated A4 PDF report through the native save dialog. */
     override suspend fun savePdf(
         defaultName: String,

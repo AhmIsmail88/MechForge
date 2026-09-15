@@ -94,6 +94,66 @@ class AndroidReportExporter(private val context: Context) : ReportExporter {
         "Downloads/MechForge/$fileName"
     }
 
+    /** Writes the same report as an Excel workbook into Downloads/MechForge and offers the share sheet. */
+    override suspend fun saveXlsx(
+        defaultName: String,
+        title: String,
+        meta: List<Pair<String, String>>,
+        blocks: List<ReportBlock>,
+        rtl: Boolean,
+    ): String? = withContext(Dispatchers.IO) {
+        val safeName = defaultName.replace(Regex("[^A-Za-z0-9._-]"), "_")
+        val fileName = safeName + "_" + System.currentTimeMillis() + ".xlsx"
+        val mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+        val cache = File(context.cacheDir, "reports").apply { mkdirs() }
+        val tmp = File(cache, fileName)
+        return@withContext try {
+            tmp.writeBytes(XlsxReport.render(title, meta, blocks, ReportLabels.of(rtl), rtl))
+
+            val uri: Uri? = try {
+                val values = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(MediaStore.MediaColumns.MIME_TYPE, mime)
+                    put(
+                        MediaStore.MediaColumns.RELATIVE_PATH,
+                        Environment.DIRECTORY_DOWNLOADS + "/MechForge",
+                    )
+                }
+                val target = context.contentResolver.insert(
+                    MediaStore.Files.getContentUri("external"),
+                    values,
+                )
+                if (target != null) {
+                    context.contentResolver.openOutputStream(target)?.use { out ->
+                        tmp.inputStream().use { it.copyTo(out) }
+                    }
+                }
+                target
+            } catch (t: Throwable) {
+                null
+            }
+
+            if (uri == null) {
+                // MediaStore unavailable: keep the workbook in app storage instead of failing.
+                val fallbackDir = File(context.getExternalFilesDir(null) ?: context.filesDir, "reports")
+                    .apply { mkdirs() }
+                val fallback = File(fallbackDir, fileName)
+                tmp.copyTo(fallback, overwrite = true)
+                tmp.delete()
+                return@withContext fallback.absolutePath
+            }
+
+            tmp.delete()
+            offerShare(uri)
+            notifyReady(uri, fileName)
+            "Downloads/MechForge/$fileName"
+        } catch (t: Throwable) {
+            tmp.delete()
+            null
+        }
+    }
+
     /** Opens the system share sheet so the report can be opened or sent straight away. */
     private fun offerShare(uri: Uri) {
         try {

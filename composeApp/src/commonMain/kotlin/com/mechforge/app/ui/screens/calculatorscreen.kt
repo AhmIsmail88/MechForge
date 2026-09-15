@@ -401,6 +401,34 @@ fun CalculatorScreen(
                             },
                             label = { Text(strings.exportPdf) },
                         )
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    // Same blocks, same order, same report language: only the
+                                    // renderer changes (styled Excel workbook instead of PDF).
+                                    val rtl = deps.settings.reportIsArabic()
+                                    val labels = ReportLabels.of(rtl)
+                                    val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
+                                    val meta = listOfNotNull(
+                                        labels.project to deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
+                                        labels.client to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT),
+                                        labels.engineer to engineerName,
+                                        labels.location to deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION),
+                                        labels.reportNo to deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO),
+                                        labels.revision to deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV),
+                                        labels.date to java.time.LocalDate.now().toString(),
+                                    ).filter { it.second.isNotBlank() }
+                                    val signature = listOf(
+                                        labels.preparedBy to engineerName,
+                                        labels.checkedBy to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CHECKED),
+                                        labels.approvedBy to "",
+                                    )
+                                    val blocks = ReportSheet.build(calc, lastInputs ?: emptyMap(), out, restoreTitle, labels, signature)
+                                    val path = deps.exporter.saveXlsx(def.id, def.name, meta, blocks, rtl)
+                                    savedMessage = if (path != null) strings.calculatorReportSaved + " " + path else strings.calculatorExportCancelled
+                                }
+                            },
+                        ) { Text(strings.exportExcel) }
                     }
                 }
             }

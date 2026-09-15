@@ -31,4 +31,18 @@ ull when the user cancelled or rendering failed.
         logo: ByteArray? = null,
         rtl: Boolean = false,
     ): String?
+
+    /**
+     * Writes the same report as a formatted Excel workbook (one worksheet, the same
+     * block order as the PDF, styled headings/tables and clear fonts).
+     *
+     * @return the path written, or `null` when the user cancelled.
+     */
+    suspend fun saveXlsx(
+        defaultName: String,
+        title: String,
+        meta: List<Pair<String, String>>,
+        blocks: List<ReportBlock>,
+        rtl: Boolean = false,
+    ): String?
 }

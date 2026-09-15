@@ -168,6 +168,7 @@ interface UiStrings {
     val close: String
     val remove: String
     val exportPdf: String
+    val exportExcel: String
     val libraryPick: String
     val libraryNoData: String
     val historyCopyName: String
@@ -358,6 +359,7 @@ object ArStrings : UiStrings {
     override val close = "إغلاق"
     override val remove = "إزالة"
     override val exportPdf = "تصدير PDF"
+    override val exportExcel = "تصدير Excel"
     override val libraryPick = "المكتبة"
     override val libraryNoData = "(لا توجد بيانات)"
     override val historyCopyName = "(نسخة)"
@@ -560,6 +562,7 @@ object EnStrings : UiStrings {
     override val close = "Close"
     override val remove = "Remove"
     override val exportPdf = "Export PDF"
+    override val exportExcel = "Export Excel"
     override val libraryPick = "Library"
     override val libraryNoData = "(no data)"
     override val historyCopyName = "(copy)"
