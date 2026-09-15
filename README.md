@@ -15,6 +15,13 @@ Hydraulics · HVAC · Thermodynamics · Mechanical design · Piping · Water &am
 
 <img src="docs/assets/screenshot-desktop.png" width="860" alt="MechForge on the desktop: the glass interface, the calculator library and the reference library">
 
+<p>
+  <img src="docs/assets/screenshot-phone-home.png" width="248" alt="MechForge on Android: the calculator library, recents and categories">
+  <img src="docs/assets/screenshot-phone-drawer.png" width="248" alt="MechForge on Android: the navigation drawer">
+</p>
+
+<sub>Desktop (above) and Android (below the same UI, glass theme): the calculator library and the navigation drawer.</sub>
+
 </div>
 
 ---
