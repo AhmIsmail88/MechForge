@@ -39,6 +39,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.ui.theme.glassBorder
 
 private val historyDateFormatter =
     DateTimeFormatter.ofPattern("dd MMM yyyy  HH:mm").withZone(ZoneId.systemDefault())
@@ -67,7 +68,7 @@ fun HistoryScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
         LazyColumn(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
             items(history, key = { it.id }) { row ->
                 val calc = CalculatorRegistry.byId(row.calculator_id)
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(modifier = Modifier.fillMaxWidth().glassBorder()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier

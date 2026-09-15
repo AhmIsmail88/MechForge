@@ -93,6 +93,8 @@ object ReportSheet {
                 "${labels.signatureLine}: ..............................        " +
                     "${labels.dateLine}: .................."
             )
+            // Credit line printed under the signature block.
+            blocks += ReportBlock.Paragraph("By Ahmed Ismail")
         }
 
         return blocks

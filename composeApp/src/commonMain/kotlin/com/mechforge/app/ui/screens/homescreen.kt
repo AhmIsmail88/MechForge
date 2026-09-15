@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.ui.theme.glassBorder
 import com.mechforge.app.ui.Screen
 import com.mechforge.core.engine.Calculator
 import com.mechforge.core.engine.CalculatorCategory
@@ -199,7 +200,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
 
 @Composable
 private fun CalculatorCard(calc: Calculator, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Card(modifier = modifier.clickable(onClick = onClick)) {
+    Card(modifier = modifier.clickable(onClick = onClick).glassBorder()) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(calc.def.name, style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(4.dp))

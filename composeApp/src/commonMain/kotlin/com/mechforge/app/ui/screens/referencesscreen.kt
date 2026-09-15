@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.data.ImportResult
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.ui.theme.glassBorder
 import com.mechforge.app.ui.util.DatasetFilePickerButton
 
 /**
@@ -83,7 +84,7 @@ fun ReferencesScreen(deps: AppDependencies) {
         }
 
         for (dataset in datasets) {
-            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+            Card(modifier = Modifier.fillMaxWidth().glassBorder(MaterialTheme.shapes.large).padding(vertical = 4.dp)) {
                 Column(modifier = Modifier.padding(14.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

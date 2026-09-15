@@ -35,12 +35,21 @@ private val LightColors = lightColorScheme(
     tertiary = Cyan,
     onTertiary = Color.White,
     tertiaryContainer = Color(0xFFD2F2F8),
-    background = Color(0xFFF7F8FA),
-    onBackground = Color(0xFF1A1C1E),
-    surface = Color.White,
-    onSurface = Color(0xFF1A1C1E),
-    surfaceVariant = Color(0xFFECEEF1),
-    onSurfaceVariant = Color(0xFF43474A),
+    // Glass pass: the shell paints the backdrop, so every surface is translucent and
+    // Material components (cards, fields, dialogs, menus) become glass for free.
+    background = Color(0xFFEDF2FB),
+    onBackground = Color(0xFF141A24),
+    surface = Color(0x9EFFFFFF),
+    onSurface = Color(0xFF141A24),
+    surfaceVariant = Color(0x7AFFFFFF),
+    onSurfaceVariant = Color(0xFF3A4453),
+    surfaceContainerLowest = Color(0x70FFFFFF),
+    surfaceContainerLow = Color(0xB8FFFFFF),
+    surfaceContainer = Color(0xC6FFFFFF),
+    surfaceContainerHigh = Color(0xD8FFFFFF),
+    surfaceContainerHighest = Color(0xE6FFFFFF),
+    outline = Color(0x33101828),
+    outlineVariant = Color(0x1F101828),
 )
 
 private val DarkColors = darkColorScheme(
@@ -52,12 +61,20 @@ private val DarkColors = darkColorScheme(
     onSecondary = Color(0xFF25282B),
     tertiary = Color(0xFF4DD0E1),
     onTertiary = Color(0xFF062F35),
-    background = Color(0xFF121417),
-    onBackground = Color(0xFFE2E3E5),
-    surface = Color(0xFF1B1E22),
-    onSurface = Color(0xFFE2E3E5),
-    surfaceVariant = Color(0xFF2A2E33),
-    onSurfaceVariant = Color(0xFFC3C7CB),
+    // Glass pass: translucent panes over the deep engineering backdrop.
+    background = Color(0xFF070B16),
+    onBackground = Color(0xFFE6ECF8),
+    surface = Color(0x1AFFFFFF),
+    onSurface = Color(0xFFE6ECF8),
+    surfaceVariant = Color(0x24FFFFFF),
+    onSurfaceVariant = Color(0xFFC3CCDA),
+    surfaceContainerLowest = Color(0x14FFFFFF),
+    surfaceContainerLow = Color(0x1AFFFFFF),
+    surfaceContainer = Color(0x22FFFFFF),
+    surfaceContainerHigh = Color(0x2CFFFFFF),
+    surfaceContainerHighest = Color(0x38FFFFFF),
+    outline = Color(0x42FFFFFF),
+    outlineVariant = Color(0x1FFFFFFF),
 )
 
 /** True when [mode] resolves to the dark scheme for the current system setting. */

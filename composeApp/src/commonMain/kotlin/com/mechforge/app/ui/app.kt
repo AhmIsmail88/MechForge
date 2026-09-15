@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.History
@@ -35,6 +36,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -46,10 +48,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.ui.i18n.UiStrings
+import com.mechforge.app.ui.theme.GlassBackdrop
+import com.mechforge.app.ui.theme.glassChrome
+import com.mechforge.app.ui.theme.glassPanel
 import com.mechforge.app.ui.screens.AboutScreen
 import com.mechforge.app.ui.screens.CalculatorScreen
 import com.mechforge.app.ui.screens.ConverterScreen
@@ -104,6 +110,9 @@ fun MechForgeApp(deps: AppDependencies) {
     var screen by remember { mutableStateOf<Screen>(Screen.Home) }
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        // Glass pass: the backdrop is painted once here; every screen stays transparent
+        // so the translucent surfaces above it read as frosted panes.
+        GlassBackdrop()
         if (maxWidth < CompactWidth) {
             // Phone / narrow window: navigation drawer + top bar so the content gets the full width.
             val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -125,7 +134,7 @@ fun MechForgeApp(deps: AppDependencies) {
                                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
                             )
                             Text(
-                                "Mechanical Engineering Toolkit",
+                                strings.appTagline,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 24.dp),
@@ -223,7 +232,7 @@ private fun Sidebar(current: Screen, onNavigate: (Screen) -> Unit) {
             modifier = Modifier.padding(bottom = 4.dp),
         )
         Text(
-            "Mechanical Engineering Toolkit",
+            strings.appTagline,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 20.dp),

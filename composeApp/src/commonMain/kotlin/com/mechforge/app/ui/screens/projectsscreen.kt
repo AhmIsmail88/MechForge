@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.ui.theme.glassBorder
 
 @Composable
 fun ProjectsScreen(deps: AppDependencies) {
@@ -64,7 +65,7 @@ fun ProjectsScreen(deps: AppDependencies) {
 
         LazyColumn(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
             items(projects, key = { it.id }) { project ->
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(modifier = Modifier.fillMaxWidth().glassBorder()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
