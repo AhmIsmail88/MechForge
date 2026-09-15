@@ -301,6 +301,89 @@ def expectation(calc, scenario, raw):
         hlr = x("q") / x("a")
         return {"hlr": hlr * 86400.0, "hlrh": hlr * 3600.0}
 
+    if calc == "sprinkler-discharge":
+        q_lmin = x("k") * math.sqrt(x("p") / 1e5)
+        return {"q": q_lmin, "qGpm": q_lmin / 3.785411784, "qM3h": q_lmin * 0.06}
+
+    if calc == "hose-nozzle-flow":
+        d_in = x("d") / 0.0254
+        p_psi = x("p") / 6894.757293168361
+        q_gpm = 29.7 * d_in * d_in * math.sqrt(p_psi)
+        return {"q": q_gpm, "qLmin": q_gpm * 3.785411784, "qM3h": q_gpm * 3.785411784 * 0.06}
+
+    if calc == "fire-pump-head":
+        rho = x("rho") if "rho" in raw else 998.2
+        dp = x("preq") - (x("pavail") if "pavail" in raw else 0.0)
+        phead = dp / (rho * G)
+        return {"h": phead + x("hstatic") + x("hf"), "phead": phead, "dp": dp / 1e5}
+
+    if calc == "fire-pump-power":
+        rho = x("rho") if "rho" in raw else 998.2
+        hyd = rho * G * x("q") * x("h") / 1000.0
+        shaft = hyd / x("eta")
+        motors = [0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5, 11.0, 15.0, 18.5, 22.0, 30.0,
+                  37.0, 45.0, 55.0, 75.0, 90.0, 110.0, 132.0, 160.0, 200.0]
+        motor = next((m for m in motors if m >= shaft), 200.0)
+        return {"hydraulic": hyd, "shaft": shaft, "motor": motor}
+
+    if calc == "water-hammer":
+        rho = x("rho") if "rho" in raw else 1000.0
+        dp = rho * x("c") * x("dv")
+        out = {"dp": dp / 1e5, "dpMpa": dp / 1e6, "head": dp / (rho * G)}
+        if "l" in raw:
+            out["tc"] = 2.0 * x("l") / x("c")
+        return out
+
+    if calc == "heat-exchanger-duty":
+        cp = x("cp") if "cp" in raw else 4186.0
+        q = x("m") * cp * (x("tout") - x("tin"))
+        out = {"q": q / 1000.0, "qBtuh": q / 1000.0 * 3412.142, "dt": x("tout") - x("tin")}
+        if all(k in raw for k in ("u", "a", "thin", "thout", "tcin", "tcout")):
+            counter = (x("arr") >= 0.5) if "arr" in raw else True
+            dt1 = x("thin") - x("tcout") if counter else x("thin") - x("tcin")
+            dt2 = x("thout") - x("tcin") if counter else x("thout") - x("tcout")
+            if dt1 > 0 and dt2 > 0:
+                lm = dt1 if abs(dt1 - dt2) < 1e-9 else (dt1 - dt2) / math.log(dt1 / dt2)
+                out["lmtd"] = lm
+                out["qArea"] = x("u") * x("a") * lm / 1000.0
+        return out
+
+    if calc == "hx-effectiveness-ntu":
+        ntu = x("ntu")
+        cr = x("cr") if "cr" in raw else 0.0
+        counter = (x("arr") >= 0.5) if "arr" in raw else True
+        if abs(cr) < 1e-9:
+            eps = 1.0 - math.exp(-ntu)
+        elif counter and abs(1.0 - cr) < 1e-9:
+            eps = ntu / (1.0 + ntu)
+        elif counter:
+            eps = (1.0 - math.exp(-ntu * (1.0 - cr))) / (1.0 - cr * math.exp(-ntu * (1.0 - cr)))
+        else:
+            eps = (1.0 - math.exp(-ntu * (1.0 + cr))) / (1.0 + cr)
+        return {"eps": eps * 100.0, "epsFrac": eps, "ntuUsed": ntu, "crUsed": cr}
+
+    if calc == "pump-affinity-laws":
+        r = x("n2") / x("n1")
+        out = {"q2": x("q1") * r * 3600.0, "h2": x("h1") * r * r, "p2": x("p1") / 1000.0 * r ** 3}
+        if "d1" in raw and "d2" in raw:
+            rd = x("d2") / x("d1")
+            out.update({"q2t": x("q1") * rd * 3600.0, "h2t": x("h1") * rd * rd,
+                        "p2t": x("p1") / 1000.0 * rd ** 3})
+        return out
+
+    if calc == "fan-laws":
+        r = x("n2") / x("n1")
+        dr = (x("rho2") if "rho2" in raw else 1.2) / (x("rho1") if "rho1" in raw else 1.2)
+        return {"q2": x("q1") * r * 3600.0, "dp2": x("dp1") * r * r * dr,
+                "p2": x("p1") / 1000.0 * r ** 3 * dr, "rp": r, "rd": dr}
+
+    if calc == "compression-ratio":
+        ratio = x("p2") / x("p1")
+        crmax = x("crmax") if "crmax" in raw else 4.0
+        n = 1 if ratio <= crmax else math.ceil(math.log(ratio) / math.log(crmax))
+        per = ratio ** (1.0 / n)
+        return {"cr": ratio, "n": float(n), "crStage": per, "pint": x("p1") * per / 1e5}
+
     if calc == "pressure-converter":
         b = x("v")
         return {"pa": b, "kpa": b / 1e3, "mpa": b / 1e6, "bar": b / 1e5,
@@ -357,6 +440,11 @@ SCALING = [
     ("peak-flow", "pf5", "pf2.5", "qp", 2.0, "Qpeak ~ PF"),
     ("hydraulic-loading", "1000-500", "1000-250", "hlr", 0.5, "HLR ~ 1/A"),
     ("air-changes-hour", "fan-480m3-ach15", "fan-240m3-ach15", "q", 2.0, "fan capacity ~ V at fixed ACH"),
+    ("sprinkler-discharge", "p-28psi", "p-7psi", "q", 2.0, "sprinkler Q ~ sqrt(P)"),
+    ("pump-affinity-laws", "n2-1800", "n2-1200", "q2", 1.5, "affinity: Q2 ~ N2"),
+    ("fan-laws", "n2-1200", "n2-1000", "q2", 1.2, "fan laws: Q2 ~ N2"),
+    ("heat-exchanger-duty", "m-2kgs", "m-1kgs", "q", 2.0, "HX duty ~ m_dot"),
+    ("compression-ratio", "16bar", "4bar", "cr", 4.0, "CR ~ P2/P1"),
 ]
 
 

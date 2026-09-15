@@ -31,5 +31,6 @@ enum class UnitFamily(val displayName: String) {
     SPECIFIC_HEAT("Specific Heat"),
     HEAT_TRANSFER_COEFF("Heat Transfer Coefficient"),
     TEMPERATURE_DIFFERENCE("Temperature Difference"),
+    FLOW_FACTOR("Flow Factor"),
     DIMENSIONLESS("Dimensionless"),
 }

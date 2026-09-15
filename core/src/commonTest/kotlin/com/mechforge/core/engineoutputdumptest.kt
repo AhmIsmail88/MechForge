@@ -144,6 +144,26 @@ class EngineOutputDumpTest {
         dump("hydraulic-loading", "1000-250", iv("q", 1000.0, "m3d"), iv("a", 250.0, "m2"))
         dump("hydraulic-loading", "1000-500", iv("q", 1000.0, "m3d"), iv("a", 500.0, "m2"))
 
+        // --- Fire protection ---
+        dump("sprinkler-discharge", "p-7psi", iv("k", 5.6, "gpmpsi"), iv("p", 7.0, "psi"))
+        dump("sprinkler-discharge", "p-28psi", iv("k", 5.6, "gpmpsi"), iv("p", 28.0, "psi"))
+        dump("hose-nozzle-flow", "base", iv("d", 1.5, "in"), iv("p", 100.0, "psi"))
+        dump("fire-pump-head", "base", iv("preq", 8.0, "bar"), iv("pavail", 2.0, "bar"), iv("hstatic", 20.0, "m"), iv("hf", 12.0, "m"), iv("rho", 998.2, "kgm3"))
+        dump("fire-pump-power", "base", iv("q", 2500.0, "lmin"), iv("h", 93.2935, "m"), iv("eta", 75.0, "pct"), iv("rho", 998.2, "kgm3"))
+        dump("water-hammer", "base", iv("rho", 1000.0, "kgm3"), iv("c", 1200.0, "ms"), iv("dv", 2.0, "ms"), iv("l", 1000.0, "m"))
+
+        // --- Equipment ---
+        dump("heat-exchanger-duty", "m-1kgs", iv("m", 1.0, "kgs"), iv("cp", 4.186, "kjkgk"), iv("tin", 30.0, "c"), iv("tout", 50.0, "c"), iv("u", 500.0, "wm2k"), iv("a", 10.0, "m2"), iv("thin", 90.0, "c"), iv("thout", 60.0, "c"), iv("tcin", 20.0, "c"), iv("tcout", 45.0, "c"), iv("arr", 1.0, "dash"))
+        dump("heat-exchanger-duty", "m-2kgs", iv("m", 2.0, "kgs"), iv("cp", 4.186, "kjkgk"), iv("tin", 60.0, "c"), iv("tout", 80.0, "c"))
+        dump("hx-effectiveness-ntu", "ntu2-cr0", iv("ntu", 2.0, "dash"), iv("cr", 0.0, "dash"))
+        dump("hx-effectiveness-ntu", "ntu2-cr1-counter", iv("ntu", 2.0, "dash"), iv("cr", 1.0, "dash"), iv("arr", 1.0, "dash"))
+        dump("pump-affinity-laws", "n2-1800", iv("q1", 100.0, "m3h"), iv("h1", 50.0, "m"), iv("p1", 10.0, "kw"), iv("n1", 1500.0, "rpm"), iv("n2", 1800.0, "rpm"))
+        dump("pump-affinity-laws", "n2-1200", iv("q1", 100.0, "m3h"), iv("h1", 50.0, "m"), iv("p1", 10.0, "kw"), iv("n1", 1500.0, "rpm"), iv("n2", 1200.0, "rpm"))
+        dump("fan-laws", "n2-1200", iv("q1", 10000.0, "m3h"), iv("dp1", 500.0, "pa"), iv("p1", 5.0, "kw"), iv("n1", 1000.0, "rpm"), iv("n2", 1200.0, "rpm"), iv("rho1", 1.2, "kgm3"), iv("rho2", 1.2, "kgm3"))
+        dump("fan-laws", "n2-1000", iv("q1", 10000.0, "m3h"), iv("dp1", 500.0, "pa"), iv("p1", 5.0, "kw"), iv("n1", 1000.0, "rpm"), iv("n2", 1000.0, "rpm"), iv("rho1", 1.2, "kgm3"), iv("rho2", 1.2, "kgm3"))
+        dump("compression-ratio", "16bar", iv("p1", 1.0, "bar"), iv("p2", 16.0, "bar"), iv("crmax", 4.0, "dash"))
+        dump("compression-ratio", "4bar", iv("p1", 1.0, "bar"), iv("p2", 4.0, "bar"), iv("crmax", 4.0, "dash"))
+
         // --- Unit converters ---
         dump("pressure-converter", "1bar", iv("v", 1.0, "bar"))
         dump("flow-converter", "1m3h", iv("v", 1.0, "m3h"))

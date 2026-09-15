@@ -5,6 +5,16 @@ import com.mechforge.core.calcs.AirflowConverterCalculator
 import com.mechforge.core.calcs.BeamCantileverPointCalculator
 import com.mechforge.core.calcs.BeamSsUdlCalculator
 import com.mechforge.core.calcs.BearingL10Calculator
+import com.mechforge.core.calcs.CompressionRatioCalculator
+import com.mechforge.core.calcs.FanLawsCalculator
+import com.mechforge.core.calcs.FirePumpHeadCalculator
+import com.mechforge.core.calcs.FirePumpPowerCalculator
+import com.mechforge.core.calcs.HeatExchangerDutyCalculator
+import com.mechforge.core.calcs.HoseNozzleFlowCalculator
+import com.mechforge.core.calcs.HxEffectivenessNtuCalculator
+import com.mechforge.core.calcs.PumpAffinityLawsCalculator
+import com.mechforge.core.calcs.SprinklerDischargeCalculator
+import com.mechforge.core.calcs.WaterHammerCalculator
 import com.mechforge.core.calcs.BoltTorqueCalculator
 import com.mechforge.core.calcs.CarnotEfficiencyCalculator
 import com.mechforge.core.calcs.ChlorineDoseCalculator
@@ -109,6 +119,18 @@ object CalculatorRegistry {
         ChlorineDoseCalculator,
         PeakFlowCalculator,
         HydraulicLoadingCalculator,
+        // Fire protection (5)
+        SprinklerDischargeCalculator,
+        HoseNozzleFlowCalculator,
+        FirePumpHeadCalculator,
+        FirePumpPowerCalculator,
+        WaterHammerCalculator,
+        // Equipment (5)
+        HeatExchangerDutyCalculator,
+        HxEffectivenessNtuCalculator,
+        PumpAffinityLawsCalculator,
+        FanLawsCalculator,
+        CompressionRatioCalculator,
         // Unit conversion (5)
         PressureConverterCalculator,
         FlowConverterCalculator,

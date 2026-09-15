@@ -188,6 +188,10 @@ object Units {
         add(factorUnit("kcalh", "kcal/(h·m²·°C)", UnitFamily.HEAT_TRANSFER_COEFF, 1.163))
         add(factorUnit("btuhft2", "BTU/(h·ft²·°F)", UnitFamily.HEAT_TRANSFER_COEFF, 5.678263341))
 
+        // Flow factor (sprinkler K-factor; base: L/min/bar^0.5)
+        add(factorUnit("lpmbar", "L/min/bar^0.5", UnitFamily.FLOW_FACTOR, 1.0))
+        add(factorUnit("gpmpsi", "gpm/psi^0.5", UnitFamily.FLOW_FACTOR, 14.41704))
+
         // Temperature difference (base: K) — difference units, no offsets
         add(factorUnit("delk", "K", UnitFamily.TEMPERATURE_DIFFERENCE, 1.0))
         add(factorUnit("delc", "°C", UnitFamily.TEMPERATURE_DIFFERENCE, 1.0))
@@ -258,6 +262,7 @@ object Units {
         UnitFamily.SPECIFIC_HEAT to "kjkgk",
         UnitFamily.HEAT_TRANSFER_COEFF to "wm2k",
         UnitFamily.TEMPERATURE_DIFFERENCE to "delk",
+        UnitFamily.FLOW_FACTOR to "lpmbar",
         UnitFamily.DIMENSIONLESS to "pct",
     )
 
