@@ -2,25 +2,28 @@
 
 <img src="docs/assets/cover.png" width="100%" alt="MechForge - 62 verified mechanical engineering calculators, offline-first, Arabic and English, PDF and Excel reports">
 
+<img src="docs/assets/cover-ar.png" width="100%" alt="MechForge - مجموعة أدوات الهندسة الميكانيكية، 62 حاسبة متحققة، عربي وإنجليزي">
+
 **A local-first mechanical-engineering toolkit for engineers who need to check their numbers.**
 
 Hydraulics · HVAC · Thermodynamics · Mechanical design · Piping · Water &amp; wastewater · Fire protection · Equipment
 
-![version](https://img.shields.io/badge/version-0.2.0-1856FF?style=flat-square)
-![platform](https://img.shields.io/badge/platform-Android%208%2B%20%7C%20Desktop%20JVM-3A344E?style=flat-square)
-![kotlin](https://img.shields.io/badge/Kotlin-2.2.20-7F52FF?style=flat-square)
-![compose](https://img.shields.io/badge/Compose%20Multiplatform-1.9.0-4285F4?style=flat-square)
-![tests](https://img.shields.io/badge/tests-259%20engine%20%2B%2016%20app-07CA6B?style=flat-square)
-![permissions](https://img.shields.io/badge/permissions-none%20(no%20INTERNET)-EA2143?style=flat-square)
+<img src="docs/assets/badges/version.svg" alt="version 0.2.0">
+<img src="docs/assets/badges/platform.svg" alt="Android 8+ and Desktop JVM">
+<img src="docs/assets/badges/kotlin.svg" alt="Kotlin 2.2.20">
+<img src="docs/assets/badges/compose.svg" alt="Compose Multiplatform 1.9.0">
+<img src="docs/assets/badges/tests.svg" alt="259 engine tests + 16 app tests">
+<img src="docs/assets/badges/offline.svg" alt="no INTERNET permission">
 
 <img src="docs/assets/screenshot-desktop.png" width="860" alt="MechForge on the desktop: the glass interface, the calculator library and the reference library">
 
 <p>
   <img src="docs/assets/screenshot-phone-home.png" width="248" alt="MechForge on Android: the calculator library, recents and categories">
   <img src="docs/assets/screenshot-phone-drawer.png" width="248" alt="MechForge on Android: the navigation drawer">
+  <img src="docs/assets/screenshot-phone-calculator.png" width="248" alt="MechForge on Android: a calculation with its result and the export actions">
 </p>
 
-<sub>Desktop (above) and Android (below the same UI, glass theme): the calculator library and the navigation drawer.</sub>
+<sub>Desktop (above) and Android (below the same UI, glass theme): the calculator library, the navigation drawer and a calculation with its result and the export actions (PDF / Excel).</sub>
 
 </div>
 
@@ -166,11 +169,16 @@ On Windows, `run-mechforge.bat` starts the desktop app with the JBR already set.
 - More fire-protection depth (CO₂ pipe/nozzle sizing and venting), and additional
   equipment calculators.
 - Desktop packaging (`jpackage`) and a published release with installable artefacts.
+- **Live Excel formulas** in the exported workbook: the formula and the steps are already
+  written into the sheet, but a *live* formula needs the sheet cells to carry the units
+  the engine converts to SI internally, and there is no spreadsheet engine in this
+  environment to evaluate the templates - so it is planned as its own change with tests
+  rather than shipped unverified.
 
 ## License and credits
 
-- **No license file yet** — all rights reserved by the author; add a licence before any
-  redistribution.
+- **MIT License** — see [LICENSE](LICENSE) (Copyright (c) 2026 Ahmed Ismail). Change it if
+  you prefer another licence.
 - The application embeds **no copyrighted standard tables**; formulas are implemented and
   cited, and licensed data is imported by the user.
 - Built by **Ahmed Ismail**.
