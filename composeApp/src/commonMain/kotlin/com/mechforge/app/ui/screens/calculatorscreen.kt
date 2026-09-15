@@ -4,6 +4,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -72,6 +74,7 @@ private data class InputUi(
     val unitId: String,
 )
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CalculatorScreen(
     deps: AppDependencies,
@@ -360,9 +363,11 @@ fun CalculatorScreen(
                     }
 
                     Spacer(Modifier.height(12.dp))
-                    Row(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    // The action chips wrap instead of scrolling sideways: on a phone the
+                    // export actions used to sit off-screen and looked missing entirely.
+                    FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         AssistChip(
                             onClick = { clipboard.setText(AnnotatedString(ReportWriter.build(calc, lastInputs ?: emptyMap(), out, restoreTitle))) },
