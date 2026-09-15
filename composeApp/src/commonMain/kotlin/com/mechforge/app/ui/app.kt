@@ -128,7 +128,7 @@ fun MechForgeApp(deps: AppDependencies) {
                     ) {
                         Column(modifier = Modifier.padding(vertical = 12.dp)) {
                             Text(
-                                "⚙ MechForge",
+                                strings.appName,
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
@@ -232,7 +232,7 @@ private fun Sidebar(current: Screen, onNavigate: (Screen) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            "⚙ MechForge",
+            strings.appName,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 4.dp),
