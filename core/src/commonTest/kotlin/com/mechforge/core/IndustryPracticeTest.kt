@@ -1,5 +1,7 @@
 package com.mechforge.core
 
+import com.mechforge.core.calcs.BearingL10Calculator
+import com.mechforge.core.calcs.BoltTorqueCalculator
 import com.mechforge.core.calcs.ChlorineDoseCalculator
 import com.mechforge.core.calcs.DuctVelocityCalculator
 import com.mechforge.core.calcs.FanPowerCalculator
@@ -199,5 +201,126 @@ class ChlorineDoseDisplayTest {
         assertEquals(20.0, out.results.first { it.id == "mr" }.value, 0.01)
         // the step must echo the dose back in mg/L (1 kg/m3 = 1000 mg/L)
         assertTrue(out.steps.any { it.contains("4.000") && it.contains("mg/L") }, out.steps.toString())
+    }
+}
+
+/**
+ * Bolt preload design from the property class (ISO 898-1 proof strengths) and the metric
+ * tensile stress area, plus the reliability/lubrication adjusted bearing life.
+ *
+ * Independently computed (python):
+ *   M12, p = 1.75 mm -> A_t = 84.266 mm2 (tabulated 84.3)
+ *     8.8, 65 %      -> F = 35.055 kN, T = 84.13 N.m
+ *   M16, p = 2.0 mm  -> A_t = 156.668 mm2 (tabulated 157)
+ *     10.9, 65 %     -> F = 95.724 kN, T = 306.32 N.m
+ *   bearing C = 30 kN, P = 5 kN, p = 3, n = 1500 rpm
+ *     L10 = 216 x 10^6 rev = 2400 h ; a1 = 0.62 -> 133.92 x 10^6 rev (1488 h)
+ */
+class BoltPreloadDesignTest {
+
+    @Test
+    fun m12Class88DesignPreloadAndTorque() {
+        val out = T.run(
+            BoltTorqueCalculator,
+            T.iv("d", 12.0, "mm"), T.iv("pitch", 1.75, "mm"),
+            T.iv("class", 1.0, "dash"), T.iv("preloadpct", 65.0, "pct"),
+        )
+        assertEquals(84.266, out.results.first { it.id == "at" }.value, 0.01)
+        assertEquals(35.0547, out.results.first { it.id == "fRec" }.value, 0.01)
+        assertEquals(84.13, out.results.first { it.id == "tRec" }.value, 0.05)
+    }
+
+    @Test
+    fun m16Class109DesignPreloadAndTorque() {
+        val out = T.run(
+            BoltTorqueCalculator,
+            T.iv("d", 16.0, "mm"), T.iv("pitch", 2.0, "mm"),
+            T.iv("class", 2.0, "dash"), T.iv("preloadpct", 65.0, "pct"),
+        )
+        assertEquals(156.668, out.results.first { it.id == "at" }.value, 0.01)
+        assertEquals(95.7238, out.results.first { it.id == "fRec" }.value, 0.01)
+        assertEquals(306.32, out.results.first { it.id == "tRec" }.value, 0.1)
+    }
+
+    @Test
+    fun enteredPreloadIsCheckedAgainstTheProofLoad() {
+        val out = T.run(
+            BoltTorqueCalculator,
+            T.iv("d", 12.0, "mm"), T.iv("pitch", 1.75, "mm"),
+            T.iv("class", 1.0, "dash"), T.iv("f", 35.0, "kn"),
+        )
+        assertEquals(64.9, out.results.first { it.id == "util" }.value, 0.05)
+        assertEquals(84.0, out.results.first { it.id == "t" }.value, 0.05)
+        assertEquals(415.3, out.results.first { it.id == "sigma" }.value, 1.0)
+    }
+
+    @Test
+    fun propertyClassWithoutStressAreaIsRejected() {
+        try {
+            T.run(BoltTorqueCalculator, T.iv("d", 12.0, "mm"), T.iv("class", 1.0, "dash"))
+            fail("expected ValidationException")
+        } catch (e: ValidationException) {
+            assertTrue(e.errors.any { it.inputId == "at" })
+        }
+    }
+
+    @Test
+    fun neitherForceNorPropertyClassIsRejected() {
+        try {
+            T.run(BoltTorqueCalculator, T.iv("d", 12.0, "mm"))
+            fail("expected ValidationException")
+        } catch (e: ValidationException) {
+            assertTrue(e.errors.any { it.inputId == "f" })
+        }
+    }
+}
+
+class BearingModifiedLifeTest {
+
+    @Test
+    fun basicLifeIsUnchangedWithoutAdjustmentFactors() {
+        val out = T.run(
+            BearingL10Calculator,
+            T.iv("c", 30.0, "kn"), T.iv("p", 5.0, "kn"), T.iv("exp", 3.0, "dash"),
+            T.iv("n", 1500.0, "rpm"),
+        )
+        assertEquals(216.0e6, out.results.first { it.id == "l10" }.value, 1.0)
+        assertEquals(2400.0, out.results.first { it.id == "l10h" }.value, 1.0)
+        assertTrue(out.results.none { it.id == "lnm" })
+    }
+
+    @Test
+    fun reliabilityFactorShrinksTheLife() {
+        val out = T.run(
+            BearingL10Calculator,
+            T.iv("c", 30.0, "kn"), T.iv("p", 5.0, "kn"), T.iv("exp", 3.0, "dash"),
+            T.iv("n", 1500.0, "rpm"), T.iv("rel", 1.0, "dash"),
+        )
+        assertEquals(0.62, out.results.first { it.id == "a1" }.value, 1e-9)
+        assertEquals(133.92e6, out.results.first { it.id == "lnm" }.value, 1.0)
+        assertEquals(1488.0, out.results.first { it.id == "lnmh" }.value, 1.0)
+    }
+
+    @Test
+    fun lubricationFactorScalesTheLife() {
+        val out = T.run(
+            BearingL10Calculator,
+            T.iv("c", 30.0, "kn"), T.iv("p", 5.0, "kn"), T.iv("exp", 3.0, "dash"),
+            T.iv("n", 1500.0, "rpm"), T.iv("aiso", 0.8, "dash"),
+        )
+        assertEquals(172.8e6, out.results.first { it.id == "lnm" }.value, 1.0)
+        assertEquals(1920.0, out.results.first { it.id == "lnmh" }.value, 1.0)
+    }
+
+    @Test
+    fun bothFactorsApplyTogether() {
+        val out = T.run(
+            BearingL10Calculator,
+            T.iv("c", 30.0, "kn"), T.iv("p", 5.0, "kn"), T.iv("exp", 3.0, "dash"),
+            T.iv("n", 1500.0, "rpm"), T.iv("rel", 4.0, "dash"), T.iv("aiso", 0.8, "dash"),
+        )
+        assertEquals(0.33, out.results.first { it.id == "a1" }.value, 1e-9)
+        assertEquals(57.024e6, out.results.first { it.id == "lnm" }.value, 1.0)
+        assertEquals(633.6, out.results.first { it.id == "lnmh" }.value, 1.0)
     }
 }

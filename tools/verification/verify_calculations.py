@@ -172,9 +172,35 @@ def expectation(calc, scenario, raw):
         return out
 
     if calc == "bolt-torque":
+        k = x("k") if "k" in raw else 0.20
+        d = x("d")
+        out = {}
+        force = None
         if "f" in raw:
-            return {"t": x("k") * x("f") * x("d"), "f": x("f") / 1000.0}
-        f = x("t") / (x("k") * x("d"))
+            force = x("f")
+            out["t"] = k * force * d
+            out["f"] = force / 1000.0
+        elif "t" in raw:
+            force = x("t") / (k * d)
+            out["t"] = x("t")
+            out["f"] = force / 1000.0
+        # metric tensile stress area A_t = pi/4*(d - 0.9382*p)^2 and the ISO 898-1 proof strengths
+        at = x("at") if "at" in raw else None
+        if at is None and "pitch" in raw:
+            minor = d - 0.9382 * x("pitch")
+            at = math.pi / 4.0 * minor * minor
+        sp = {0: 225.0, 1: 640.0, 2: 940.0, 3: 1100.0, 4: 450.0}[int(x("class"))] if "class" in raw else None
+        if at is not None and force is not None:
+            out["sigma"] = force / at / 1e6
+        if sp is not None and at is not None:
+            pct = x("preloadpct") if "preloadpct" in raw else 0.65
+            f_rec = pct * sp * 1e6 * at
+            out["at"] = at * 1e6
+            out["fRec"] = f_rec / 1000.0
+            out["tRec"] = k * f_rec * d
+            if force is not None:
+                out["util"] = force / (sp * 1e6 * at) * 100.0
+        return out
         return {"t": x("t"), "f": f / 1000.0}
 
     if calc == "bearing-l10":
@@ -183,6 +209,17 @@ def expectation(calc, scenario, raw):
         out = {"l10": l10}
         if "n" in raw:
             out["l10h"] = l10 / (60.0 * x("n"))
+        # ISO 281 reliability factors a1 and the life modification factor a_ISO
+        a1 = {0: 1.0, 1: 0.62, 2: 0.53, 3: 0.44, 4: 0.33, 5: 0.21}[int(x("rel"))] if "rel" in raw else 1.0
+        a_iso = x("aiso") if "aiso" in raw else 1.0
+        if a1 != 1.0 or a_iso != 1.0:
+            lnm = a1 * a_iso * l10
+            out["lnm"] = lnm
+            out["a1"] = a1
+            out["aisoUsed"] = a_iso
+            if "n" in raw:
+                out["lnmh"] = lnm / (60.0 * x("n"))
+        return out
         return out
 
     if calc == "spring-rate":
