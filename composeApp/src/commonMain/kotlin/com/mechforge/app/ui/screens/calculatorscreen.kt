@@ -64,6 +64,7 @@ import com.mechforge.core.units.Units
 import com.mechforge.core.util.Fmt
 import kotlinx.coroutines.launch
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.ui.theme.glassBorder
 
 private data class InputUi(
     val specId: String,
@@ -286,8 +287,10 @@ fun CalculatorScreen(
             Spacer(Modifier.height(20.dp))
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    // Tinted glass: the primary container at partial opacity over the backdrop.
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f),
                 ),
+                modifier = Modifier.glassBorder(MaterialTheme.shapes.large),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(strings.calculatorResults, style = MaterialTheme.typography.titleMedium)
