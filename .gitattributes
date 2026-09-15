@@ -1,0 +1,16 @@
+# Keep the repository consistent: text files are stored with LF, whatever the platform.
+# (A GitHub ZIP extracted on Windows can otherwise show every file as "modified".)
+* text=auto eol=lf
+
+# binaries that must never be touched
+*.png binary
+*.jpg binary
+*.pdf binary
+*.xlsx binary
+*.apk binary
+*.jks binary
+*.rar binary
+*.jar binary
+*.db binary
+*.ttf binary
+*.woff2 binary
