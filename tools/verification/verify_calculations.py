@@ -222,8 +222,9 @@ def expectation(calc, scenario, raw):
         return out
 
     if calc == "duct-velocity":
-        v = x("q") / (x("w") * x("h"))
-        return {"v": v, "vFpm": v / 0.00508, "a": x("w") * x("h")}
+        area = math.pi * x("d") ** 2 / 4.0 if "d" in raw else x("w") * x("h")
+        v = x("q") / area
+        return {"v": v, "vFpm": v / 0.00508, "a": area}
 
     if calc == "duct-sizing":
         ratio = x("r") if "r" in raw else 1.0
@@ -244,8 +245,14 @@ def expectation(calc, scenario, raw):
     if calc == "fan-power":
         etad = x("etad") if "etad" in raw else 1.0
         pair = x("q") * x("dp")
-        return {"pair": pair / 1000.0, "pshaft": pair / x("etaf") / 1000.0,
-                "pmotor": pair / x("etaf") / etad / 1000.0}
+        pmotor = pair / x("etaf") / etad / 1000.0
+        motors = [0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5, 11.0, 15.0, 18.5, 22.0, 30.0,
+                  37.0, 45.0, 55.0, 75.0, 90.0, 110.0, 132.0, 160.0, 200.0]
+        res = {"pair": pair / 1000.0, "pshaft": pair / x("etaf") / 1000.0, "pmotor": pmotor}
+        motor = next((m for m in motors if m >= pmotor), None)
+        if motor is not None:
+            res["motor"] = motor
+        return res
 
     if calc == "air-changes-hour":
         if "q" in raw and "vroom" in raw:
@@ -264,11 +271,21 @@ def expectation(calc, scenario, raw):
     if calc == "pipe-weight":
         rho = x("rho") if "rho" in raw else 7850.0
         area = math.pi * (x("od") - x("t")) * x("t")
-        return {"w": area * rho, "area": area, "id": (x("od") - 2 * x("t")) * 1000.0}
+        res = {"w": area * rho, "area": area, "id": (x("od") - 2 * x("t")) * 1000.0}
+        if "rhoc" in raw:
+            content_area = math.pi * (x("od") - 2 * x("t")) ** 2 / 4.0
+            res["wc"] = content_area * x("rhoc")
+            res["wtot"] = area * rho + content_area * x("rhoc")
+        return res
 
     if calc == "pipe-wall-thickness":
-        tp = x("p") * x("d") / (2.0 * x("sigma"))
-        return {"tp": tp * 1000.0, "t": (tp + x("ca")) * 1000.0}
+        # ASME B31.3 form: t = PD/(2(SE + PY)) + CA, then /(1 - mill tolerance) for the nominal
+        e = x("e") if "e" in raw else 1.0
+        y = x("y") if "y" in raw else 0.4
+        mill = x("mill") if "mill" in raw else 0.125
+        tp = x("p") * x("d") / (2.0 * (x("sigma") * e + x("p") * y))
+        t_min = tp + x("ca")
+        return {"tp": tp * 1000.0, "t": t_min * 1000.0, "tNom": t_min / (1.0 - mill) * 1000.0}
 
     if calc == "thermal-expansion":
         dl = x("alpha") * x("l") * x("dt")
@@ -308,7 +325,8 @@ def expectation(calc, scenario, raw):
     if calc == "hose-nozzle-flow":
         d_in = x("d") / 0.0254
         p_psi = x("p") / 6894.757293168361
-        q_gpm = 29.7 * d_in * d_in * math.sqrt(p_psi)
+        c = x("c") if "c" in raw else 1.0
+        q_gpm = 29.7 * c * d_in * d_in * math.sqrt(p_psi)
         return {"q": q_gpm, "qLmin": q_gpm * 3.785411784, "qM3h": q_gpm * 3.785411784 * 0.06}
 
     if calc == "fire-pump-head":
@@ -328,10 +346,16 @@ def expectation(calc, scenario, raw):
 
     if calc == "water-hammer":
         rho = x("rho") if "rho" in raw else 1000.0
-        dp = rho * x("c") * x("dv")
-        out = {"dp": dp / 1e5, "dpMpa": dp / 1e6, "head": dp / (rho * G)}
+        if "c" in raw:
+            c = x("c")
+        else:
+            k_bulk = x("kbulk") if "kbulk" in raw else 2.15e9
+            e_pipe = x("epipe") if "epipe" in raw else 200e9
+            c = math.sqrt(k_bulk / rho) / math.sqrt(1.0 + k_bulk * x("d") / (e_pipe * x("t")))
+        dp = rho * c * x("dv")
+        out = {"dp": dp / 1e5, "dpMpa": dp / 1e6, "head": dp / (rho * G), "cUsed": c}
         if "l" in raw:
-            out["tc"] = 2.0 * x("l") / x("c")
+            out["tc"] = 2.0 * x("l") / c
         return out
 
     if calc == "heat-exchanger-duty":
@@ -457,7 +481,9 @@ SCALING = [
     ("beam-cantilever-point", "L4", "L2", "defl", 8.0, "delta ~ L^3"),
     ("beam-cantilever-point", "L4", "L2", "moment", 2.0, "M ~ L"),
     ("pipe-sizing", "200m3h-2ms", "100m3h-2ms", "d", math.sqrt(2.0), "D ~ sqrt(Q)"),
-    ("pipe-wall-thickness", "p20bar", "p10bar", "tp", 2.0, "t_p ~ p"),
+    # t = PD/(2(SE + PY)) is not exactly linear in P, so the exact ratio is asserted:
+    # 2*(140 + 0.4)/(140 + 0.8) = 1.9943182
+    ("pipe-wall-thickness", "p20bar", "p10bar", "tp", 1.9943181818181818, "t_p ~ p (B31.3 form)"),
     ("thermal-expansion", "dt100", "dt50", "dl", 2.0, "dL ~ dT"),
     ("equivalent-length", "k5", "k2.5", "leq", 2.0, "Leq ~ K"),
     ("valve-kv", "dp4bar", "dp1bar", "q", 2.0, "Q ~ sqrt(dP)"),

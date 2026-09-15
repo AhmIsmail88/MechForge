@@ -111,7 +111,7 @@ object ChlorineDoseCalculator : Calculator(DosingDef) {
                 result("mh", "Chemical Mass Rate (kg/h)", massRate * 3600.0, "kgh"),
             ),
             steps = listOf(
-                "Flow: ${Fmt.n(q * 86400.0, 0)} m³/d   Dose: ${Fmt.n(dose * 1e6, 3)} mg/L",
+                "Flow: ${Fmt.n(q * 86400.0, 0)} m³/d   Dose: ${Fmt.n(dose * 1000.0, 3)} mg/L",
                 "ṁ = Q·dose = ${Fmt.n(q, 6)} m³/s × ${Fmt.n(dose, 8)} kg/m³ = ${Fmt.n(massRate, 8)} kg/s = ${Fmt.n(massRate * 86400.0, 2)} kg/d",
             ),
             warnings = listOf(

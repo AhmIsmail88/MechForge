@@ -58,26 +58,55 @@ class PipeWeightTest {
 class PipeWallThicknessTest {
 
     @Test
-    fun preliminaryTextbookCase() {
-        // p = 1 MPa (10 bar), D = 300 mm, σ = 140 MPa, CA = 2 mm → 1.071 + 2 = 3.07 mm
+    fun b313FormHandCheck() {
+        // p = 1 MPa (10 bar), D = 300 mm, S = 140 MPa, E = 1.0, Y = 0.4, CA = 2 mm, mill 12.5 %
+        //   t = p*D/(2*(S*E + p*Y)) = 1.0684 mm ; t + CA = 3.0684 mm ; /0.875 = 3.5067 mm
         val out = T.run(
             PipeWallThicknessCalculator,
             T.iv("p", 10.0, "bar"), T.iv("d", 300.0, "mm"),
             T.iv("sigma", 140.0, "mpa"), T.iv("ca", 2.0, "mm"),
         )
-        assertEquals(1.071, out.results.first { it.id == "tp" }.value, 0.01)
-        assertEquals(3.071, out.results.first { it.id == "t" }.value, 0.02)
+        assertEquals(1.0684, out.results.first { it.id == "tp" }.value, 0.001)
+        assertEquals(3.0684, out.results.first { it.id == "t" }.value, 0.005)
+        assertEquals(3.5067, out.results.first { it.id == "tNom" }.value, 0.01)
+    }
+
+    @Test
+    fun weldJointFactorReducesTheAllowable() {
+        // E = 0.85 -> t = 1.2563 mm (thicker wall required for a welded joint)
+        val out = T.run(
+            PipeWallThicknessCalculator,
+            T.iv("p", 10.0, "bar"), T.iv("d", 300.0, "mm"),
+            T.iv("sigma", 140.0, "mpa"), T.iv("ca", 2.0, "mm"), T.iv("e", 0.85, "dash"),
+        )
+        assertEquals(1.2563, out.results.first { it.id == "tp" }.value, 0.001)
     }
 
     @Test
     fun psiAndInchCase() {
-        // p = 150 psi (1.0342 MPa), D = 12 in, σ = 20000 psi (137.9 MPa), CA = 3 mm
+        // p = 150 psi, D = 12 in, S = 20000 psi (137.895 MPa), CA = 3 mm
         val out = T.run(
             PipeWallThicknessCalculator,
             T.iv("p", 150.0, "psi"), T.iv("d", 12.0, "in"),
             T.iv("sigma", 137.895, "mpa"), T.iv("ca", 3.0, "mm"),
         )
-        assertEquals(1.143, out.results.first { it.id == "tp" }.value, 0.02)
+        assertEquals(1.1396, out.results.first { it.id == "tp" }.value, 0.005)
+        assertEquals(4.1396, out.results.first { it.id == "t" }.value, 0.01)
+        assertEquals(4.7310, out.results.first { it.id == "tNom" }.value, 0.02)
+    }
+
+    @Test
+    fun zeroMillToleranceLeavesTheMinimumThickness() {
+        val out = T.run(
+            PipeWallThicknessCalculator,
+            T.iv("p", 10.0, "bar"), T.iv("d", 300.0, "mm"),
+            T.iv("sigma", 140.0, "mpa"), T.iv("ca", 2.0, "mm"), T.iv("mill", 0.0, "pct"),
+        )
+        assertEquals(
+            out.results.first { it.id == "t" }.value,
+            out.results.first { it.id == "tNom" }.value,
+            1e-9,
+        )
     }
 
     @Test
@@ -86,7 +115,7 @@ class PipeWallThicknessTest {
             PipeWallThicknessCalculator,
             T.iv("p", 10.0, "bar"), T.iv("d", 300.0, "mm"), T.iv("sigma", 140.0, "mpa"),
         )
-        assertTrue(out.warnings.any { it.contains("PRELIMINARY") })
+        assertTrue(out.warnings.any { it.contains("ASME B31.3") })
     }
 
     @Test

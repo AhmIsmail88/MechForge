@@ -38,10 +38,13 @@ object FanPowerCalculator : Calculator(Def) {
         val pAir = q * dp
         val pShaft = pAir / etaFan
         val pMotor = pShaft / etaDrive
+        val motorRating = nextIecMotorRating(pMotor / 1000.0)
 
         val warnings = buildList {
             if (!has(inputs, "etad")) add("Drive efficiency not provided — assumed 1.0 (direct drive, no margin).")
             if (etaFan > 0.8) add("Fan efficiency above 80% is optimistic for small fans; verify at the duty point on the fan curve.")
+            add("Motor rating is the next standard IEC rating; check the ambient/altitude derating, the starting method and the fan inertia before ordering.")
+            if (motorRating == null) add("Motor power exceeds the largest rating in the standard list - verify the driver selection.")
         }
 
         return CalcOutput(
@@ -49,11 +52,20 @@ object FanPowerCalculator : Calculator(Def) {
                 result("pair", "Air Power", pAir / 1000.0, "kw"),
                 result("pshaft", "Shaft Power", pShaft / 1000.0, "kw", isPrimary = true),
                 result("pmotor", "Motor Power", pMotor / 1000.0, "kw", isPrimary = true),
-            ),
+            ) + if (motorRating != null) {
+                listOf(result("motor", "Standard Motor Rating (IEC 60034)", motorRating, "kw", isPrimary = true))
+            } else {
+                emptyList()
+            },
             steps = listOf(
                 "Air power: P_air = Q·Δp = ${Fmt.n(q, 5)} × ${Fmt.n(dp, 1)} = ${Fmt.n(pAir, 2)} W",
                 "Shaft power: P_shaft = P_air/η_fan = ${Fmt.n(pAir, 2)} / ${Fmt.n(etaFan, 4)} = ${Fmt.n(pShaft, 2)} W = ${Fmt.n(pShaft / 1000.0, 3)} kW",
                 "Motor power: P_motor = P_shaft/η_drive = ${Fmt.n(pMotor / 1000.0, 3)} kW",
+                if (motorRating != null) {
+                    "Standard IEC motor rating selected: ${Fmt.n(motorRating, 3)} kW (next rating at or above the motor power)"
+                } else {
+                    "Motor power is above the largest standard rating in the list - check with the manufacturer."
+                },
             ),
             warnings = warnings,
         )

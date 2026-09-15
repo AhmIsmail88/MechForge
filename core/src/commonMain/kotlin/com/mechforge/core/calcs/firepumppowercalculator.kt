@@ -30,10 +30,6 @@ private val Def = CalculatorDefinition(
 object FirePumpPowerCalculator : Calculator(Def) {
 
     private const val G = 9.80665
-    private val IEC_MOTOR_RATINGS_KW = doubleArrayOf(
-        0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5, 11.0, 15.0,
-        18.5, 22.0, 30.0, 37.0, 45.0, 55.0, 75.0, 90.0, 110.0, 132.0, 160.0, 200.0,
-    )
 
     override fun calculate(inputs: Map<String, InputValue>): CalcOutput {
         val q = value(inputs, "q")
