@@ -23,8 +23,8 @@ private val Def = CalculatorDefinition(
     keywords = listOf("effectiveness", "ntu", "heat exchanger", "kays london", "equipment", "thermal"),
     inputs = listOf(
         InputSpec("ntu", "Number of transfer units", "NTU", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
-        InputSpec("cr", "Capacity ratio", "Cr", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 1.0, defaultUnitId = "dash"),
-        InputSpec("arr", "Arrangement (1 = counter, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash"),
+        InputSpec("cr", "Capacity ratio", "Cr", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 1.0, defaultUnitId = "dash", assumedWhenOmitted = "Capacity ratio assumed as 0 - this models one stream condensing or evaporating at constant temperature."),
+        InputSpec("arr", "Arrangement (1 = counter, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash", assumedWhenOmitted = "Flow arrangement assumed as counter-flow - check it against the exchanger actually specified."),
     ),
 )
 

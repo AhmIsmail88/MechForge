@@ -30,13 +30,13 @@ private val Def = CalculatorDefinition(
     notes = "The Joukowsky value is the maximum surge, reached when the valve closes faster than the critical time 2L/c; slower closure reduces it. Leave the wave speed empty to calculate it from the fluid bulk modulus K (2.15 GPa for water), the pipe elastic modulus E (200 GPa for steel) and the pipe internal diameter and wall thickness. Typical wave speeds: about 1000-1250 m/s in steel water pipes and 300-500 m/s in plastic pipe.",
     keywords = listOf("water hammer", "surge", "joukowsky", "wave speed", "transient", "pipe", "valve closure", "fire"),
     inputs = listOf(
-        InputSpec("rho", "Fluid density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
+        InputSpec("rho", "Fluid density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Fluid density assumed as 1000 kg/m3 - use the value for the fluid actually handled."),
         InputSpec("c", "Pressure wave speed (leave empty to calculate)", "c", UnitFamily.VELOCITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "ms"),
         InputSpec("dv", "Velocity change", "dv", UnitFamily.VELOCITY, minValue = 0.0, exclusiveMin = true, defaultUnitId = "ms"),
         InputSpec("d", "Pipe internal diameter", "D", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("t", "Pipe wall thickness", "t", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
-        InputSpec("kbulk", "Fluid bulk modulus K", "K", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa", defaultValue = 2150.0),
-        InputSpec("epipe", "Pipe elastic modulus E", "E", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa", defaultValue = 200000.0),
+        InputSpec("kbulk", "Fluid bulk modulus K", "K", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa", defaultValue = 2150.0, assumedWhenOmitted = "Bulk modulus assumed as 2.15 GPa (water at 20 C) - correct it for temperature and any entrained air."),
+        InputSpec("epipe", "Pipe elastic modulus E", "E", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa", defaultValue = 200000.0, assumedWhenOmitted = "Pipe elastic modulus assumed as 200 GPa (steel) - use the value for the actual pipe material."),
         InputSpec("l", "Pipe length (optional)", "L", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m"),
     ),
 )

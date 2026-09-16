@@ -116,6 +116,7 @@ def parse_inputs(def_block: str):
             ),
             "options": re.findall(r'InputOption\(\s*"([^"]+)"\s*,\s*"([^"]*)"', block),
             "library": string_arg(block, "libraryKey"),
+            "assumed": string_arg(block, "assumedWhenOmitted"),
         }
         inputs.append(entry)
     return inputs
@@ -493,6 +494,9 @@ def main() -> int:
                 extra.append("default: " + escape(i["default_value"]))
             if i["library"]:
                 extra.append("library: " + escape(i["library"]))
+            if i["assumed"]:
+                # the engine raises this warning when the input is omitted (review P1-6)
+                extra.append("<b>ASSUMED if omitted:</b> " + escape(i["assumed"]))
             A(f"<tr><td><code>{escape(i['id'])}</code></td><td>{escape(i['symbol'])}</td>"
               f"<td>{escape(i['label'])}</td><td><code>{escape(i['family'])}</code></td>"
               f"<td>{escape(i['default_unit'] or '')}</td><td>{'yes' if i['required'] else 'optional'}</td>"

@@ -85,7 +85,7 @@ private val Def = CalculatorDefinition(
             "mcyl", "Cylinder charge (standard 45 kg)", "m_cyl", UnitFamily.MASS,
             required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kg",
             defaultValue = STANDARD_CYLINDER_CHARGE,
-        ),
+        assumedWhenOmitted = "Cylinder charge assumed as 45 kg (standard NFPA 12 cylinder) - confirm the cylinder size actually ordered."),
     ),
 )
 

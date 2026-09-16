@@ -13,7 +13,14 @@ abstract class Calculator(val def: CalculatorDefinition) {
     fun run(inputs: Map<String, InputValue>): CalcOutput {
         val errors = validateDefinition(def, inputs)
         if (errors.isNotEmpty()) throw ValidationException(errors)
-        return calculate(inputs)
+        val output = calculate(inputs)
+        // an input the caller left out while the calculator falls back to a built-in number
+        // must never stay silent: report it as an assumption at the top of the warnings.
+        val assumed = def.inputs
+            .filter { it.assumedWhenOmitted != null && !inputs.containsKey(it.id) }
+            .map { it.assumedWhenOmitted!! }
+        if (assumed.isEmpty()) return output
+        return output.copy(warnings = assumed + output.warnings)
     }
 
     protected abstract fun calculate(inputs: Map<String, InputValue>): CalcOutput

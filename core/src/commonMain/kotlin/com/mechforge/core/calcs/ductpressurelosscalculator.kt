@@ -26,9 +26,9 @@ private val Def = CalculatorDefinition(
         InputSpec("d", "Round duct diameter", "D", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("w", "Rectangular width", "W", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("h", "Rectangular height", "H", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
-        InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
-        InputSpec("nu", "Kinematic viscosity", "ν", UnitFamily.KINEMATIC_VISCOSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "cst"),
-        InputSpec("eps", "Absolute roughness", "ε", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "mm", libraryKey = "roughness"),
+        InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Air density assumed as 1.2 kg/m3 (20 C, sea level) - correct it for the actual temperature and altitude."),
+        InputSpec("nu", "Kinematic viscosity", "ν", UnitFamily.KINEMATIC_VISCOSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "cst", assumedWhenOmitted = "Kinematic viscosity assumed as 1.5e-5 m2/s (air at 20 C) - correct it for the actual temperature."),
+        InputSpec("eps", "Absolute roughness", "ε", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "mm", libraryKey = "roughness", assumedWhenOmitted = "Absolute roughness assumed as 9e-5 m (galvanised steel) - use the value for the actual duct material."),
     ),
 )
 

@@ -42,7 +42,7 @@ private val Def = CalculatorDefinition(
     notes = "K = 0.20 is typical for as-received steel bolts, lightly oiled; lubrication, coatings and washers change K a lot, so verify it for critical joints. A_t is the tensile stress area (use the pitch field and it is calculated, or enter the tabulated value). The design preload is normally 65-75% of the proof load (up to 90% for permanent, well-controlled joints). Torque scatter is typically +/-25-35%, so safety-critical joints are verified by torque plus angle, or by bolt elongation.",
     keywords = listOf("bolt", "torque", "preload", "tension", "fastener", "stress area", "proof load", "property class", "iso 898", "vdi 2230"),
     inputs = listOf(
-        InputSpec("k", "Nut factor K", "K", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", defaultValue = 0.20),
+        InputSpec("k", "Nut factor K", "K", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", defaultValue = 0.20, assumedWhenOmitted = "Nut factor K assumed as 0.20 (dry, as-received steel) - plated or lubricated fasteners need a different K."),
         InputSpec("d", "Nominal bolt diameter", "d", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("f", "Preload (bolt tension)", "F", UnitFamily.FORCE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kn"),
         InputSpec("t", "Tightening torque", "T", UnitFamily.TORQUE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "nm"),

@@ -26,7 +26,7 @@ private val Def = CalculatorDefinition(
         InputSpec("thout", "Hot outlet temperature", "T_h,out", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("tcin", "Cold inlet temperature", "T_c,in", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("tcout", "Cold outlet temperature", "T_c,out", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
-        InputSpec("arr", "Arrangement (1 = counter-current, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash"),
+        InputSpec("arr", "Arrangement (1 = counter-current, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash", assumedWhenOmitted = "Flow arrangement assumed as counter-flow - check it against the exchanger actually specified."),
         InputSpec("u", "Overall coefficient U (optional)", "U", UnitFamily.HEAT_TRANSFER_COEFF, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "wm2k"),
         InputSpec("a", "Heat transfer area A (optional)", "A", UnitFamily.AREA, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m2"),
     ),

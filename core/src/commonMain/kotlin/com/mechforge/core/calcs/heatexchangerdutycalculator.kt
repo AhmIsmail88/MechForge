@@ -23,7 +23,7 @@ private val Def = CalculatorDefinition(
     keywords = listOf("heat exchanger", "duty", "lmtd", "u value", "thermal", "equipment"),
     inputs = listOf(
         InputSpec("m", "Mass flow", "m_dot", UnitFamily.MASS_FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgs"),
-        InputSpec("cp", "Specific heat", "cp", UnitFamily.SPECIFIC_HEAT, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kjkgk"),
+        InputSpec("cp", "Specific heat", "cp", UnitFamily.SPECIFIC_HEAT, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kjkgk", assumedWhenOmitted = "Specific heat assumed as 4186 J/(kg.K) (water) - use the value for the fluid actually handled."),
         InputSpec("tin", "Inlet temperature", "T_in", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("tout", "Outlet temperature", "T_out", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("u", "Overall coefficient U (optional)", "U", UnitFamily.HEAT_TRANSFER_COEFF, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "wm2k"),

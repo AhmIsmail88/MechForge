@@ -21,7 +21,7 @@ private val Def = CalculatorDefinition(
     notes = "d = wire diameter, D = mean coil diameter, n = number of ACTIVE coils. G ≈ 79.3 GPa for steel wire. Fatigue, buckling, end conditions and solid height are not covered.",
     keywords = listOf("spring", "rate", "stiffness", "compression", "coil", "deflection"),
     inputs = listOf(
-        InputSpec("g", "Shear modulus", "G", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa"),
+        InputSpec("g", "Shear modulus", "G", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa", assumedWhenOmitted = "Shear modulus assumed as 79.3 GPa (steel) - use the value for the actual spring material."),
         InputSpec("d", "Wire diameter", "d", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("dm", "Mean coil diameter", "D", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("n", "Active coils", "n", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),

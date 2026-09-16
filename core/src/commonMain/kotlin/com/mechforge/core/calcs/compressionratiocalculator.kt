@@ -25,7 +25,7 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("p1", "Inlet pressure", "P1", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
         InputSpec("p2", "Discharge pressure", "P2", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
-        InputSpec("crmax", "Maximum per-stage ratio", "CR_max", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = false, defaultUnitId = "dash"),
+        InputSpec("crmax", "Maximum per-stage ratio", "CR_max", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = false, defaultUnitId = "dash", assumedWhenOmitted = "Maximum per-stage ratio assumed as 4.0 - enter a value from the compressor manufacturer data."),
     ),
 )
 

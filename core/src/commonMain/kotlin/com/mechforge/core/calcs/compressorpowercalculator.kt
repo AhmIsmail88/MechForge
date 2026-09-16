@@ -25,9 +25,9 @@ private val Def = CalculatorDefinition(
         InputSpec("t1", "Inlet temperature", "T₁", UnitFamily.TEMPERATURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c"),
         InputSpec("p1", "Inlet pressure", "P₁", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
         InputSpec("p2", "Discharge pressure", "P₂", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
-        InputSpec("cp", "Specific heat c_p", "c_p", UnitFamily.SPECIFIC_HEAT, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kjkgk"),
-        InputSpec("k", "Specific heat ratio", "k", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = true, defaultUnitId = "dash"),
-        InputSpec("eta", "Isentropic efficiency", "η_is", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct"),
+        InputSpec("cp", "Specific heat c_p", "c_p", UnitFamily.SPECIFIC_HEAT, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kjkgk", assumedWhenOmitted = "Gas specific heat assumed as 1005 J/(kg.K) (air at 20 C) - use the value for the gas actually handled."),
+        InputSpec("k", "Specific heat ratio", "k", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = true, defaultUnitId = "dash", assumedWhenOmitted = "Isentropic exponent assumed as 1.4 (air) - use the value for the gas actually handled."),
+        InputSpec("eta", "Isentropic efficiency", "η_is", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct", assumedWhenOmitted = "Overall efficiency assumed as 0.80 - use the manufacturer figure for the selected machine."),
     ),
 )
 

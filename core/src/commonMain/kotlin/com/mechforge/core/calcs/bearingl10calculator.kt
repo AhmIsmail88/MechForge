@@ -42,7 +42,7 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("c", "Dynamic load rating", "C", UnitFamily.FORCE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kn"),
         InputSpec("p", "Equivalent dynamic load", "P", UnitFamily.FORCE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kn"),
-        InputSpec("exp", "Life exponent p", "p", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
+        InputSpec("exp", "Life exponent p", "p", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", assumedWhenOmitted = "Life exponent assumed as 3.0 (ball bearings) - use 10/3 for roller bearings."),
         InputSpec("n", "Rotational speed", "n", UnitFamily.ROTATIONAL_SPEED, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "rpm"),
         InputSpec(
             "rel", "Reliability (a1 factor)", "reliability", UnitFamily.DIMENSIONLESS,
@@ -52,7 +52,7 @@ private val Def = CalculatorDefinition(
         InputSpec(
             "aiso", "Life modification factor a_ISO", "a_ISO", UnitFamily.DIMENSIONLESS,
             required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", defaultValue = 1.0,
-        ),
+        assumedWhenOmitted = "a_ISO assumed as 1.0 (normal lubrication and contamination) - use the ISO 281 life modification factor where the application demands it."),
     ),
 )
 

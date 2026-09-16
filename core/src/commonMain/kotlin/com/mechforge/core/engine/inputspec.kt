@@ -34,6 +34,12 @@ data class InputSpec(
      * the arithmetic still comes from whatever the user submits.
      */
     val defaultValue: Double? = null,
+    /**
+     * Engineering caveat raised when this input is omitted, so the calculator falls back to a
+     * built-in number. Every implicit default must name itself and its source here; the engine
+     * then reports it as a warning instead of assuming silently (engineering review P1-6).
+     */
+    val assumedWhenOmitted: String? = null,
 )
 
 /** One choice of an option-based input. */

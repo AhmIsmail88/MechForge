@@ -23,7 +23,7 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("od", "Outside diameter", "OD", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("t", "Wall thickness", "t", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
-        InputSpec("rho", "Material density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
+        InputSpec("rho", "Material density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Material density assumed as 7850 kg/m3 (carbon steel) - use the value for the actual material."),
         InputSpec("rhoc", "Content density (for the operating weight)", "rho_c", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
     ),
 )
