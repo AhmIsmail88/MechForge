@@ -212,6 +212,12 @@ def evaluate(expr: str) -> str:
     60.0 / (2.0 * Math.PI)); printing only the first literal would be wrong.
     """
     clean = expr.strip().rstrip(",;")
+    # the regex capture can leave the parenthesis balance off (60.0 / (2.0 * Math.PI); repair it
+    opens, closes = clean.count("("), clean.count(")")
+    if opens > closes:
+        clean = clean + ")" * (opens - closes)
+    elif closes > opens:
+        clean = clean[:len(clean) - (closes - opens)]
     stripped = re.sub(r"Math\.PI|Math\.E|math\.pi", "", clean)
     if not re.fullmatch(r"[0-9eE+\-*/(). \t]*", stripped):
         return expr.strip()
