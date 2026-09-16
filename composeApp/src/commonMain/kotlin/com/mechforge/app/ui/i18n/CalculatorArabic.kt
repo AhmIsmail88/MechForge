@@ -422,6 +422,185 @@ object CalculatorArabic {
                 "kwtr" to "kW لكل طن (كهربائي)",
             ),
         ),
+        "power-torque-rpm" to CalculatorArabicContent(
+            name = "القدرة والعزم والسرعة",
+            description = "العلاقة بين القدرة والعزم وسرعة الدوران - أدخل أي اثنين ويُحسب الثالث.",
+            inputs = mapOf(
+                "p" to "القدرة",
+                "t" to "العزم",
+                "n" to "سرعة الدوران",
+            ),
+            results = mapOf(
+                "p" to "القدرة",
+                "t" to "العزم",
+                "n" to "السرعة",
+            ),
+        ),
+
+        "torsional-stress" to CalculatorArabicContent(
+            name = "إجهاد اللي (الفتل)",
+            description = "إجهاد القص من العزم، مع أقل قطر عمود مصمت آمن مقابل الإجهاد المسموح.",
+            inputs = mapOf(
+                "t" to "العزم",
+                "d" to "قطر العمود",
+                "taual" to "إجهاد القص المسموح",
+            ),
+            results = mapOf(
+                "tau" to "إجهاد القص اللي",
+                "dmin" to "أقل قطر لعمود مصمت",
+                "util" to "النسبة إلى الإجهاد المسموح",
+            ),
+        ),
+
+        "bolt-torque" to CalculatorArabicContent(
+            name = "عزم ربط البراغي",
+            description = "الشد المسبق وعزم الربط من قطر البرغي ودرجته ومعامل الصامولة (ISO 898-1).",
+            inputs = mapOf(
+                "d" to "القطر الاسمي للبرغي",
+                "pitch" to "خطوة القلاووظ (لحساب مساحة الشد)",
+                "class" to "درجة البرغي (إجهاد الإثبات)",
+                "k" to "معامل الصامولة K",
+                "at" to "مساحة شد البرغي",
+                "f" to "الشد المسبق (قوة الشد)",
+                "t" to "عزم الربط",
+                "preloadpct" to "نسبة الشد المسبق المستهدفة (من حمل الإثبات)",
+            ),
+            results = mapOf(
+                "at" to "مساحة الشد",
+                "f" to "الشد المسبق",
+                "fRec" to "الشد المسبق التصميمي",
+                "t" to "عزم الربط",
+                "tRec" to "عزم الشد التصميمي",
+                "sigma" to "إجهاد شد البرغي",
+                "util" to "نسبة الشد إلى حمل الإثبات",
+            ),
+        ),
+
+        "bearing-l10" to CalculatorArabicContent(
+            name = "عمر الرولمان (L10 / Lnm)",
+            description = "العمر الأساسي والمُعدَّل للرولمان بالدورات وبالساعات وفق ISO 281.",
+            inputs = mapOf(
+                "c" to "حمل التحميل الديناميكي",
+                "p" to "الحمل الديناميكي المكافئ",
+                "n" to "سرعة الدوران",
+                "exp" to "أُس العمر p",
+                "rel" to "الموثوقية (معامل a1)",
+                "aiso" to "معامل تعديل العمر a_ISO",
+            ),
+            results = mapOf(
+                "l10" to "العمر الأساسي L10 (دورات)",
+                "l10h" to "العمر الأساسي بالساعات L10h",
+                "lnm" to "العمر المُعدَّل Lnm (دورات)",
+                "lnmh" to "العمر المُعدَّل بالساعات Lnmh",
+                "a1" to "معامل الموثوقية a1",
+                "aisoUsed" to "معامل التعديل a_ISO المستخدم",
+            ),
+        ),
+
+        "spring-rate" to CalculatorArabicContent(
+            name = "معدل الياي (الصلابة)",
+            description = "معدل الياي والانحراف من قطر السلك والقطر المتوسط وعدد اللفات.",
+            inputs = mapOf(
+                "d" to "قطر السلك",
+                "dm" to "القطر المتوسط للفة",
+                "n" to "عدد اللفات الفعّالة",
+                "g" to "معامل القص",
+                "f" to "القوة المؤثرة (اختياري)",
+            ),
+            results = mapOf(
+                "k" to "معدل الياي",
+                "kmm" to "المعدل لكل مم",
+                "delta" to "الانحراف",
+            ),
+        ),
+
+        "beam-ss-udl" to CalculatorArabicContent(
+            name = "كمرة بسيطة بحمل موزّع",
+            description = "الانحراف والعزم والإجهاد الأقصى لكمرة بسيطة تحت حمل موزّع منتظم.",
+            inputs = mapOf(
+                "w" to "الحمل الموزّع",
+                "l" to "البحر (الامتداد)",
+                "e" to "معامل المرونة",
+                "i" to "عزم القصور الذاتي",
+                "z" to "معامل المقطع (اختياري)",
+            ),
+            results = mapOf(
+                "defl" to "أقصى انحراف",
+                "moment" to "أقصى عزم انحناء",
+                "sigma" to "أقصى إجهاد انحناء",
+                "ratio" to "الانحراف إلى البحر",
+            ),
+        ),
+
+        "beam-cantilever-point" to CalculatorArabicContent(
+            name = "كمرة كابولية بحمل مركّز",
+            description = "انحراف الطرف والعزم والإجهاد الأقصى لكمرة كابولية تحت حمل مركّز.",
+            inputs = mapOf(
+                "p" to "الحمل المركّز",
+                "l" to "الطول",
+                "e" to "معامل المرونة",
+                "i" to "عزم القصور الذاتي",
+                "z" to "معامل المقطع (اختياري)",
+            ),
+            results = mapOf(
+                "defl" to "انحراف الطرف",
+                "moment" to "أقصى عزم عند التثبيت",
+                "sigma" to "أقصى إجهاد انحناء",
+                "ratio" to "الانحراف إلى الطول",
+            ),
+        ),
+
+        "pipe-wall-thickness" to CalculatorArabicContent(
+            name = "سماكة جدار الماسورة (ASME B31.3)",
+            description = "سماكة الجدار المطلوبة للضغط، مع بدل التآكل وتفاوت الطاحونة.",
+            inputs = mapOf(
+                "p" to "ضغط التصميم",
+                "d" to "القطر الخارجي",
+                "sigma" to "الإجهاد المسموح عند حرارة التصميم",
+                "e" to "معامل جودة اللحام",
+                "y" to "المعامل Y (جدول 304.1.1)",
+                "ca" to "بدل التآكل",
+                "mill" to "تفاوت الطاحونة",
+            ),
+            results = mapOf(
+                "tp" to "سماكة التصميم للضغط",
+                "t" to "السماكة الدنيا مع بدل التآكل",
+                "tNom" to "السماكة الاسمية المطلوبة",
+                "odRatio" to "نسبة القطر إلى السماكة",
+            ),
+        ),
+
+        "pipe-weight" to CalculatorArabicContent(
+            name = "وزن المواسير",
+            description = "وزن الماسورة والمحتوى لكل متر، مع الوزن التشغيلي الكلي.",
+            inputs = mapOf(
+                "od" to "القطر الخارجي",
+                "t" to "سماكة الجدار",
+                "rho" to "كثافة المادة",
+                "rhoc" to "كثافة المحتوى (للوزن التشغيلي)",
+            ),
+            results = mapOf(
+                "w" to "الوزن لكل متر",
+                "wc" to "وزن المحتوى لكل متر",
+                "wtot" to "الوزن التشغيلي الكلي لكل متر",
+                "area" to "مساحة مقطع المعدن",
+                "id" to "القطر الداخلي",
+            ),
+        ),
+
+        "thermal-expansion" to CalculatorArabicContent(
+            name = "التمدد الحراري",
+            description = "التمدد الحراري الحر لطول ماسورة عند فرق حرارة.",
+            inputs = mapOf(
+                "alpha" to "معامل التمدد",
+                "l" to "طول الماسورة",
+                "dt" to "فرق الحرارة",
+            ),
+            results = mapOf(
+                "dl" to "التمدد الحر",
+                "perM" to "التمدد لكل متر",
+            ),
+        ),
     )
 
     fun name(calculatorId: String, fallback: String): String =
