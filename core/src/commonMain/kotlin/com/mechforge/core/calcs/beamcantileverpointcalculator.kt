@@ -45,24 +45,36 @@ object BeamCantileverPointCalculator : Calculator(Def) {
             result("moment", "Maximum Bending Moment (at support)", moment, "nm"),
             result("ratio", "Deflection / Length", defl / l, "dash"),
         )
+        val stepsAr = mutableListOf<String>()
         val steps = mutableListOf(
             "Flexural rigidity: E·I = ${Fmt.n(e / 1e6, 1)} MPa × ${Fmt.n(i, 12)} m⁴ = ${Fmt.n(e * i / 1000.0, 1)} kN·m²",
             "δ = P·L³/(3·E·I) = ${Fmt.n(p / 1000.0, 3)} kN × ${Fmt.n(l, 2)}³ / (3 × ${Fmt.n(e * i / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm",
             "M_max = P·L = ${Fmt.n(p, 1)} N × ${Fmt.n(l, 2)} m = ${Fmt.n(moment, 1)} N·m",
             "Deflection ratio: L/${Fmt.n(l / defl, 0)}",
         )
+        stepsAr += "الصلابة الانثنائية: E·I = ${Fmt.n(e / 1e6, 1)} MPa × ${Fmt.n(i, 12)} m⁴ = ${Fmt.n(e * i / 1000.0, 1)} kN·m²"
+        stepsAr += "δ = P·L³/(3·E·I) = ${Fmt.n(p / 1000.0, 3)} kN × ${Fmt.n(l, 2)}³ / (3 × ${Fmt.n(e * i / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm"
+        stepsAr += "M_max = P·L = ${Fmt.n(p, 1)} N × ${Fmt.n(l, 2)} m = ${Fmt.n(moment, 1)} N·m"
+        stepsAr += "نسبة الانحراف: L/${Fmt.n(l / defl, 0)}"
         if (has(inputs, "z")) {
             val z = value(inputs, "z")
             val sigma = moment / z
             results += result("sigma", "Maximum Bending Stress", sigma / 1e6, "mpa", isPrimary = true)
             steps += "Bending stress: σ = M/Z = ${Fmt.n(moment, 1)} N·m / ${Fmt.n(z * 1e9, 0)} mm³ = ${Fmt.n(sigma / 1e6, 1)} MPa"
+            stepsAr += "إجهاد الانحناء: σ = M/Z = ${Fmt.n(moment, 1)} N·m / ${Fmt.n(z * 1e9, 0)} mm³ = ${Fmt.n(sigma / 1e6, 1)} MPa"
         }
 
         return CalcOutput(
             results = results,
             steps = steps,
+            stepsAr = stepsAr,
             warnings = if (!has(inputs, "z")) {
                 listOf("Section modulus not provided — bending stress not computed.")
+            } else {
+                emptyList()
+            },
+            warningsAr = if (!has(inputs, "z")) {
+                listOf("لم يُدخل معامل المقطع — إجهاد الانحناء لم يُحسب.")
             } else {
                 emptyList()
             },

@@ -46,25 +46,38 @@ object BeamSsUdlCalculator : Calculator(Def) {
             result("moment", "Maximum Bending Moment", moment, "nm"),
             result("ratio", "Deflection / Span", defl / l, "dash"),
         )
+        val stepsAr = mutableListOf<String>()
         val steps = mutableListOf(
             "Flexural rigidity: E·I = ${Fmt.n(e / 1e6, 1)} MPa × ${Fmt.n(i, 12)} m⁴ = ${Fmt.n(ei / 1000.0, 1)} kN·m²",
             "δ_max = 5·w·L⁴/(384·E·I) = 5 × ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}⁴ / (384 × ${Fmt.n(ei / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm",
             "M_max = w·L²/8 = ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}² / 8 = ${Fmt.n(moment, 1)} N·m",
             "Deflection ratio: L/${Fmt.n(l / defl, 0)}",
         )
+        stepsAr += "الصلابة الانثنائية: E·I = ${Fmt.n(e / 1e6, 1)} MPa × ${Fmt.n(i, 12)} m⁴ = ${Fmt.n(ei / 1000.0, 1)} kN·m²"
+        stepsAr += "δ_max = 5·w·L⁴/(384·E·I) = 5 × ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}⁴ / (384 × ${Fmt.n(ei / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm"
+        stepsAr += "M_max = w·L²/8 = ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}² / 8 = ${Fmt.n(moment, 1)} N·m"
+        stepsAr += "نسبة الانحراف: L/${Fmt.n(l / defl, 0)}"
         if (has(inputs, "z")) {
             val z = value(inputs, "z")
             val sigma = moment / z
             results += result("sigma", "Maximum Bending Stress", sigma / 1e6, "mpa", isPrimary = true)
             steps += "Bending stress: σ = M/Z = ${Fmt.n(moment, 1)} N·m / ${Fmt.n(z * 1e9, 0)} mm³ = ${Fmt.n(sigma / 1e6, 1)} MPa"
+            stepsAr += "إجهاد الانحناء: σ = M/Z = ${Fmt.n(moment, 1)} N·m / ${Fmt.n(z * 1e9, 0)} mm³ = ${Fmt.n(sigma / 1e6, 1)} MPa"
         }
 
         return CalcOutput(
             results = results,
             steps = steps,
+            stepsAr = stepsAr,
             warnings = buildList {
                 if (!has(inputs, "z")) add("Section modulus not provided — bending stress not computed.")
                 add("Deflection limits (L/250, L/360, etc.) depend on the project specification and are not applied automatically.")
+            },
+            warningsAr = buildList {
+                if (!has(inputs, "z")) {
+                    add("لم يُدخل معامل المقطع — إجهاد الانحناء لم يُحسب.")
+                }
+                add("حدود الانحراف (L/250 و L/360 وغيرها) تعتمد على مواصفة المشروع ولا تُطبَّق تلقائيًا.")
             },
         )
     }
