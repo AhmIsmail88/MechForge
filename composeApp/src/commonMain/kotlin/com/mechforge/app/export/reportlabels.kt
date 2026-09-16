@@ -36,6 +36,10 @@ data class ReportLabels(
     val packageTitle: String,
     /** Printed when a saved calculation can no longer be replayed. */
     val packageRecordUnavailable: String,
+    /** Heading of the document-control block (number, revision, status). */
+    val documentControl: String,
+    /** States that the printed numbers are a result, not an approved design. */
+    val resultDisclaimer: String,
     val inputs: String,
     val formula: String,
     val calculationSteps: String,
@@ -77,6 +81,8 @@ data class ReportLabels(
             registerEmpty = "No calculations saved under this project yet.",
             packageTitle = "Project calculation package",
             packageRecordUnavailable = "This saved calculation could not be replayed; open it from the history to see its inputs.",
+            documentControl = "Document control",
+            resultDisclaimer = "The values above are the calculation result. Design approval is a separate document action recorded in the project register.",
             inputs = "Inputs",
             formula = "Formula",
             calculationSteps = "Calculation steps",
@@ -118,6 +124,8 @@ data class ReportLabels(
             registerEmpty = "لا توجد حسابات محفوظة لهذا المشروع بعد.",
             packageTitle = "حزمة حسابات المشروع",
             packageRecordUnavailable = "تعذّر إعادة تشغيل هذا الحساب المحفوظ؛ افتحه من السجل لعرض مدخلاته.",
+            documentControl = "ضبط المستند",
+            resultDisclaimer = "القيم أعلاه هي نتيجة الحساب، واعتماد التصميم إجراء مستندي منفصل يُسجّل في سجل المشروع.",
             inputs = "المدخلات",
             formula = "المعادلة",
             calculationSteps = "خطوات الحل",

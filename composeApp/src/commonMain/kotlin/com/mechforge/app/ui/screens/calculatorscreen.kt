@@ -51,6 +51,7 @@ import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.util.UiFormat
 import com.mechforge.app.export.ReportLabels
 import com.mechforge.app.export.ReportMeta
+import com.mechforge.app.export.ReportQa
 import com.mechforge.app.export.ReportSheet
 import com.mechforge.app.export.ReportWriter
 import com.mechforge.app.data.LanguageMode
@@ -388,8 +389,9 @@ fun CalculatorScreen(
                                     val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
                                     // The project owns this data (engineering audit section 11); the
                                     // Settings values are the fallback while a project is still blank.
+                                    val activeProject = deps.projects.activeProject()
                                     val meta = ReportMeta.build(
-                                        project = deps.projects.activeProject(),
+                                        project = activeProject,
                                         labels = labels,
                                         fallback = ReportMeta.Fallback(
                                             project = deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
@@ -407,9 +409,33 @@ fun CalculatorScreen(
                                         labels.checkedBy to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CHECKED),
                                         labels.approvedBy to "",
                                     )
-                                    val blocks = ReportSheet.build(calc, lastInputs ?: emptyMap(), out, restoreTitle, labels, signature)
+                                    val control = listOfNotNull(
+                                        activeProject?.projectNumber?.takeIf { it.isNotBlank() }?.let { labels.reportNo to it },
+                                        activeProject?.documentNumber?.takeIf { it.isNotBlank() }?.let { labels.documentNo to it },
+                                        activeProject?.revision?.takeIf { it.isNotBlank() }?.let { labels.revision to it },
+                                        activeProject?.status?.takeIf { it.isNotBlank() }?.let { labels.status to it },
+                                    )
+                                    val qa = ReportQa.check(
+                                        project = activeProject,
+                                        calculationNumber = null,
+                                        revision = activeProject?.revision,
+                                        status = activeProject?.status,
+                                        assumedInputWarnings = out.warnings.filter { it.contains("assumed") },
+                                        isSaved = false,
+                                    )
+                                    val blocks = ReportSheet.build(
+                                        calculator = calc,
+                                        inputs = lastInputs ?: emptyMap(),
+                                        output = out,
+                                        title = restoreTitle,
+                                        labels = labels,
+                                        signature = signature,
+                                        documentControl = control,
+                                        disclaimer = labels.resultDisclaimer,
+                                    )
                                     val path = deps.exporter.savePdf(def.id, def.name, meta, blocks, deps.logoStore.load(), rtl)
-                                    savedMessage = if (path != null) strings.calculatorReportSaved + " " + path else strings.calculatorExportCancelled
+                                    val qaNote = if (qa.isEmpty()) "" else "  |  QA: " + qa.joinToString("; ") { it.message }
+                                    savedMessage = if (path != null) strings.calculatorReportSaved + " " + path + qaNote else strings.calculatorExportCancelled
                                 }
                             },
                             label = { Text(strings.exportPdf) },
@@ -424,8 +450,9 @@ fun CalculatorScreen(
                                     val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
                                     // The project owns this data (engineering audit section 11); the
                                     // Settings values are the fallback while a project is still blank.
+                                    val activeProject = deps.projects.activeProject()
                                     val meta = ReportMeta.build(
-                                        project = deps.projects.activeProject(),
+                                        project = activeProject,
                                         labels = labels,
                                         fallback = ReportMeta.Fallback(
                                             project = deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
@@ -443,9 +470,33 @@ fun CalculatorScreen(
                                         labels.checkedBy to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CHECKED),
                                         labels.approvedBy to "",
                                     )
-                                    val blocks = ReportSheet.build(calc, lastInputs ?: emptyMap(), out, restoreTitle, labels, signature)
+                                    val control = listOfNotNull(
+                                        activeProject?.projectNumber?.takeIf { it.isNotBlank() }?.let { labels.reportNo to it },
+                                        activeProject?.documentNumber?.takeIf { it.isNotBlank() }?.let { labels.documentNo to it },
+                                        activeProject?.revision?.takeIf { it.isNotBlank() }?.let { labels.revision to it },
+                                        activeProject?.status?.takeIf { it.isNotBlank() }?.let { labels.status to it },
+                                    )
+                                    val qa = ReportQa.check(
+                                        project = activeProject,
+                                        calculationNumber = null,
+                                        revision = activeProject?.revision,
+                                        status = activeProject?.status,
+                                        assumedInputWarnings = out.warnings.filter { it.contains("assumed") },
+                                        isSaved = false,
+                                    )
+                                    val blocks = ReportSheet.build(
+                                        calculator = calc,
+                                        inputs = lastInputs ?: emptyMap(),
+                                        output = out,
+                                        title = restoreTitle,
+                                        labels = labels,
+                                        signature = signature,
+                                        documentControl = control,
+                                        disclaimer = labels.resultDisclaimer,
+                                    )
                                     val path = deps.exporter.saveXlsx(def.id, def.name, meta, blocks, rtl)
-                                    savedMessage = if (path != null) strings.calculatorReportSaved + " " + path else strings.calculatorExportCancelled
+                                    val qaNote = if (qa.isEmpty()) "" else "  |  QA: " + qa.joinToString("; ") { it.message }
+                                    savedMessage = if (path != null) strings.calculatorReportSaved + " " + path + qaNote else strings.calculatorExportCancelled
                                 }
                             },
                         ) { Text(strings.exportExcel) }

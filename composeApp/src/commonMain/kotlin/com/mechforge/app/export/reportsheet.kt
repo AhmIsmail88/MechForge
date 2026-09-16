@@ -23,6 +23,8 @@ object ReportSheet {
         title: String?,
         labels: ReportLabels = ReportLabels.ENGLISH,
         signature: List<Pair<String, String>> = emptyList(),
+        documentControl: List<Pair<String, String>> = emptyList(),
+        disclaimer: String? = null,
     ): List<ReportBlock> {
         val blocks = mutableListOf<ReportBlock>()
 
@@ -83,6 +85,15 @@ object ReportSheet {
         blocks += ReportBlock.Heading(labels.reference)
         blocks += ReportBlock.Paragraph(calculator.def.reference)
 
+        // Document control ----------------------------------------------------
+        val control = documentControl.filter { it.second.isNotBlank() }
+        if (control.isNotEmpty()) {
+            blocks += ReportBlock.Heading(labels.documentControl)
+            for ((label, value) in control) {
+                blocks += ReportBlock.TableRow(listOf(label, value))
+            }
+        }
+
         // Signatures ----------------------------------------------------------
         if (signature.isNotEmpty()) {
             blocks += ReportBlock.Heading(labels.signatures)
@@ -95,6 +106,11 @@ object ReportSheet {
             )
             // Credit line printed under the signature block.
             blocks += ReportBlock.Paragraph("By Ahmed Ismail")
+        }
+
+        // Result versus approval (engineering audit section 9): the sheet states what it is.
+        if (!disclaimer.isNullOrBlank()) {
+            blocks += ReportBlock.Paragraph(disclaimer)
         }
 
         return blocks
