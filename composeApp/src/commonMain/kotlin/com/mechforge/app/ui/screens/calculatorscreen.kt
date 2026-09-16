@@ -472,7 +472,19 @@ fun CalculatorScreen(
                 if (out != null && inMap != null) {
                     val inputsJson = Snapshots.encodeInputs(inMap)
                     val resultsJson = Snapshots.encodeResults(out)
-                    deps.history.add(def.id, title, System.currentTimeMillis(), inputsJson, resultsJson)
+                    // freeze the project data with the record (audit section 5.1)
+                    val project = deps.projects.activeProject()
+                    deps.history.add(
+                        calculatorId = def.id,
+                        title = title,
+                        timestamp = System.currentTimeMillis(),
+                        inputsJson = inputsJson,
+                        resultsJson = resultsJson,
+                        projectId = deps.projects.activeProjectId(),
+                        projectSnapshot = project?.toJson(),
+                        revision = project?.revision?.takeIf { it.isNotBlank() },
+                        status = project?.status?.takeIf { it.isNotBlank() },
+                    )
                     savedMessage = "Saved to history."
                 }
                 showSaveDialog = false

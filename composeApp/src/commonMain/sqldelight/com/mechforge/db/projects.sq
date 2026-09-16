@@ -65,7 +65,8 @@ deleteProject:
 DELETE FROM projects WHERE id = ?;
 
 selectAllProjects:
-SELECT projects.*, (SELECT COUNT(*) FROM saved_calculations WHERE saved_calculations.project_id = projects.id) AS saved_count
+SELECT projects.*,
+       (SELECT COUNT(*) FROM calculation_history WHERE calculation_history.project_id = projects.id) AS saved_count
 FROM projects ORDER BY created_at DESC;
 
 selectProjectById:

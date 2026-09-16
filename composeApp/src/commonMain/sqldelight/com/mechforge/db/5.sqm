@@ -1,0 +1,9 @@
+-- Migration v5 -> v6: a saved calculation keeps the project data it was made under
+-- (engineering audit section 5.1). Data-preserving: only nullable columns are added, so
+-- every existing history row stays readable.
+
+ALTER TABLE calculation_history ADD COLUMN project_id INTEGER REFERENCES projects(id);
+ALTER TABLE calculation_history ADD COLUMN project_snapshot TEXT;
+ALTER TABLE calculation_history ADD COLUMN calculation_number TEXT;
+ALTER TABLE calculation_history ADD COLUMN revision TEXT;
+ALTER TABLE calculation_history ADD COLUMN status TEXT;

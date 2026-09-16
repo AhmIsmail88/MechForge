@@ -124,6 +124,34 @@ class MigrationTest {
         assertTrue(saved.project_snapshot!!.contains("Wastewater Pump Station 01"))
         assertEquals(project.id, saved.project_id)
 
+        // v5 -> v6: a saved calculation keeps the project it belongs to and a snapshot of that
+        // project's data (engineering audit section 5.1). Existing history rows survive with
+        // empty new columns.
+        val historyRow = db.historyQueries.selectAllHistory().executeAsList().first()
+        assertTrue(
+            historyRow.project_id == null && historyRow.project_snapshot == null,
+            "the new history columns must start empty on an upgraded database",
+        )
+        db.historyQueries.insertHistoryFull(
+            calculator_id = "pump-power",
+            title = "Fire pump power",
+            timestamp = 1726200000001L,
+            inputs_json = "{}",
+            results_json = "{}",
+            project_id = project.id,
+            project_snapshot = "{\"name\":\"Wastewater Pump Station 01\",\"revision\":\"02\"}",
+            calculation_number = "FP-CALC-005",
+            revision = "02",
+            status = "For Review",
+        )
+        val savedRow = db.historyQueries.selectAllHistory().executeAsList()
+            .first { it.calculation_number == "FP-CALC-005" }
+        assertEquals("02", savedRow.revision)
+        assertEquals("For Review", savedRow.status)
+        assertEquals(project.id, savedRow.project_id)
+        assertTrue(savedRow.project_snapshot!!.contains("Wastewater Pump Station 01"))
+        assertEquals(1L, db.historyQueries.countHistoryByProject(project.id).executeAsOne())
+
         driver.close()
     }
 }

@@ -4,12 +4,27 @@ CREATE TABLE calculation_history (
   title TEXT NOT NULL,
   timestamp INTEGER NOT NULL,
   inputs_json TEXT NOT NULL,
-  results_json TEXT NOT NULL
+  results_json TEXT NOT NULL,
+  -- the project this calculation belongs to, and a frozen copy of its data: revising the
+  -- project later must not rewrite an issued calculation (engineering audit section 5.1)
+  project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+  project_snapshot TEXT,
+  calculation_number TEXT,
+  revision TEXT,
+  status TEXT
 );
 
 insertHistory:
 INSERT INTO calculation_history(calculator_id, title, timestamp, inputs_json, results_json)
 VALUES (?, ?, ?, ?, ?);
+
+insertHistoryFull:
+INSERT INTO calculation_history(calculator_id, title, timestamp, inputs_json, results_json,
+                                project_id, project_snapshot, calculation_number, revision, status)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+countHistoryByProject:
+SELECT COUNT(*) FROM calculation_history WHERE project_id = ?;
 
 selectAllHistory:
 SELECT * FROM calculation_history ORDER BY timestamp DESC;

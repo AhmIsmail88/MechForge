@@ -16,8 +16,35 @@ class HistoryRepository(private val db: MechForgeDatabase) {
     fun all(): Flow<List<Calculation_history>> =
         db.historyQueries.selectAllHistory().asFlow().mapToList(Dispatchers.IO)
 
-    fun add(calculatorId: String, title: String, timestamp: Long, inputsJson: String, resultsJson: String) {
-        db.historyQueries.insertHistory(calculatorId, title, timestamp, inputsJson, resultsJson)
+    /**
+     * Saves one calculation. When a project is active, [projectSnapshot] freezes its data with
+     * the record (engineering audit section 5.1), so a project revision made later cannot
+     * rewrite a calculation that was already issued.
+     */
+    fun add(
+        calculatorId: String,
+        title: String,
+        timestamp: Long,
+        inputsJson: String,
+        resultsJson: String,
+        projectId: Long? = null,
+        projectSnapshot: String? = null,
+        calculationNumber: String? = null,
+        revision: String? = null,
+        status: String? = null,
+    ) {
+        db.historyQueries.insertHistoryFull(
+            calculator_id = calculatorId,
+            title = title,
+            timestamp = timestamp,
+            inputs_json = inputsJson,
+            results_json = resultsJson,
+            project_id = projectId,
+            project_snapshot = projectSnapshot,
+            calculation_number = calculationNumber,
+            revision = revision,
+            status = status,
+        )
     }
 
     fun byId(id: Long): Calculation_history? =
