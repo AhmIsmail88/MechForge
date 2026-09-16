@@ -23,7 +23,7 @@ private val Def = CalculatorDefinition(
         InputSpec("q", "Airflow", "Q", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
         InputSpec("dp", "Fan total pressure", "Δp", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "pa"),
         InputSpec("etaf", "Fan efficiency", "η_fan", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct"),
-        InputSpec("etad", "Drive / transmission efficiency", "η_drive", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct"),
+        InputSpec("etad", "Drive / transmission efficiency", "η_drive", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct", assumedWhenOmitted = "Drive efficiency assumed as 1.0 (direct drive, no margin) - enter the motor or belt efficiency where a margin is needed."),
     ),
 )
 
@@ -41,7 +41,6 @@ object FanPowerCalculator : Calculator(Def) {
         val motorRating = nextIecMotorRating(pMotor / 1000.0)
 
         val warnings = buildList {
-            if (!has(inputs, "etad")) add("Drive efficiency not provided — assumed 1.0 (direct drive, no margin).")
             if (etaFan > 0.8) add("Fan efficiency above 80% is optimistic for small fans; verify at the duty point on the fan curve.")
             add("Motor rating is the next standard IEC rating; check the ambient/altitude derating, the starting method and the fan inertia before ordering.")
             if (motorRating == null) add("Motor power exceeds the largest rating in the standard list - verify the driver selection.")

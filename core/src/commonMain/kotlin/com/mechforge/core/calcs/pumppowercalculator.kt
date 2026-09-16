@@ -30,7 +30,7 @@ private val Def = CalculatorDefinition(
             "eta", "Pump efficiency", "η", UnitFamily.DIMENSIONLESS,
             minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "pct",
         ),
-        InputSpec("rho", "Fluid density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
+        InputSpec("rho", "Fluid density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Fluid density assumed as 1000 kg/m3 (water) - use the value for the fluid actually handled."),
     ),
 )
 
@@ -51,9 +51,6 @@ object PumpPowerCalculator : Calculator(Def) {
         val motor = IEC_MOTOR_RATINGS_KW.firstOrNull { it * 1000.0 >= shaftW }
 
         val warnings = buildList {
-            if (!has(inputs, "rho")) {
-                add("Fluid density not provided — assumed 1000 kg/m³ (water).")
-            }
             if (eta > 0.85) {
                 add("Efficiency above 85% is optimistic for most pump types; verify against the pump curve.")
             }

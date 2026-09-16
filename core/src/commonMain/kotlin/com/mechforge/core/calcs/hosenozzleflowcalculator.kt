@@ -26,7 +26,7 @@ private val Def = CalculatorDefinition(
           InputSpec(
               "c", "Nozzle discharge coefficient", "C", UnitFamily.DIMENSIONLESS,
               required = false, minValue = 0.0, exclusiveMin = true, maxValue = 1.0,
-              defaultUnitId = "dash", defaultValue = 1.0,
+              defaultUnitId = "dash", defaultValue = 1.0, assumedWhenOmitted = "Nozzle coefficient assumed as 1.0 (ideal smooth-bore reference) - verify the nozzle manufacturer data."
           ),
     ),
 )
@@ -58,7 +58,7 @@ object HoseNozzleFlowCalculator : Calculator(Def) {
             ),
             warnings = buildList {
                 add("Coefficient 29.7 is the standard fire-service form (gpm, in, psi). Verify the nozzle manufacturer data for smooth-bore and fog nozzles.")
-                if (!has(inputs, "c")) add("Nozzle coefficient not provided - assumed 1.0 (ideal smooth-bore reference).")
+                if (pPsi < 50.0 || pPsi > 100.0) add("Nozzle pressure outside the usual 50-100 psi (3.5-7 bar) band - check it against the nozzle and pump ratings.")
             },
         )
     }

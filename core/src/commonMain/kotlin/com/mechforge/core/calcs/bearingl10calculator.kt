@@ -99,7 +99,6 @@ object BearingL10Calculator : Calculator(Def) {
         }
 
         val warnings = buildList {
-            if (!has(inputs, "exp")) add("Exponent not provided - assumed p = 3 (ball bearings). Use 10/3 for roller bearings.")
             if (!has(inputs, "n")) add("Speed not provided - hours-based life not computed.")
             if (!has(inputs, "rel")) add("Reliability not provided - basic rating life (90 %) reported.")
             if (a1 < 1.0) add("A reliability above 90 % shortens the rating life: a1 = ${Fmt.n(a1, 2)} from ISO 281.")

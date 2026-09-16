@@ -93,8 +93,6 @@ object WaterHammerCalculator : Calculator(Def) {
         }
 
         val warnings = buildList {
-            if (!has(inputs, "rho")) add("Density not provided - assumed 1000 kg/m3 (water).")
-            if (!cEntered && !has(inputs, "kbulk")) add("Fluid bulk modulus not provided - assumed 2.15 GPa (water at ambient temperature).")
             if (!cEntered && !has(inputs, "epipe")) add("Pipe elastic modulus not provided - assumed 200 GPa (steel). Use the value for the actual pipe material (plastic pipes give much lower wave speeds).")
             add("This is the maximum (instantaneous closure) surge. For slower closures use the standard wave-speed characteristics or a surge-analysis package.")
             if (dv > 3.0) add("Velocity change above 3 m/s produces a very large surge - review the valve closure time and the pipe pressure class.")

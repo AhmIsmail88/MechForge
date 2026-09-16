@@ -66,9 +66,8 @@ object HxEffectivenessNtuCalculator : Calculator(Def) {
                 "Effectiveness = ${Fmt.n(eps * 100.0, 2)} %",
             ),
             warnings = buildList {
-                if (!has(inputs, "arr")) add("Arrangement not provided - assumed counter-current.")
-                if (!has(inputs, "cr")) add("Capacity ratio not provided - assumed 0 (one stream changing phase).")
                 if (counter && cr > 0.95 && cr < 1.0) add("Cr close to 1: the counter-flow result uses a near-singular form - check the limit value.")
+                if (eps > 0.95) add("Effectiveness above 95 % needs a very large surface - check the area and the approach temperatures.")
             },
         )
     }

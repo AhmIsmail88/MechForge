@@ -79,10 +79,10 @@ object LmtdCalculator : Calculator(Def) {
         return CalcOutput(
             results = results,
             steps = steps,
-            warnings = if (!has(inputs, "arr")) {
-                listOf("Arrangement not provided — assumed counter-current (default 1).")
-            } else {
-                emptyList()
+            warnings = buildList {
+                if (minOf(dt1, dt2) < 5.0) {
+                    add("Smallest terminal difference is below 5 K — the required area becomes very sensitive to the assumed U and the flow rates.")
+                }
             },
         )
     }

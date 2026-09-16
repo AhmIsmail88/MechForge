@@ -89,7 +89,7 @@ class BearingL10Test {
     @Test
     fun missingSpeedWarns() {
         val out = T.run(BearingL10Calculator, T.iv("c", 30.0, "kn"), T.iv("p", 5.0, "kn"))
-        assertTrue(out.warnings.any { it.contains("p = 3") })
+        assertTrue(out.warnings.any { it.contains("Life exponent assumed as 3.0") })
         assertTrue(out.warnings.any { it.contains("hours") })
     }
 
