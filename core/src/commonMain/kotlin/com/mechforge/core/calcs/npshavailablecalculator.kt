@@ -60,6 +60,25 @@ object NpshAvailableCalculator : Calculator(Def) {
                 "NPSHa = ${Fmt.n(pressureHead, 3)} + ${Fmt.n(hStatic, 3)} − ${Fmt.n(hFriction, 3)} = ${Fmt.n(npsha, 3)} m",
             ),
             warnings = warnings,
+            stepsAr = listOf(
+                "مساهمة ضغط الرأس: (p_atm − p_v)/(ρ·g) = (${Fmt.n(pAtm, 0)} − ${Fmt.n(pV, 0)}) / (${Fmt.n(rho, 1)} × 9.80665) = ${Fmt.n(pressureHead, 3)} m",
+                "الرفع الاستاتيكي: ${Fmt.n(hStatic, 3)} m   فقد خط الشفط: −${Fmt.n(hFriction, 3)} m",
+                "NPSHa = ${Fmt.n(pressureHead, 3)} + ${Fmt.n(hStatic, 3)} − ${Fmt.n(hFriction, 3)} = ${Fmt.n(npsha, 3)} m",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "pv")) {
+                    add("لم يُدخل ضغط البخار - افتُرض 2.339 kPa (مياه عند 20 °C).")
+                }
+                if (!has(inputs, "rho")) {
+                    add("لم تُدخل الكثافة - افتُرضت 998.2 kg/m³ (مياه عند 20 °C).")
+                }
+                if (npsha < 3.0) {
+                    add("NPSHa أقل من 3 m - هامش منخفض. تحقق مقابل منحنى NPSHr للمضخة بهامش أمان كافٍ.")
+                }
+                if (npsha <= 0.0) {
+                    add("NPSHa غير موجب - المضخة ستتكهّف عند نقطة التشغيل هذه.")
+                }
+            },
         )
     }
 }

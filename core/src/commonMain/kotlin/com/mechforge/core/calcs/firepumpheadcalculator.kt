@@ -59,6 +59,21 @@ object FirePumpHeadCalculator : Calculator(Def) {
                 if (total <= 0.0) add("Total head is not positive - the supply pressure already exceeds the requirement.")
                 add("Select the pump from its certified curve (NFPA 20 churn/rated/overload points).")
             },
+            stepsAr = listOf(
+                "فرق الضغط: ${Fmt.n((pReq - pAvail) / 1e5, 3)} bar",
+                "ضغط الرأس: (P_req - P_avail)/(rho*g) = ${Fmt.n(pReq - pAvail, 0)} / (${Fmt.n(rho, 1)} × 9.80665) = ${Fmt.n(pressureHead, 3)} m",
+                "الارتفاع الاستاتيكي: ${Fmt.n(hStatic, 2)} m   الاحتكاك والفقد الفرعي: ${Fmt.n(hFriction, 2)} m",
+                "الرفع الكلي: H = ${Fmt.n(pressureHead, 3)} + ${Fmt.n(hStatic, 2)} + ${Fmt.n(hFriction, 2)} = ${Fmt.n(total, 2)} m",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "rho")) {
+                    add("لم تُدخل الكثافة - افتُرضت 998.2 kg/m3 (مياه عند 20 °C).")
+                }
+                if (total <= 0.0) {
+                    add("الرفع الكلي غير موجب - ضغط الإمداد يتجاوز المطلوب بالفعل.")
+                }
+                add("اختر المضخة من منحنى معتمد (نقاط NFPA 20: الحجز والمعدل والحمل الزائد).")
+            },
         )
     }
 }
