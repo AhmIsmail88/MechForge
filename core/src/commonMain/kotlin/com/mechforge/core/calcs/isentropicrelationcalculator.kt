@@ -55,6 +55,17 @@ object IsentropicRelationCalculator : Calculator(Def) {
                 "Density ratio: ρ₂/ρ₁ = (P₂/P₁)^(1/k) = ${Fmt.n(densityRatio, 4)}",
             ),
             warnings = if (!has(inputs, "k")) listOf("Specific heat ratio not provided — assumed k = 1.4 (air).") else emptyList(),
+            stepsAr = listOf(
+                "نسبة الضغط: P₂/P₁ = ${Fmt.n(p2, 2)} / ${Fmt.n(p1, 2)} = ${Fmt.n(pressureRatio, 4)}",
+                "الأُس (k−1)/k = (${Fmt.n(k, 3)} − 1)/${Fmt.n(k, 3)} = ${Fmt.n((k - 1.0) / k, 4)}",
+                "T₂ = T₁·(P₂/P₁)^((k−1)/k) = ${Fmt.n(t1, 2)} × ${Fmt.n(pressureRatio, 4)}^${Fmt.n((k - 1.0) / k, 4)} = ${Fmt.n(t2, 2)} K (${Fmt.n(t2 - 273.15, 1)} °C)",
+                "نسبة الكثافة: ρ₂/ρ₁ = (P₂/P₁)^(1/k) = ${Fmt.n(densityRatio, 4)}",
+            ),
+            warningsAr = if (!has(inputs, "k")) {
+                listOf("لم تُدخل نسبة الحرارة النوعية - افتُرضت k = 1.4 (هواء).")
+            } else {
+                emptyList()
+            },
         )
     }
 }
