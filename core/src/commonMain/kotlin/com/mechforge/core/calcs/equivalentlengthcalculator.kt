@@ -44,6 +44,10 @@ object EquivalentLengthCalculator : Calculator(Def) {
                 "L_eq = K·D/f = ${Fmt.n(k, 3)} × ${Fmt.n(d * 1000.0, 1)} mm / ${Fmt.n(f, 5)} = ${Fmt.n(leq, 3)} m",
                 "In pipe diameters: L_eq/D = ${Fmt.n(leq / d, 1)} D",
             ),
+            stepsAr = listOf(
+                "L_eq = K·D/f = ${Fmt.n(k, 3)} × ${Fmt.n(d * 1000.0, 1)} mm / ${Fmt.n(f, 5)} = ${Fmt.n(leq, 3)} m",
+                "بالأقطار: L_eq/D = ${Fmt.n(leq / d, 1)} D",
+            ),
             warnings = emptyList(),
         )
     }

@@ -53,6 +53,17 @@ object ValveKvCalculator : Calculator(Def) {
                 if (!has(inputs, "sg")) add("Specific gravity not provided — assumed 1.0 (water).")
                 add("Liquid sizing only — no cavitation, flashing, laminar-flow or gas/steam correction applied.")
             },
+            stepsAr = listOf(
+                "فرق الضغط: ΔP = ${Fmt.n(dpPa, 1)} Pa = ${Fmt.n(dpBar, 3)} bar",
+                "التدفق: Q = Kv·√(ΔP/SG) = ${Fmt.n(kv, 3)} × √(${Fmt.n(dpBar, 3)}/${Fmt.n(sg, 3)}) = ${Fmt.n(qM3h, 3)} m³/h",
+                "المكافئ Cv = 1.156 × Kv = ${Fmt.n(cv, 3)}",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "sg")) {
+                    add("لم تُدخل الكثافة النوعية - افتُرضت 1.0 (مياه).")
+                }
+                add("حساب السوائل فقط - بدون تصحيح للتكهّف أو التبخّر أو السريان الصفحي أو الغازات والبخار.")
+            },
         )
     }
 }
