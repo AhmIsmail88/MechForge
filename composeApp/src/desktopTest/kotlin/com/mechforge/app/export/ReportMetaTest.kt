@@ -3,6 +3,7 @@ package com.mechforge.app.export
 import com.mechforge.app.data.ProjectInfo
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -71,6 +72,28 @@ class ReportMetaTest {
         val noProject = rows(null)
         assertEquals("Old project name", noProject[labels.project])
         assertEquals("R-001", noProject[labels.reportNo])
+    }
+
+    @Test
+    fun aFrozenSnapshotWinsOverTheActiveProject() {
+        // audit section 5.1: an issued calculation keeps the project data it was made under
+        val frozen = ProjectInfo(
+            name = "Old project",
+            projectNumber = "OLD-001",
+            client = "Old client",
+            revision = "01",
+        )
+        val active = ProjectInfo(name = "Current project", projectNumber = "NEW-002", revision = "02")
+
+        val chosen = ReportMeta.projectFor(frozen.toJson(), active)!!
+        assertEquals("Old project", chosen.name)
+        assertEquals("01", chosen.revision)
+        assertEquals("Old client", rows(chosen)[labels.client], "the sheet prints the frozen client")
+
+        // a record from before the snapshot existed, or a damaged one, still prints today's project
+        assertEquals("Current project", ReportMeta.projectFor(null, active)!!.name)
+        assertEquals("Current project", ReportMeta.projectFor("{ not json", active)!!.name)
+        assertNull(ReportMeta.projectFor(null, null))
     }
 
     @Test

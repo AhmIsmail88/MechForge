@@ -83,6 +83,10 @@ fun CalculatorScreen(
     calculatorId: String,
     restoreInputs: Map<String, InputValue>? = null,
     restoreTitle: String? = null,
+    restoreProjectSnapshot: String? = null,
+    restoreCalculationNumber: String? = null,
+    restoreRevision: String? = null,
+    restoreStatus: String? = null,
     onBack: () -> Unit,
 ) {
     val strings = LocalStrings.current
@@ -389,7 +393,11 @@ fun CalculatorScreen(
                                     val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
                                     // The project owns this data (engineering audit section 11); the
                                     // Settings values are the fallback while a project is still blank.
-                                    val activeProject = deps.projects.activeProject()
+                                    // a restored record prints the project data frozen with it
+                                    val activeProject = ReportMeta.projectFor(
+                                        restoreProjectSnapshot,
+                                        deps.projects.activeProject(),
+                                    )
                                     val meta = ReportMeta.build(
                                         project = activeProject,
                                         labels = labels,
@@ -414,14 +422,15 @@ fun CalculatorScreen(
                                         activeProject?.documentNumber?.takeIf { it.isNotBlank() }?.let { labels.documentNo to it },
                                         activeProject?.revision?.takeIf { it.isNotBlank() }?.let { labels.revision to it },
                                         activeProject?.status?.takeIf { it.isNotBlank() }?.let { labels.status to it },
+                                        restoreCalculationNumber?.takeIf { it.isNotBlank() }?.let { labels.registerCalcNo to it },
                                     )
                                     val qa = ReportQa.check(
                                         project = activeProject,
-                                        calculationNumber = null,
+                                        calculationNumber = restoreCalculationNumber,
                                         revision = activeProject?.revision,
-                                        status = activeProject?.status,
+                                        status = restoreStatus ?: activeProject?.status,
                                         assumedInputWarnings = out.warnings.filter { it.contains("assumed") },
-                                        isSaved = false,
+                                        isSaved = restoreCalculationNumber != null,
                                     )
                                     val blocks = ReportSheet.build(
                                         calculator = calc,
@@ -450,7 +459,11 @@ fun CalculatorScreen(
                                     val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
                                     // The project owns this data (engineering audit section 11); the
                                     // Settings values are the fallback while a project is still blank.
-                                    val activeProject = deps.projects.activeProject()
+                                    // a restored record prints the project data frozen with it
+                                    val activeProject = ReportMeta.projectFor(
+                                        restoreProjectSnapshot,
+                                        deps.projects.activeProject(),
+                                    )
                                     val meta = ReportMeta.build(
                                         project = activeProject,
                                         labels = labels,
@@ -475,14 +488,15 @@ fun CalculatorScreen(
                                         activeProject?.documentNumber?.takeIf { it.isNotBlank() }?.let { labels.documentNo to it },
                                         activeProject?.revision?.takeIf { it.isNotBlank() }?.let { labels.revision to it },
                                         activeProject?.status?.takeIf { it.isNotBlank() }?.let { labels.status to it },
+                                        restoreCalculationNumber?.takeIf { it.isNotBlank() }?.let { labels.registerCalcNo to it },
                                     )
                                     val qa = ReportQa.check(
                                         project = activeProject,
-                                        calculationNumber = null,
+                                        calculationNumber = restoreCalculationNumber,
                                         revision = activeProject?.revision,
-                                        status = activeProject?.status,
+                                        status = restoreStatus ?: activeProject?.status,
                                         assumedInputWarnings = out.warnings.filter { it.contains("assumed") },
-                                        isSaved = false,
+                                        isSaved = restoreCalculationNumber != null,
                                     )
                                     val blocks = ReportSheet.build(
                                         calculator = calc,

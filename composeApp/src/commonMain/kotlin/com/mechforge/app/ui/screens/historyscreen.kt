@@ -81,6 +81,10 @@ fun HistoryScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                                             calculatorId = row.calculator_id,
                                             restoreInputs = inputs,
                                             restoreTitle = row.title,
+                                            restoreProjectSnapshot = row.project_snapshot,
+                                            restoreCalculationNumber = row.calculation_number,
+                                            restoreRevision = row.revision,
+                                            restoreStatus = row.status,
                                         )
                                     )
                                 }

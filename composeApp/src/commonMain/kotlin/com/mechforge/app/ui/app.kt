@@ -82,6 +82,11 @@ sealed interface Screen {
         val calculatorId: String,
         val restoreInputs: Map<String, com.mechforge.core.engine.InputValue>? = null,
         val restoreTitle: String? = null,
+    /** Project data frozen with the restored record, plus its document control fields. */
+    val restoreProjectSnapshot: String? = null,
+    val restoreCalculationNumber: String? = null,
+    val restoreRevision: String? = null,
+    val restoreStatus: String? = null,
     ) : Screen
 }
 
@@ -219,6 +224,10 @@ private fun ScreenHost(screen: Screen, deps: AppDependencies, onNavigate: (Scree
             calculatorId = screen.calculatorId,
             restoreInputs = screen.restoreInputs,
             restoreTitle = screen.restoreTitle,
+            restoreProjectSnapshot = screen.restoreProjectSnapshot,
+            restoreCalculationNumber = screen.restoreCalculationNumber,
+            restoreRevision = screen.restoreRevision,
+            restoreStatus = screen.restoreStatus,
             onBack = { onNavigate(Screen.Home) },
         )
     }

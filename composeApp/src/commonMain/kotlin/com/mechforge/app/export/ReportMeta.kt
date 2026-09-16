@@ -22,6 +22,14 @@ object ReportMeta {
         val code: String = "",
     )
 
+    /**
+     * The project a sheet must print. A restored calculation carries the project data that was
+     * frozen with it, and that snapshot wins over whatever project is active today: revising the
+     * project must not rewrite a calculation that was already issued (audit section 5.1).
+     */
+    fun projectFor(snapshot: String?, active: ProjectInfo?): ProjectInfo? =
+        ProjectInfo.fromJson(snapshot) ?: active
+
     fun build(
         project: ProjectInfo?,
         labels: ReportLabels,
