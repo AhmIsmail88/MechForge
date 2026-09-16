@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class ProjectInfo(
     val name: String = "",
+    val description: String = "",
     val projectNumber: String = "",
     val projectCode: String = "",
     val projectType: String = "",
@@ -40,7 +41,7 @@ data class ProjectInfo(
     /** True when nothing but the project name is known, so the report can fall back to Settings. */
     val isEmpty: Boolean
         get() = listOf(
-            projectNumber, projectCode, projectType, location, country, client, consultant,
+            description, projectNumber, projectCode, projectType, location, country, client, consultant,
             contractor, endUser, preparedBy, checkedBy, approvedBy, discipline, revision,
             documentNumber, codes, codeEdition, designConditions, notes,
         ).all { it.isBlank() } && revisionDate == null
@@ -48,6 +49,7 @@ data class ProjectInfo(
     /** The rows the report prints, in order, skipping everything that was left empty. */
     fun reportRows(): List<Pair<String, String>> = listOf(
         "Project" to name,
+        "Description" to description,
         "Project No." to projectNumber,
         "Project Code" to projectCode,
         "Project Type" to projectType,

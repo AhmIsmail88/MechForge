@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.util.UiFormat
 import com.mechforge.app.export.ReportLabels
+import com.mechforge.app.export.ReportMeta
 import com.mechforge.app.export.ReportSheet
 import com.mechforge.app.export.ReportWriter
 import com.mechforge.app.data.LanguageMode
@@ -385,16 +386,22 @@ fun CalculatorScreen(
                                     val rtl = deps.settings.reportIsArabic()
                                     val labels = ReportLabels.of(rtl)
                                     val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
-                                    val meta = listOfNotNull(
-                                        labels.project to deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
-                                        labels.client to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT),
-                                        labels.engineer to engineerName,
-                                        labels.location to deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION),
-                                        labels.reportNo to deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO),
-                                        labels.revision to deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV),
-                                        labels.date to java.time.LocalDate.now().toString(),
-                                        labels.code to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CODE),
-                                    ).filter { it.second.isNotBlank() }
+                                    // The project owns this data (engineering audit section 11); the
+                                    // Settings values are the fallback while a project is still blank.
+                                    val meta = ReportMeta.build(
+                                        project = deps.projects.activeProject(),
+                                        labels = labels,
+                                        fallback = ReportMeta.Fallback(
+                                            project = deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
+                                            client = deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT),
+                                            engineer = engineerName,
+                                            location = deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION),
+                                            reportNo = deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO),
+                                            revision = deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV),
+                                            code = deps.settings.reportValue(SettingsRepository.KEY_REPORT_CODE),
+                                        ),
+                                        date = java.time.LocalDate.now().toString(),
+                                    )
                                     val signature = listOf(
                                         labels.preparedBy to engineerName,
                                         labels.checkedBy to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CHECKED),
@@ -415,16 +422,22 @@ fun CalculatorScreen(
                                     val rtl = deps.settings.reportIsArabic()
                                     val labels = ReportLabels.of(rtl)
                                     val engineerName = deps.settings.reportValue(SettingsRepository.KEY_REPORT_ENGINEER)
-                                    val meta = listOfNotNull(
-                                        labels.project to deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
-                                        labels.client to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT),
-                                        labels.engineer to engineerName,
-                                        labels.location to deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION),
-                                        labels.reportNo to deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO),
-                                        labels.revision to deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV),
-                                        labels.date to java.time.LocalDate.now().toString(),
-                                        labels.code to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CODE),
-                                    ).filter { it.second.isNotBlank() }
+                                    // The project owns this data (engineering audit section 11); the
+                                    // Settings values are the fallback while a project is still blank.
+                                    val meta = ReportMeta.build(
+                                        project = deps.projects.activeProject(),
+                                        labels = labels,
+                                        fallback = ReportMeta.Fallback(
+                                            project = deps.settings.reportValue(SettingsRepository.KEY_REPORT_PROJECT),
+                                            client = deps.settings.reportValue(SettingsRepository.KEY_REPORT_CLIENT),
+                                            engineer = engineerName,
+                                            location = deps.settings.reportValue(SettingsRepository.KEY_REPORT_LOCATION),
+                                            reportNo = deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO),
+                                            revision = deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV),
+                                            code = deps.settings.reportValue(SettingsRepository.KEY_REPORT_CODE),
+                                        ),
+                                        date = java.time.LocalDate.now().toString(),
+                                    )
                                     val signature = listOf(
                                         labels.preparedBy to engineerName,
                                         labels.checkedBy to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CHECKED),

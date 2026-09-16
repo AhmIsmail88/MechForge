@@ -1,19 +1,26 @@
 package com.mechforge.app.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,17 +39,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
+import com.mechforge.app.data.ProjectInfo
 import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.ui.theme.glassBorder
 
+/**
+ * The project area: a list of projects, and the engineering record of each one.
+ *
+ * Following the engineering audit (sections 3, 6, 7) the project - not Settings - owns the
+ * project number, the client/consultant/contractor, the location, the revision, the status,
+ * the responsibility and the design basis, and a calculation report prints whatever the
+ * active project holds.
+ */
 @Composable
 fun ProjectsScreen(deps: AppDependencies) {
     val strings = LocalStrings.current
     val projects by deps.projects.all().collectAsState(initial = emptyList())
+    val activeId by deps.projects.activeProjectIdFlow().collectAsState(initial = null)
     var showCreate by remember { mutableStateOf(false) }
     var createName by remember { mutableStateOf("") }
     var renameTarget by remember { mutableStateOf<Long?>(null) }
     var renameText by remember { mutableStateOf("") }
+    var infoTarget by remember { mutableStateOf<Long?>(null) }
+    var infoDraft by remember { mutableStateOf<ProjectInfo?>(null) }
 
     Column(
         modifier = Modifier
@@ -59,31 +78,62 @@ fun ProjectsScreen(deps: AppDependencies) {
 
         if (projects.isEmpty()) {
             Text(strings.projectsEmpty, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(strings.projectsEmptyHint, color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text(strings.projectsEmptyHint, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
-        LazyColumn(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(projects, key = { it.id }) { project ->
+                val info = deps.projects.info(project.id)
                 Card(modifier = Modifier.fillMaxWidth().glassBorder()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(project.name, style = MaterialTheme.typography.titleSmall)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(project.name, style = MaterialTheme.typography.titleSmall)
+                                if (project.id == activeId) {
+                                    Spacer(Modifier.padding(horizontal = 4.dp))
+                                    AssistChip(
+                                        onClick = {},
+                                        label = { Text(strings.projectActive, style = MaterialTheme.typography.labelSmall) },
+                                    )
+                                }
+                            }
                             Text(
                                 strings.savedCalculations(project.saved_count.toInt()),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+                            val details = listOfNotNull(
+                                info?.projectNumber?.takeIf { it.isNotBlank() }?.let { "No. $it" },
+                                info?.client?.takeIf { it.isNotBlank() },
+                                info?.revision?.takeIf { it.isNotBlank() }?.let { "Rev. $it" },
+                                info?.status?.takeIf { it.isNotBlank() },
+                            ).joinToString("  -  ")
+                            if (details.isNotBlank()) {
+                                Text(
+                                    details,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
+                        if (project.id != activeId) {
+                            IconButton(onClick = { deps.projects.setActiveProject(project.id) }) {
+                                Icon(Icons.Filled.Check, strings.projectSetActive)
+                            }
+                        }
+                        IconButton(onClick = {
+                            infoTarget = project.id
+                            infoDraft = info
+                        }) { Icon(Icons.Filled.Info, strings.projectInfoTitle) }
                         IconButton(onClick = {
                             renameTarget = project.id
                             renameText = project.name
-                        }) { Icon(Icons.Filled.Edit, "Rename") }
+                        }) { Icon(Icons.Filled.Edit, strings.projectsRenameTitle) }
                         IconButton(onClick = { deps.projects.delete(project.id) }) {
-                            Icon(Icons.Filled.Delete, "Delete")
+                            Icon(Icons.Filled.Delete, strings.projectsDelete)
                         }
                     }
                 }
@@ -127,4 +177,53 @@ fun ProjectsScreen(deps: AppDependencies) {
             dismissButton = { TextButton(onClick = { renameTarget = null }) { Text(strings.cancel) } },
         )
     }
+
+    val draft = infoDraft
+    val target = infoTarget
+    if (draft != null && target != null) {
+        AlertDialog(
+            onDismissRequest = { infoTarget = null; infoDraft = null },
+            title = { Text(strings.projectInfoTitle) },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 420.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    ProjectField(strings.projectsNameLabel, draft.name) { infoDraft = draft.copy(name = it) }
+                    ProjectField(strings.fieldProjectNumber, draft.projectNumber) { infoDraft = draft.copy(projectNumber = it) }
+                    ProjectField(strings.fieldProjectClient, draft.client) { infoDraft = draft.copy(client = it) }
+                    ProjectField(strings.fieldProjectConsultant, draft.consultant) { infoDraft = draft.copy(consultant = it) }
+                    ProjectField(strings.fieldProjectContractor, draft.contractor) { infoDraft = draft.copy(contractor = it) }
+                    ProjectField(strings.fieldProjectLocation, draft.location) { infoDraft = draft.copy(location = it) }
+                    ProjectField(strings.fieldProjectRevision, draft.revision) { infoDraft = draft.copy(revision = it) }
+                    ProjectField(strings.fieldProjectStatus, draft.status) { infoDraft = draft.copy(status = it) }
+                    ProjectField(strings.fieldProjectPreparedBy, draft.preparedBy) { infoDraft = draft.copy(preparedBy = it) }
+                    ProjectField(strings.fieldProjectCheckedBy, draft.checkedBy) { infoDraft = draft.copy(checkedBy = it) }
+                    ProjectField(strings.fieldProjectCodes, draft.codes) { infoDraft = draft.copy(codes = it) }
+                    ProjectField(strings.fieldProjectCodeEdition, draft.codeEdition) { infoDraft = draft.copy(codeEdition = it) }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    deps.projects.saveInfo(target, draft)
+                    infoTarget = null
+                    infoDraft = null
+                }) { Text(strings.save) }
+            },
+            dismissButton = { TextButton(onClick = { infoTarget = null; infoDraft = null }) { Text(strings.cancel) } },
+        )
+    }
+}
+
+@Composable
+private fun ProjectField(label: String, value: String, onChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        label = { Text(label) },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }

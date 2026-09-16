@@ -122,6 +122,22 @@ interface UiStrings {
     val projectsRenameTitle: String
     val projectsNameLabel: String
     val projectsDescriptionLabel: String
+    // Project-centric records (engineering audit sections 4, 5, 11)
+    val projectInfoTitle: String
+    val fieldProjectNumber: String
+    val fieldProjectClient: String
+    val fieldProjectConsultant: String
+    val fieldProjectContractor: String
+    val fieldProjectLocation: String
+    val fieldProjectRevision: String
+    val fieldProjectStatus: String
+    val fieldProjectPreparedBy: String
+    val fieldProjectCheckedBy: String
+    val fieldProjectCodes: String
+    val fieldProjectCodeEdition: String
+    val projectSetActive: String
+    val projectActive: String
+    val projectsDelete: String
 
     // ---- Settings -------------------------------------------------------
     val settingsTitle: String
@@ -306,6 +322,21 @@ object ArStrings : UiStrings {
     override val projectsRenameTitle = "إعادة تسمية المشروع"
     override val projectsNameLabel = "اسم المشروع"
     override val projectsDescriptionLabel = "الوصف"
+        override val projectInfoTitle = "بيانات المشروع"
+        override val fieldProjectNumber = "رقم المشروع"
+        override val fieldProjectClient = "العميل"
+        override val fieldProjectConsultant = "الاستشاري"
+        override val fieldProjectContractor = "المقاول"
+        override val fieldProjectLocation = "الموقع"
+        override val fieldProjectRevision = "المراجعة"
+        override val fieldProjectStatus = "الحالة"
+        override val fieldProjectPreparedBy = "إعداد"
+        override val fieldProjectCheckedBy = "مراجعة"
+        override val fieldProjectCodes = "الأكواد المطبقة"
+        override val fieldProjectCodeEdition = "إصدار الكود"
+        override val projectSetActive = "تعيين كمشروع نشط"
+        override val projectActive = "المشروع النشط"
+        override val projectsDelete = "حذف"
 
     override val settingsTitle = "الإعدادات"
     override val settingsAppearance = "المظهر"
@@ -509,6 +540,21 @@ object EnStrings : UiStrings {
     override val projectsRenameTitle = "Rename project"
     override val projectsNameLabel = "Project name"
     override val projectsDescriptionLabel = "Description"
+        override val projectInfoTitle = "Project information"
+        override val fieldProjectNumber = "Project number"
+        override val fieldProjectClient = "Client"
+        override val fieldProjectConsultant = "Consultant"
+        override val fieldProjectContractor = "Contractor"
+        override val fieldProjectLocation = "Location"
+        override val fieldProjectRevision = "Revision"
+        override val fieldProjectStatus = "Status"
+        override val fieldProjectPreparedBy = "Prepared by"
+        override val fieldProjectCheckedBy = "Checked by"
+        override val fieldProjectCodes = "Applicable codes"
+        override val fieldProjectCodeEdition = "Code edition"
+        override val projectSetActive = "Set as active project"
+        override val projectActive = "Active project"
+        override val projectsDelete = "Delete"
 
     override val settingsTitle = "Settings"
     override val settingsAppearance = "Appearance"
