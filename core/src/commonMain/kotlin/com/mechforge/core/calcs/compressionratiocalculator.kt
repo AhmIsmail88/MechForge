@@ -70,6 +70,26 @@ object CompressionRatioCalculator : Calculator(Def) {
                 if (stages > 4) add("More than 4 stages: consider a different machine type or review the required discharge pressure.")
                 add("Check the discharge temperature and the intercooler duty for each stage before selecting the machine.")
             },
+            stepsAr = listOf(
+                "النسبة الكلية: CR = P2/P1 = ${Fmt.n(p2 / 1e5, 3)} / ${Fmt.n(p1 / 1e5, 3)} = ${Fmt.n(ratio, 3)}",
+                "أقصى نسبة لكل مرحلة: ${Fmt.n(crMax, 2)}",
+                if (stages == 1) {
+                    "CR ≤ CR_max - مرحلة واحدة كافية."
+                } else {
+                    "المراحل: n = ceil(ln(${Fmt.n(ratio, 3)})/ln(${Fmt.n(crMax, 2)})) = ${Fmt.n(ln(ratio) / ln(crMax), 3)} ← $stages مرحلة"
+                },
+                "النسبة المتساوية لكل مرحلة: CR_stage = CR^(1/n) = ${Fmt.n(ratio, 3)}^(1/$stages) = ${Fmt.n(perStage, 3)}",
+                "ضغط ما بين المرحلتين (بعد التبريد البيني): ${Fmt.n(interstage / 1e5, 3)} bar",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "crmax")) {
+                    add("لم تُدخل أقصى نسبة لكل مرحلة - افتُرضت 4.0 (ضواغط هواء معتادة؛ تحقق من بيانات الماكينة).")
+                }
+                if (stages > 4) {
+                    add("أكثر من 4 مراحل: فكّر في نوع ماكينة مختلف أو راجع ضغط التصريف المطلوب.")
+                }
+                add("راجع حرارة التصريف وحمل المبرد البيني لكل مرحلة قبل اختيار الماكينة.")
+            },
         )
     }
 }
