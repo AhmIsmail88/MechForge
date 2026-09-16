@@ -49,6 +49,10 @@ object CarnotEfficiencyCalculator : Calculator(Def) {
                 "η = 1 − T_c/T_h = 1 − ${Fmt.n(tc, 2)}/${Fmt.n(th, 2)} = ${Fmt.n(eta, 4)} = ${Fmt.n(eta * 100.0, 2)} %",
             ),
             warnings = emptyList(),
+            stepsAr = listOf(
+                "الحرارات المطلقة: T_h = ${Fmt.n(th, 2)} K، T_c = ${Fmt.n(tc, 2)} K",
+                "η = 1 − T_c/T_h = 1 − ${Fmt.n(tc, 2)}/${Fmt.n(th, 2)} = ${Fmt.n(eta, 4)} = ${Fmt.n(eta * 100.0, 2)} %",
+            ),
         )
     }
 }

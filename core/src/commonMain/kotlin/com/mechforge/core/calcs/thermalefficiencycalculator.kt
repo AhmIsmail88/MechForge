@@ -50,6 +50,10 @@ object ThermalEfficiencyCalculator : Calculator(Def) {
                 "Heat rejected: Q_out = Q_in − W_net = ${Fmt.n((q - w) / 1000.0, 3)} kJ",
             ),
             warnings = emptyList(),
+            stepsAr = listOf(
+                "η = W_net/Q_in = ${Fmt.n(w / 1000.0, 3)} kJ / ${Fmt.n(q / 1000.0, 3)} kJ = ${Fmt.n(eta, 4)} = ${Fmt.n(eta * 100.0, 2)} %",
+                "الحرارة المطرودة: Q_out = Q_in − W_net = ${Fmt.n((q - w) / 1000.0, 3)} kJ",
+            ),
         )
     }
 }
