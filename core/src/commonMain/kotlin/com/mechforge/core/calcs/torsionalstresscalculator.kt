@@ -51,18 +51,22 @@ object TorsionalStressCalculator : Calculator(Def) {
 
         val results = mutableListOf<com.mechforge.core.engine.ResultValue>()
         val steps = mutableListOf<String>()
+        val stepsAr = mutableListOf<String>()
 
         if (hasD) {
             val d = value(inputs, "d") // m
             val tau = 16.0 * t / (PI * d.pow(3)) // Pa
             results += result("tau", "Torsional Shear Stress", tau / 1e6, "mpa", isPrimary = true)
             steps += "τ = 16·T/(π·d³) = 16 × ${Fmt.n(t, 2)} / (π × ${Fmt.n(d * 1000.0, 2)}³ mm) = ${Fmt.n(tau / 1e6, 2)} MPa"
+            stepsAr += "إجهاد القص اللي: τ = 16·T/(π·d³) = 16 × ${Fmt.n(t, 2)} / (π × ${Fmt.n(d * 1000.0, 2)}³ mm) = ${Fmt.n(tau / 1e6, 2)} MPa"
             if (hasTauAllow) {
                 val taual = value(inputs, "taual") // Pa
                 val ratio = tau / taual
                 results += result("util", "Stress / Allowable", ratio, "dash")
                 steps += "Utilization: τ/τ_allow = ${Fmt.n(ratio, 3)}" +
                     (if (ratio > 1.0) "  → EXCEEDS allowable — increase diameter." else "  → within allowable.")
+                stepsAr += "نسبة الاستغلال: τ/τ_allow = ${Fmt.n(ratio, 3)}" +
+                    (if (ratio > 1.0) "  ← يتجاوز المسموح — كبّر القطر." else "  ← داخل المسموح.")
             }
         }
 
@@ -71,9 +75,10 @@ object TorsionalStressCalculator : Calculator(Def) {
             val dMin = (16.0 * t / (PI * taual)).pow(1.0 / 3.0)
             results += result("dmin", "Minimum Solid Shaft Diameter", dMin * 1000.0, "mm", isPrimary = !hasD, isRecommended = !hasD)
             steps += "d_min = (16·T/(π·τ_allow))^(1/3) = ${Fmt.n(dMin * 1000.0, 2)} mm"
+            stepsAr += "أقل قطر: d_min = (16·T/(π·τ_allow))^(1/3) = ${Fmt.n(dMin * 1000.0, 2)} mm"
         }
 
-        return CalcOutput(results = results, steps = steps, warnings = emptyList())
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = emptyList())
     }
 
 }
