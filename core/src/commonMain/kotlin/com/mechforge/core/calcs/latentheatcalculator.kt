@@ -57,6 +57,7 @@ object LatentHeatCalculator : Calculator(Def) {
                 "Δw = ${Fmt.n(wOut, 5)} − ${Fmt.n(wIn, 5)} = ${Fmt.n(dw, 5)} kg/kg",
                 "Q_l = ṁ·h_fg·Δw = ${Fmt.n(massFlow, 4)} × 2501 × ${Fmt.n(dw, 5)} = ${Fmt.n(ql, 3)} kW",
             ),
+            warnings = warnings,
             stepsAr = listOf(
                 "معدل الكتلة: ṁ = ρ·V̇ = ${Fmt.n(rho, 3)} × ${Fmt.n(q, 4)} = ${Fmt.n(massFlow, 4)} kg/s",
                 "Δw = ${Fmt.n(wOut, 5)} − ${Fmt.n(wIn, 5)} = ${Fmt.n(dw, 5)} kg/kg",
