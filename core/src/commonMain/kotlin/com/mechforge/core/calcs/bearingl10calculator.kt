@@ -77,12 +77,17 @@ object BearingL10Calculator : Calculator(Def) {
             "Load ratio: C/P = ${Fmt.n(c / 1000.0, 3)} kN / ${Fmt.n(p / 1000.0, 3)} kN = ${Fmt.n(c / p, 3)}",
             "L10 = (C/P)^p * 10^6 = ${Fmt.n(c / p, 3)}^${Fmt.n(exponent, 2)} x 10^6 = ${Fmt.n(l10Revs / 1e6, 1)} x 10^6 revolutions",
         )
+        val stepsAr = mutableListOf(
+            "نسبة الحمل: C/P = ${Fmt.n(c / 1000.0, 3)} kN / ${Fmt.n(p / 1000.0, 3)} kN = ${Fmt.n(c / p, 3)}",
+            "L10 = (C/P)^p × 10^6 = ${Fmt.n(c / p, 3)}^${Fmt.n(exponent, 2)} × 10^6 = ${Fmt.n(l10Revs / 1e6, 1)} × 10^6 دورة",
+        )
 
         if (has(inputs, "n")) {
             val n = value(inputs, "n")
             val hours = l10Revs / (60.0 * n)
             results += result("l10h", "Basic Life in Hours (L10h)", hours, "h", isPrimary = a1 == 1.0 && aIso == 1.0)
             steps += "L10h = L10/(60*n) = ${Fmt.n(l10Revs / 1e6, 1)}x10^6 / (60 x ${Fmt.n(n, 0)}) = ${Fmt.n(hours, 0)} h"
+            stepsAr += "L10h = L10/(60×n) = ${Fmt.n(l10Revs / 1e6, 1)}×10^6 / (60 × ${Fmt.n(n, 0)}) = ${Fmt.n(hours, 0)} ساعة"
         }
 
         if (a1 != 1.0 || aIso != 1.0) {
@@ -90,11 +95,14 @@ object BearingL10Calculator : Calculator(Def) {
             results += result("a1", "Reliability factor a1", a1, "dash")
             results += result("aisoUsed", "Life modification factor a_ISO", aIso, "dash")
             steps += "Reliability: ${reliability.first.label} -> a1 = ${Fmt.n(a1, 2)}"
+            stepsAr += "الموثوقية المختارة ← a1 = ${Fmt.n(a1, 2)}"
             steps += "Lnm = a1 * a_ISO * L10 = ${Fmt.n(a1, 2)} x ${Fmt.n(aIso, 3)} x ${Fmt.n(l10Revs / 1e6, 1)}x10^6 = ${Fmt.n(lnmRevs / 1e6, 1)} x 10^6 revolutions"
+            stepsAr += "Lnm = a1 × a_ISO × L10 = ${Fmt.n(a1, 2)} × ${Fmt.n(aIso, 3)} × ${Fmt.n(l10Revs / 1e6, 1)}×10^6 = ${Fmt.n(lnmRevs / 1e6, 1)} × 10^6 دورة"
             if (has(inputs, "n")) {
                 val n = value(inputs, "n")
                 results += result("lnmh", "Modified Life in Hours (Lnmh)", lnmRevs / (60.0 * n), "h", isPrimary = true)
                 steps += "Lnmh = Lnm/(60*n) = ${Fmt.n(lnmRevs / (60.0 * n), 0)} h"
+                stepsAr += "Lnmh = Lnm/(60×n) = ${Fmt.n(lnmRevs / (60.0 * n), 0)} ساعة"
             }
         }
 
@@ -105,6 +113,13 @@ object BearingL10Calculator : Calculator(Def) {
             add("a_ISO depends on the lubrication (viscosity ratio) and the contamination of the application; enter it from the lubricant data or the bearing manufacturer's calculation.")
         }
 
-        return CalcOutput(results = results, steps = steps, warnings = warnings)
+        val warningsAr = buildList {
+            if (!has(inputs, "n")) add("لم تُدخل السرعة - العمر بالساعات لم يُحسب.")
+            if (!has(inputs, "rel")) add("لم تُدخل الموثوقية - تم عرض العمر الأساسي (90 %).")
+            if (a1 < 1.0) add("موثوقية أعلى من 90 % تقصّر العمر: a1 = ${Fmt.n(a1, 2)} وفق ISO 281.")
+            add("a_ISO تعتمد على التزييت (نسبة اللزوجة) والتلوث في التطبيق؛ أدخلها من بيانات الزيت أو من حساب مصنّع الرولمان.")
+        }
+
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = warnings, warningsAr = warningsAr)
     }
 }
