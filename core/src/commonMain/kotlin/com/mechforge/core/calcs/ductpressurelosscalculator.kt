@@ -90,7 +90,28 @@ object DuctPressureLossCalculator : Calculator(Def) {
                 "Velocity pressure: ρv²/2 = ${Fmt.n(rho, 3)} × ${Fmt.n(v, 3)}² / 2 = ${Fmt.n(velocityPressure, 3)} Pa",
                 "Pressure loss: Δp = f·(L/D_h)·ρv²/2 = ${Fmt.n(f, 5)} × (${Fmt.n(l, 2)}/${Fmt.n(dh, 4)}) × ${Fmt.n(velocityPressure, 3)} = ${Fmt.n(dp, 2)} Pa",
             ),
+            stepsAr = listOf(
+                "القطر الهيدروليكي: D_h = ${Fmt.n(dh, 4)} m" + if (hasRound) " (دكت دائري)" else " (مستطيل 2WH/(W+H))",
+                "رقم رينولدز: Re = v·D_h/ν = ${Fmt.n(v, 3)} × ${Fmt.n(dh, 4)} / ${Fmt.n(nu, 8)} = ${Fmt.n(re, 0)}",
+                "الخشونة النسبية: ε/D_h = ${Fmt.n(eps * 1000.0, 3)} mm / ${Fmt.n(dh * 1000.0, 1)} mm = ${Fmt.n(relRough, 6)}",
+                "معامل الاحتكاك (كولبروك-وايت): f = ${Fmt.n(f, 5)}",
+                "ضغط السرعة: ρv²/2 = ${Fmt.n(rho, 3)} × ${Fmt.n(v, 3)}² / 2 = ${Fmt.n(velocityPressure, 3)} Pa",
+                "فقد الضغط: Δp = f·(L/D_h)·ρv²/2 = ${Fmt.n(f, 5)} × (${Fmt.n(l, 2)}/${Fmt.n(dh, 4)}) × ${Fmt.n(velocityPressure, 3)} = ${Fmt.n(dp, 2)} Pa",
+            ),
             warnings = warnings,
+            warningsAr = buildList {
+                // the same condition as FrictionFactor.regimeWarning
+                if (re >= 2300.0 && re <= 4000.0) {
+                    add("رقم رينولدز في المنطقة الانتقالية (2300-4000)؛ معامل الاحتكاك غير مؤكد فيها - تعامل مع النتيجة بحذر.")
+                }
+                add("يحسب الاحتكاك في المسار المستقيم فقط - أضف فقد الوصلات والمنافذ للوصول إلى إجمالي النظام.")
+                if (dp / l > 1.5) {
+                    add("فقد الاحتكاك أعلى من 1.5 Pa/m - فوق المدى المعتاد؛ راجع طاقة المروحة مقابل معيار المشروع.")
+                }
+                if (dp / l < 0.5) {
+                    add("فقد الاحتكاك أقل من 0.5 Pa/m - الدكت قد يكون أكبر من اللازم للمعيار المذكور.")
+                }
+            },
         )
     }
 }
