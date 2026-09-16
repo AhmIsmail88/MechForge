@@ -19,7 +19,7 @@ import com.mechforge.core.util.Fmt
  * sensible-heat equation, and dividing by the air density gives the fan capacity.
  *
  * A fan capacity and a fan count may be entered as well, in which case the tool reports how many
- * fans of that size the calculated airflow takes and how much margin the installation carries.
+ * fans of that size the calculated airflow takes and how much margin the selection carries.
  */
 private const val CP_AIR = 1005.0
 private const val RHO_AIR = 1.2
@@ -39,7 +39,7 @@ private val Def = CalculatorDefinition(
         InputSpec("rho", "Air density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Air density assumed as 1.2 kg/m3 (20 C, sea level) - correct it for the actual temperature and altitude."),
         InputSpec("cp", "Specific heat of air", "c_p", UnitFamily.SPECIFIC_HEAT, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "jkgk", assumedWhenOmitted = "Specific heat assumed as 1005 J/(kg.K) (air at 20 C) - use the value for the gas actually handled."),
         InputSpec("fancap", "Fan capacity (per fan)", "Q_fan", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
-        InputSpec("nfans", "Number of fans installed", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),
+        InputSpec("nfans", "Number of fans selected", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),
     ),
 )
 
@@ -68,11 +68,11 @@ object HeatDissipationCalculator : Calculator(Def) {
                 add(result("fansNeeded", "Fans Required", it.toDouble(), "dash", isPrimary = true))
             }
             provided?.let {
-                add(result("fanTotal", "Installed Fan Capacity", it * 3600.0, "m3h"))
-                add(result("fanTotalCfm", "Installed Fan Capacity (imperial)", it / 4.719474432e-4, "cfm"))
+                add(result("fanTotal", "Selected Fan Capacity", it * 3600.0, "m3h"))
+                add(result("fanTotalCfm", "Selected Fan Capacity (imperial)", it / 4.719474432e-4, "cfm"))
             }
             margin?.let {
-                add(result("fanMargin", "Installed Capacity Margin", it, "pct"))
+                add(result("fanMargin", "Selected Capacity Margin", it, "pct"))
             }
         }
 
@@ -97,7 +97,7 @@ object HeatDissipationCalculator : Calculator(Def) {
                     add(
                         "Fans of ${Fmt.n(fanCap * 3600.0, 1)} m3/h each: " +
                             "$fansNeeded fan(s) required" +
-                            (provided?.let { " (installed ${Fmt.n(it * 3600.0, 1)} m3/h)" } ?: "")
+                            (provided?.let { " (selected ${Fmt.n(it * 3600.0, 1)} m3/h)" } ?: "")
                     )
                 }
             },

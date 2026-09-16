@@ -33,7 +33,7 @@ private val Def = CalculatorDefinition(
         InputSpec("vroom", "Room volume", "V", UnitFamily.VOLUME, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3"),
         InputSpec("ach", "Air changes per hour", "ACH", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "perh"),
         InputSpec("fancap", "Fan capacity (per fan)", "Q_fan", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
-        InputSpec("nfans", "Number of fans installed", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),
+        InputSpec("nfans", "Number of fans selected", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),
     ),
 )
 
@@ -78,7 +78,7 @@ object AirChangesCalculator : Calculator(Def) {
 
         val minutesPerChange = 60.0 / ach
 
-        // the fan installation the engineer intends to use, sized against the airflow above
+        // the fan selection the engineer intends to use, sized against the airflow above
         val fanCap = if (has(inputs, "fancap")) value(inputs, "fancap") else null
         val fanCount = if (has(inputs, "nfans")) value(inputs, "nfans") else null
         val fanProvided = FanCoverage.provided(fanCount, fanCap)
@@ -90,11 +90,11 @@ object AirChangesCalculator : Calculator(Def) {
                 add(result("fansNeeded", "Fans Required", it.toDouble(), "dash", isPrimary = true))
             }
             fanProvided?.let {
-                add(result("fanTotal", "Installed Fan Capacity", it * 3600.0, "m3h"))
-                add(result("fanTotalCfm", "Installed Fan Capacity (imperial)", it / 4.719474432e-4, "cfm"))
+                add(result("fanTotal", "Selected Fan Capacity", it * 3600.0, "m3h"))
+                add(result("fanTotalCfm", "Selected Fan Capacity (imperial)", it / 4.719474432e-4, "cfm"))
             }
             fanMargin?.let {
-                add(result("fanMargin", "Installed Capacity Margin", it, "pct"))
+                add(result("fanMargin", "Selected Capacity Margin", it, "pct"))
             }
         }
 

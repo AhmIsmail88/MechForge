@@ -26,7 +26,7 @@ class FanCoverageTest {
     }
 
     @Test
-    fun installedCapacityNeedsBothNumbers() {
+    fun selectedCapacityNeedsBothNumbers() {
         assertEquals(3.0, FanCoverage.provided(3.0, 1.0)!!, 1e-12)
         assertNull(FanCoverage.provided(null, 1.0))
         assertNull(FanCoverage.provided(3.0, null))
@@ -51,7 +51,7 @@ class FanCoverageTest {
         )
         assertTrue(
             FanCoverage.warnings(1.0, 1.05, 1, 1.0).isEmpty(),
-            "a covered installation raises nothing",
+            "a covered selection raises nothing",
         )
 
         val short = FanCoverage.warnings(1.0, 0.8, 2, 1.0)
@@ -65,7 +65,7 @@ class FanCoverageTest {
 
     @Test
     fun theAchCalculatorSizesFansAgainstItsComputedAirflow() {
-        // 15 ACH on 240 m3 = 3600 m3/h required; fans of 1200 m3/h each, two installed
+        // 15 ACH on 240 m3 = 3600 m3/h required; fans of 1200 m3/h each, two selected
         val out = AirChangesCalculator.run(
             mapOf(
                 "vroom" to InputValue("vroom", 240.0, "m3"),
