@@ -393,6 +393,7 @@ fun CalculatorScreen(
                                         labels.reportNo to deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO),
                                         labels.revision to deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV),
                                         labels.date to java.time.LocalDate.now().toString(),
+                                        labels.code to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CODE),
                                     ).filter { it.second.isNotBlank() }
                                     val signature = listOf(
                                         labels.preparedBy to engineerName,
@@ -422,6 +423,7 @@ fun CalculatorScreen(
                                         labels.reportNo to deps.settings.reportValue(SettingsRepository.KEY_REPORT_NO),
                                         labels.revision to deps.settings.reportValue(SettingsRepository.KEY_REPORT_REV),
                                         labels.date to java.time.LocalDate.now().toString(),
+                                        labels.code to deps.settings.reportValue(SettingsRepository.KEY_REPORT_CODE),
                                     ).filter { it.second.isNotBlank() }
                                     val signature = listOf(
                                         labels.preparedBy to engineerName,

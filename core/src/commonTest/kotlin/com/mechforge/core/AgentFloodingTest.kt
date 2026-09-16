@@ -46,8 +46,8 @@ class Fm200AgentQuantityTest {
             Fm200AgentQuantityCalculator,
             T.iv("v", 100.0, "m3"), T.iv("hazard", 2.0, "dash"), T.iv("t", 21.0, "c"),
         )
-        assertEquals(6.25, classC.results.first { it.id == "cUsed" }.value, 1e-9)
-        assertEquals(46.9621, classC.results.first { it.id == "w" }.value, 0.01)
+        assertEquals(7.0, classC.results.first { it.id == "cUsed" }.value, 1e-9)
+        assertEquals(53.0218, classC.results.first { it.id == "w" }.value, 0.01)
     }
 
     @Test

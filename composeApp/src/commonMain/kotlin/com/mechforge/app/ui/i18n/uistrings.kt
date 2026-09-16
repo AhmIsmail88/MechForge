@@ -161,6 +161,7 @@ interface UiStrings {
     val settingsReportLocation: String
     val settingsReportNo: String
     val settingsReportRevision: String
+    val settingsReportCode: String
     val settingsReportCheckedBy: String
     val settingsLogoSelected: String
     val settingsLogoNone: String
@@ -352,6 +353,7 @@ object ArStrings : UiStrings {
     override val settingsReportLocation = "الموقع"
     override val settingsReportNo = "رقم التقرير"
     override val settingsReportRevision = "المراجعة"
+    override val settingsReportCode = "الكود / الإصدار"
     override val settingsReportCheckedBy = "المراجَع بواسطة"
     override val settingsLogoSelected = "تم اختيار شعار — سيظهر على التقارير المُصدَّرة."
     override val settingsLogoNone = "لم يتم اختيار شعار بعد."
@@ -555,6 +557,7 @@ object EnStrings : UiStrings {
     override val settingsReportLocation = "Location"
     override val settingsReportNo = "Report no."
     override val settingsReportRevision = "Revision"
+    override val settingsReportCode = "Code / edition"
     override val settingsReportCheckedBy = "Checked by"
     override val settingsLogoSelected = "Logo selected - it will appear on exported reports."
     override val settingsLogoNone = "No logo selected yet."

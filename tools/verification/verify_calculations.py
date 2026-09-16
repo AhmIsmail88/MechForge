@@ -443,27 +443,45 @@ def expectation(calc, scenario, raw):
         M = 0.17003
         s = x("s") if "s" in raw else R_UNIVERSAL * x("t") / (101325.0 * M)
         # hazard index -> typical design concentration (NFPA 2001 HFC-227ea values)
-        c = x("c") * 100.0 if "c" in raw else {0: 7.0, 1: 8.7, 2: 6.25}[int(x("hazard"))]
+        c = x("c") * 100.0 if "c" in raw else {0: 7.0, 1: 8.7, 2: 7.0}[int(x("hazard"))]
         ratio = c / (100.0 - c)
-        w = (x("v") / s) * ratio
-        f = w / x("v")
-        out = {"w": w, "wLb": w / 0.45359237, "f": f, "fLb": f / 16.0184634,
-               "vapourVolume": w * s, "sUsed": s, "cUsed": c}
+        v = x("v")
+        w_basic = (v / s) * ratio
+        extra = x("addkg") if "addkg" in raw else 0.0
+        w = w_basic + extra
+        f = w_basic / v
+        out = {"w": w, "wLb": w / 0.45359237, "wbasic": w_basic, "wadd": extra,
+               "f": f, "fLb": f / 16.0184634, "vapourVolume": w_basic * s,
+               "sUsed": s, "cUsed": c, "vnet": v}
+        if "vgross" in raw:
+            out["vexcl"] = max(0.0, x("vgross") - v)
         if "mcyl" in raw:
-            out["cylinders"] = float(math.ceil(w / x("mcyl")))
+            charge = x("mcyl")
+            n = math.ceil(w / charge)
+            out["cylinders"] = float(n)
+            out["installed"] = n * charge
+            out["margin"] = n * charge - w
+            out["marginPct"] = (n * charge - w) / w * 100.0
         return out
 
     if calc == "co2-agent-quantity":
         # f = rho_vapour(T) * C/(100-C); rho_vapour = P*M/(R*T), M = 44.01 g/mol
         rho = 101325.0 * 0.04401 / (R_UNIVERSAL * x("t"))
         # hazard index -> design concentration (NFPA 12: 34 % surface, 50 % deep-seated)
-        c = x("c") * 100.0 if "c" in raw else {0: 34.0, 1: 34.0, 2: 34.0, 3: 50.0}[int(x("hazard"))]
+        c = x("c") * 100.0 if "c" in raw else {0: 34.0, 1: 34.0, 2: 34.0, 3: 50.0, 4: 50.0}[int(x("hazard"))]
         ratio = c / (100.0 - c)
-        f = rho * ratio
-        w = x("v") * f
+        f_ideal = rho * ratio
+        f = x("ftable") if "ftable" in raw else f_ideal
+        v = x("v")
+        w_basic = v * f
+        extra = x("addkg") if "addkg" in raw else 0.0
+        w = w_basic + extra
         charge = x("mcyl") if "mcyl" in raw else 45.0
-        return {"w": w, "wLb": w / 0.45359237, "f": f, "fLb": f / 16.0184634,
-                "rhoVapour": rho, "cylinders": float(math.ceil(w / charge)), "cUsed": c}
+        n = math.ceil(w / charge)
+        return {"w": w, "wLb": w / 0.45359237, "wbasic": w_basic, "wadd": extra,
+                "f": f, "fIdeal": f_ideal, "fLb": f / 16.0184634, "rhoVapour": rho,
+                "cylinders": float(n), "installed": n * charge, "margin": n * charge - w,
+                "marginPct": (n * charge - w) / w * 100.0, "cUsed": c, "vnet": v}
 
     if calc == "compression-ratio":
         ratio = x("p2") / x("p1")

@@ -171,6 +171,11 @@ fun SettingsScreen(deps: AppDependencies) {
             reportRev = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_REV, it)
         }
+        var reportCode by remember { mutableStateOf(deps.settings.reportValue(SettingsRepository.KEY_REPORT_CODE)) }
+        ReportField(strings.settingsReportCode, reportCode) {
+            reportCode = it
+            deps.settings.setReportValue(SettingsRepository.KEY_REPORT_CODE, it)
+        }
         ReportField(strings.settingsReportCheckedBy, checkedBy) {
             checkedBy = it
             deps.settings.setReportValue(SettingsRepository.KEY_REPORT_CHECKED, it)
