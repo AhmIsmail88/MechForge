@@ -601,6 +601,232 @@ object CalculatorArabic {
                 "perM" to "التمدد لكل متر",
             ),
         ),
+        "fire-pump-head" to CalculatorArabicContent(
+            name = "رفع مضخة الحريق",
+            description = "الرفع الكلي المطلوب لمضخة الحريق من الضغط المطلوب والمتاح وفرق الارتفاع والفقد.",
+            inputs = mapOf(
+                "preq" to "ضغط التصريف المطلوب",
+                "pavail" to "ضغط الإمداد المتاح",
+                "hstatic" to "فرق الارتفاع الاستاتيكي",
+                "hf" to "فقد الاحتكاك والفقد الفرعي",
+                "rho" to "كثافة المياه",
+            ),
+            results = mapOf(
+                "h" to "الرفع الكلي للمضخة",
+                "dp" to "فرق الضغط",
+                "phead" to "مساهمة ضغط الرأس",
+            ),
+        ),
+
+        "fire-pump-power" to CalculatorArabicContent(
+            name = "قدرة مضخة الحريق",
+            description = "القدرة الهيدروليكية وقدرة العمود وقدرة المحرك الموصى بها لمضخة الحريق.",
+            inputs = mapOf(
+                "q" to "معدل السريان",
+                "h" to "الرفع الكلي",
+                "eta" to "كفاءة المضخة",
+                "rho" to "كثافة المياه",
+            ),
+            results = mapOf(
+                "hydraulic" to "القدرة الهيدروليكية",
+                "shaft" to "قدرة العمود",
+                "motor" to "قدرة المحرك الموصى بها",
+            ),
+        ),
+
+        "sprinkler-discharge" to CalculatorArabicContent(
+            name = "تصرف الرشاش (معامل K)",
+            description = "تصرف الرشاش من معامل K والضغط عنده.",
+            inputs = mapOf(
+                "k" to "معامل K للرشاش",
+                "p" to "الضغط عند الرشاش",
+            ),
+            results = mapOf(
+                "q" to "التصرف (لتر/دقيقة)",
+                "qM3h" to "التصرف (م³/ساعة)",
+                "qGpm" to "التصرف (إمبريال)",
+            ),
+        ),
+
+        "fm200-agent-quantity" to CalculatorArabicContent(
+            name = "كمية عامل الإطفاء FM-200",
+            description = "كمية FM-200 من الحجم المحمي وتصنيف الخطر ودرجة التصميم (NFPA 2001).",
+            inputs = mapOf(
+                "v" to "الحجم المحمي الصافي (الإجمالي ناقص المستثنى)",
+                "vgross" to "حجم الغرفة الإجمالي (للمراجعة)",
+                "vexcl" to "الحجم المستثنى",
+                "hazard" to "تصنيف الخطر (يحدد تركيز التصميم)",
+                "c" to "تركيز التصميم (تجاوز يدوي)",
+                "t" to "حرارة التصميم",
+                "s" to "الحجم النوعي للبخار (NFPA 2001 / قيم مُدرجة)",
+                "addkg" to "كمية إضافية للظروف الخاصة",
+                "mcyl" to "شحنة الأسطوانة (قيم مُدرجة)",
+            ),
+            results = mapOf(
+                "w" to "الكمية النهائية المطلوبة",
+                "wbasic" to "الكمية الأساسية",
+                "wadd" to "الكمية الإضافية",
+                "wLb" to "الكمية النهائية (إمبريال)",
+                "cUsed" to "تركيز التصميم المستخدم",
+                "vnet" to "الحجم الصافي المستخدم",
+                "sUsed" to "الحجم النوعي المستخدم",
+                "vapourVolume" to "حجم بخار العامل عند حرارة التصميم",
+                "f" to "معامل الغمر المكافئ",
+                "fLb" to "معامل الغمر المكافئ (إمبريال)",
+                "cylinders" to "عدد الأسطوانات المطلوبة",
+                "installed" to "سعة العامل المُركّبة",
+                "margin" to "هامش السعة (كمية)",
+                "marginPct" to "هامش السعة (نسبة)",
+            ),
+        ),
+
+        "co2-agent-quantity" to CalculatorArabicContent(
+            name = "كمية ثاني أكسيد الكربون CO₂",
+            description = "كمية CO₂ من الحجم المحمي وتصنيف الخطر ومعامل الغمر، مع عدد الأسطوانات القياسية (NFPA 12).",
+            inputs = mapOf(
+                "v" to "الحجم المحمي الصافي (الإجمالي ناقص المستثنى)",
+                "vgross" to "حجم الغرفة الإجمالي (للمراجعة)",
+                "vexcl" to "الحجم المستثنى",
+                "hazard" to "تصنيف الخطر (يحدد تركيز التصميم)",
+                "c" to "تركيز التصميم (تجاوز يدوي)",
+                "t" to "حرارة التصميم",
+                "ftable" to "معامل الغمر من جدول NFPA 12 أو بيانات مُدرجة",
+                "addkg" to "كمية إضافية للفتحات غير القابلة للغلق",
+                "mcyl" to "شحنة الأسطوانة (45 كجم قياسي)",
+            ),
+            results = mapOf(
+                "w" to "الكمية النهائية المطلوبة",
+                "wbasic" to "الكمية الأساسية",
+                "wadd" to "الكمية الإضافية",
+                "wLb" to "الكمية النهائية (إمبريال)",
+                "cUsed" to "تركيز التصميم المستخدم",
+                "f" to "معامل الغمر المستخدم",
+                "fIdeal" to "معامل الغمر المكافئ للغاز المثالي",
+                "fLb" to "معامل الغمر المستخدم (إمبريال)",
+                "vnet" to "الحجم الصافي المستخدم",
+                "rhoVapour" to "كثافة بخار CO₂ عند حرارة التصميم",
+                "cylinders" to "عدد الأسطوانات المطلوبة",
+                "installed" to "سعة CO₂ المُركّبة",
+                "margin" to "هامش السعة (كمية)",
+                "marginPct" to "هامش السعة (نسبة)",
+            ),
+        ),
+
+        "tank-volume" to CalculatorArabicContent(
+            name = "حجم الخزان أو الحوض",
+            description = "الحجم المطلوب من معدل السريان وزمن المكث.",
+            inputs = mapOf(
+                "q" to "معدل السريان",
+                "t" to "زمن المكث",
+            ),
+            results = mapOf(
+                "v" to "الحجم المطلوب",
+                "vl" to "الحجم المطلوب (لتر)",
+            ),
+        ),
+
+        "detention-time" to CalculatorArabicContent(
+            name = "زمن المكث",
+            description = "زمن مكث المياه من حجم الخزان ومعدل السريان.",
+            inputs = mapOf(
+                "v" to "حجم الخزان أو الحوض",
+                "q" to "معدل السريان عبره",
+            ),
+            results = mapOf(
+                "t" to "زمن المكث",
+                "tm" to "زمن المكث (دقائق)",
+            ),
+        ),
+
+        "chlorine-dose" to CalculatorArabicContent(
+            name = "الجرعة الكلورية",
+            description = "معدل إضافة المادة الكيميائية من تدفق المياه والجرعة المستهدفة.",
+            inputs = mapOf(
+                "q" to "تدفق المياه",
+                "dose" to "الجرعة المستهدفة",
+            ),
+            results = mapOf(
+                "mh" to "معدل إضافة المادة (كجم/ساعة)",
+                "mr" to "معدل إضافة المادة",
+            ),
+        ),
+
+        "peak-flow" to CalculatorArabicContent(
+            name = "تدفق الذروة",
+            description = "تدفق الذروة من متوسط التدفق ومعامل الذروة.",
+            inputs = mapOf(
+                "q" to "متوسط التدفق",
+                "pf" to "معامل الذروة",
+            ),
+            results = mapOf(
+                "qp" to "تدفق الذروة",
+                "qpd" to "تدفق الذروة (م³/يوم)",
+            ),
+        ),
+
+        "hydraulic-loading" to CalculatorArabicContent(
+            name = "التحميل الهيدروليكي",
+            description = "معدل التحميل الهيدروليكي من التدفق ومساحة السطح.",
+            inputs = mapOf(
+                "q" to "معدل السريان",
+                "a" to "مساحة السطح",
+            ),
+            results = mapOf(
+                "hlr" to "معدل التحميل الهيدروليكي",
+                "hlrh" to "معدل التحميل (م/ساعة)",
+            ),
+        ),
+
+        "water-hammer" to CalculatorArabicContent(
+            name = "المطرقة المائية (Joukowsky)",
+            description = "ارتفاع الضغط المفاجئ وزمن الغلق الحرج من سرعة الموجة وتغير السرعة.",
+            inputs = mapOf(
+                "rho" to "كثافة السائل",
+                "c" to "سرعة موجة الضغط (اتركه فارغًا لحسابها)",
+                "dv" to "تغير السرعة",
+                "d" to "القطر الداخلي للماسورة",
+                "t" to "سماكة جدار الماسورة",
+                "kbulk" to "معامل مرونة السائل K",
+                "epipe" to "معامل مرونة الماسورة E",
+                "l" to "طول الماسورة (اختياري)",
+            ),
+            results = mapOf(
+                "dp" to "ارتفاع الضغط (Joukowsky)",
+                "dpMpa" to "ارتفاع الضغط (ميجاباسكال)",
+                "head" to "ضغط الصدم (رفع)",
+                "cUsed" to "سرعة الموجة المستخدمة",
+                "tc" to "زمن الغلق الحرج",
+            ),
+        ),
+
+        "valve-kv" to CalculatorArabicContent(
+            name = "معامل الصمام Kv / Cv",
+            description = "التصرف عبر الصمام من معامل التصرف وفرق الضغط والكثافة النوعية.",
+            inputs = mapOf(
+                "kv" to "معامل التصرف Kv",
+                "dp" to "فرق الضغط على الصمام",
+                "sg" to "الكثافة النوعية (مياه = 1)",
+            ),
+            results = mapOf(
+                "q" to "معدل السريان",
+                "dp" to "فرق الضغط",
+                "cv" to "المكافئ Cv (أمريكي)",
+            ),
+        ),
+
+        "equivalent-length" to CalculatorArabicContent(
+            name = "الطول المكافئ",
+            description = "الطول المكافئ للوصلات والصمامات من معامل الفقد والقطر ومعامل الاحتكاك.",
+            inputs = mapOf(
+                "k" to "معامل الفقد",
+                "d" to "القطر الداخلي",
+                "f" to "معامل الاحتكاك",
+            ),
+            results = mapOf(
+                "leq" to "الطول المكافئ",
+                "inD" to "الطول المكافئ بالأقطار",
+            ),
+        ),
     )
 
     fun name(calculatorId: String, fallback: String): String =
