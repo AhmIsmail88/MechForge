@@ -52,6 +52,7 @@ import com.mechforge.app.ui.util.UiFormat
 import com.mechforge.app.export.ReportLabels
 import com.mechforge.app.export.ReportMeta
 import com.mechforge.app.export.ReportQa
+import com.mechforge.app.ui.CalcText
 import com.mechforge.app.export.ReportSheet
 import com.mechforge.app.export.ReportWriter
 import com.mechforge.app.data.LanguageMode
@@ -134,7 +135,7 @@ fun CalculatorScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
             Column(modifier = Modifier.weight(1f)) {
-                Text(def.name, style = MaterialTheme.typography.headlineSmall)
+                Text(CalcText.name(def, strings.isRtl), style = MaterialTheme.typography.headlineSmall)
                 Text(
                     restoreTitle ?: def.category.displayName,
                     style = MaterialTheme.typography.labelMedium,
@@ -153,7 +154,7 @@ fun CalculatorScreen(
             }
         }
         Spacer(Modifier.height(6.dp))
-        Text(def.description, style = MaterialTheme.typography.bodyMedium)
+        Text(CalcText.description(def, strings.isRtl), style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(16.dp))
 
         // ---- Inputs ----
@@ -177,7 +178,13 @@ fun CalculatorScreen(
                         inputsUi = inputsUi.map { if (it.specId == spec.id) it.copy(text = text) else it }
                         fieldErrors = fieldErrors - spec.id
                     },
-                    label = { Text("${spec.symbol} — ${spec.label}${if (spec.required) "" else " (" + strings.optionalSuffix + ")"}") },
+                    label = {
+                        Text(
+                            "${spec.symbol} — " +
+                                CalcText.inputLabel(def.id, spec.id, spec.label, strings.isRtl) +
+                                if (spec.required) "" else " (" + strings.optionalSuffix + ")"
+                        )
+                    },
                     isError = fieldErrors.containsKey(spec.id),
                     readOnly = options != null,
                     supportingText = fieldErrors[spec.id]?.let { msg -> { Text(msg, color = MaterialTheme.colorScheme.error) } },
@@ -315,7 +322,7 @@ fun CalculatorScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    r.label + when {
+                                    CalcText.resultLabel(def.id, r.id, r.label, strings.isRtl) + when {
                                         r.isRecommended -> "  ★"
                                         r.isPrimary -> ""
                                         else -> ""

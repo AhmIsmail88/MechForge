@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
+import com.mechforge.app.ui.CalcText
 import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.ui.theme.glassBorder
 import com.mechforge.app.ui.Screen
@@ -78,7 +79,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                     Column(modifier = Modifier.padding(8.dp)) {
                         for (calc in results) {
                             Text(
-                                "${calc.def.name}  —  ${calc.def.category.displayName}",
+                                "${CalcText.name(calc.def, strings.isRtl)}  —  ${calc.def.category.displayName}",
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -108,7 +109,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                         FilterChip(
                             selected = false,
                             onClick = { onNavigate(Screen.Calculator(calc.def.id)) },
-                            label = { Text(calc.def.name) },
+                            label = { Text(CalcText.name(calc.def, strings.isRtl)) },
                         )
                     }
                 }
@@ -130,7 +131,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                             FilterChip(
                                 selected = false,
                                 onClick = { onNavigate(Screen.Calculator(calc.def.id)) },
-                                label = { Text(calc.def.name) },
+                                label = { Text(CalcText.name(calc.def, strings.isRtl)) },
                             )
                         }
                     }
@@ -202,7 +203,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
 private fun CalculatorCard(calc: Calculator, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Card(modifier = modifier.clickable(onClick = onClick).glassBorder()) {
         Column(modifier = Modifier.padding(14.dp)) {
-            Text(calc.def.name, style = MaterialTheme.typography.titleSmall)
+            Text(CalcText.name(calc.def, LocalStrings.current.isRtl), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(4.dp))
             Text(
                 calc.def.category.displayName,
@@ -211,7 +212,7 @@ private fun CalculatorCard(calc: Calculator, modifier: Modifier = Modifier, onCl
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                calc.def.description,
+                CalcText.description(calc.def, LocalStrings.current.isRtl),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 3,
