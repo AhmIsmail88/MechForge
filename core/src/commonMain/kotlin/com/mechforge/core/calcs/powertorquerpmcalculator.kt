@@ -55,6 +55,7 @@ object PowerTorqueRpmCalculator : Calculator(Def) {
 
         val results = mutableListOf<com.mechforge.core.engine.ResultValue>()
         val steps = mutableListOf<String>()
+        val stepsAr = mutableListOf<String>()
 
         if (pKw != null && rpm != null) {
             val t = K * pKw / rpm
@@ -62,12 +63,14 @@ object PowerTorqueRpmCalculator : Calculator(Def) {
             results += result("p", "Power", pKw, "kw")
             results += result("n", "Speed", rpm, "rpm")
             steps += "T = 9550·P/N = 9550 × ${Fmt.n(pKw, 3)} / ${Fmt.n(rpm, 1)} = ${Fmt.n(t, 3)} N·m"
+            stepsAr += "العزم: T = 9550·P/N = 9550 × ${Fmt.n(pKw, 3)} / ${Fmt.n(rpm, 1)} = ${Fmt.n(t, 3)} N·m"
         } else if (tNm != null && rpm != null) {
             val p = tNm * rpm / K
             results += result("p", "Power", p, "kw", isPrimary = true)
             results += result("t", "Torque", tNm, "nm")
             results += result("n", "Speed", rpm, "rpm")
             steps += "P = T·N/9550 = ${Fmt.n(tNm, 3)} × ${Fmt.n(rpm, 1)} / 9550 = ${Fmt.n(p, 4)} kW"
+            stepsAr += "القدرة: P = T·N/9550 = ${Fmt.n(tNm, 3)} × ${Fmt.n(rpm, 1)} / 9550 = ${Fmt.n(p, 4)} kW"
         } else if (pKw != null && tNm != null) {
             if (tNm == 0.0) {
                 throw com.mechforge.core.engine.ValidationException(
@@ -79,11 +82,13 @@ object PowerTorqueRpmCalculator : Calculator(Def) {
             results += result("p", "Power", pKw, "kw")
             results += result("t", "Torque", tNm, "nm")
             steps += "N = 9550·P/T = 9550 × ${Fmt.n(pKw, 3)} / ${Fmt.n(tNm, 3)} = ${Fmt.n(n, 1)} rpm"
+            stepsAr += "السرعة: N = 9550·P/T = 9550 × ${Fmt.n(pKw, 3)} / ${Fmt.n(tNm, 3)} = ${Fmt.n(n, 1)} rpm"
         }
 
         return CalcOutput(
             results = results,
             steps = steps,
+            stepsAr = stepsAr,
             warnings = emptyList(),
         )
     }
