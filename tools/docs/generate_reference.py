@@ -191,7 +191,7 @@ def parse_logic(text: str):
 
 def parse_constants(text: str):
     consts = re.findall(r"private const val (\w+)\s*=\s*([^\n/]+)", text)
-    return [(n, v.strip()) for n, v in consts]
+    return [(n, v.strip(), evaluate(v)) for n, v in consts]
 
 
 def parse_option_lists(text: str):
@@ -205,13 +205,36 @@ def parse_option_lists(text: str):
     return out
 
 
+def evaluate(expr: str) -> str:
+    """Evaluate a Kotlin numeric expression so the document shows the real factor.
+
+    Unit factors are written as expressions (1.0 / 3600.0, 0.45359237 / 3600.0,
+    60.0 / (2.0 * Math.PI)); printing only the first literal would be wrong.
+    """
+    clean = expr.strip().rstrip(",;")
+    stripped = re.sub(r"Math\.PI|Math\.E|math\.pi", "", clean)
+    if not re.fullmatch(r"[0-9eE+\-*/(). \t]*", stripped):
+        return expr.strip()
+    py = clean.replace("Math.PI", "math.pi").replace("Math.E", "math.e")
+    try:
+        value = eval(py, {"__builtins__": {}}, {"math": __import__("math")})
+    except Exception:
+        return expr.strip()
+    if isinstance(value, float):
+        if value == 0:
+            return "0"
+        if abs(value) >= 1e-4 and abs(value) < 1e7:
+            return f"{value:.10g}"
+        return f"{value:.10g}"
+    return str(value)
+
 def unit_families():
     text = read(os.path.join(UNITS, "UnitFamily.kt"))
     fams = re.findall(r"^\s{4}([A-Z_]+)\(", text, re.M)
     units = read(os.path.join(UNITS, "Units.kt"))
     table = {}
-    for m in re.finditer(r'factorUnit\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*,\s*UnitFamily\.(\w+)\s*,\s*([0-9.eE+-]+)', units):
-        table.setdefault(m.group(3), []).append((m.group(1), m.group(2), m.group(4)))
+    for m in re.finditer(r'factorUnit\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*,\s*UnitFamily\.(\w+)\s*,\s*([^)]+)\)', units):
+        table.setdefault(m.group(3), []).append((m.group(1), m.group(2), evaluate(m.group(4))))
     return fams, table
 
 
@@ -403,7 +426,16 @@ def main() -> int:
     A("<table><tr><th>Family</th><th>Units (id &rarr; symbol, factor to base)</th></tr>")
     for fam in sorted(unit_table.keys()):
         rows = unit_table[fam]
-        cells = ", ".join(f"<code>{escape(u)}</code> &rarr; {escape(sym)} &times;{escape(f)}" for u, sym, f in rows)
+        def cell(u, sym, f):
+            evaluated = evaluate(f)
+            shown = f"&times;{escape(f)}"
+            if evaluated != f:
+                # unit factors are written as expressions (1.0 / 3600.0): show the value too,
+                # so a reader cannot mistake the first literal for the factor.
+                shown += f" <b>(= {escape(evaluated)})</b>"
+            return f"<code>{escape(u)}</code> &rarr; {escape(sym)} {shown}"
+
+        cells = ", ".join(cell(u, sym, f) for u, sym, f in rows)
         A(f"<tr><td><code>{escape(fam)}</code></td><td>{cells}</td></tr>")
     A("</table></section>")
 
@@ -481,9 +513,10 @@ def main() -> int:
             for w in c["warnings"]:
                 A(f"<div class='warn'>{escape(w)}</div>")
         if c["constants"]:
-            A("<p><b>Constants used</b></p><table><tr><th>name</th><th>value</th></tr>")
-            for n, v in c["constants"]:
-                A(f"<tr><td><code>{escape(n)}</code></td><td><code>{escape(v)}</code></td></tr>")
+            A("<p><b>Constants used</b></p><table><tr><th>name</th><th>as written</th><th>value</th></tr>")
+            for n, raw_v, evaluated in c["constants"]:
+                A(f"<tr><td><code>{escape(n)}</code></td><td><code>{escape(raw_v)}</code></td>"
+                  f"<td><code>{escape(evaluated)}</code></td></tr>")
             A("</table>")
         if c["reference"]:
             A(f"<p><b>Reference.</b> {escape(c['reference'])}</p>")
