@@ -95,7 +95,7 @@ object BearingL10Calculator : Calculator(Def) {
             results += result("a1", "Reliability factor a1", a1, "dash")
             results += result("aisoUsed", "Life modification factor a_ISO", aIso, "dash")
             steps += "Reliability: ${reliability.first.label} -> a1 = ${Fmt.n(a1, 2)}"
-            stepsAr += "الموثوقية المختارة ← a1 = ${Fmt.n(a1, 2)}"
+            stepsAr += "الموثوقية المختارة: ${reliability.first.label} ← a1 = ${Fmt.n(a1, 2)}"
             steps += "Lnm = a1 * a_ISO * L10 = ${Fmt.n(a1, 2)} x ${Fmt.n(aIso, 3)} x ${Fmt.n(l10Revs / 1e6, 1)}x10^6 = ${Fmt.n(lnmRevs / 1e6, 1)} x 10^6 revolutions"
             stepsAr += "Lnm = a1 × a_ISO × L10 = ${Fmt.n(a1, 2)} × ${Fmt.n(aIso, 3)} × ${Fmt.n(l10Revs / 1e6, 1)}×10^6 = ${Fmt.n(lnmRevs / 1e6, 1)} × 10^6 دورة"
             if (has(inputs, "n")) {
