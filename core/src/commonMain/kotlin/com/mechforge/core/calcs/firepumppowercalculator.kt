@@ -61,6 +61,21 @@ object FirePumpPowerCalculator : Calculator(Def) {
                 if (motor == null) add("Shaft power exceeds 200 kW - select a larger or custom driver.")
                 add("NFPA 20 requires the driver to be rated for the pump overload point - confirm before ordering.")
             },
+            stepsAr = listOf(
+                "التدفق: ${Fmt.n(q * 60000.0, 1)} L/min = ${Fmt.n(q, 5)} m3/s",
+                "القدرة الهيدروليكية: P_h = rho*g*Q*H = ${Fmt.n(rho, 1)} × 9.80665 × ${Fmt.n(q, 5)} × ${Fmt.n(h, 2)} = ${Fmt.n(hydraulicKw, 2)} kW",
+                "قدرة العمود: P = P_h/eta = ${Fmt.n(hydraulicKw, 2)} / ${Fmt.n(eta, 4)} = ${Fmt.n(shaftKw, 2)} kW",
+                "أقرب قدرة قياسية IEC: ${motor?.let { Fmt.n(it, 1) } ?: "> 200"} kW",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "rho")) {
+                    add("لم تُدخل الكثافة - افتُرضت 998.2 kg/m3 (مياه عند 20 °C).")
+                }
+                if (motor == null) {
+                    add("قدرة العمود تتجاوز 200 kW - اختر محركًا أكبر أو خاصًا.")
+                }
+                add("NFPA 20 يشترط أن يكون المحرك مُقنَّنًا عند نقطة الحمل الزائد للمضخة - تأكد قبل الشراء.")
+            },
         )
     }
 }
