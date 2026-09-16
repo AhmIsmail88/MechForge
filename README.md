@@ -89,6 +89,15 @@ Engineering data lives next to the calculator, not inside it:
 - Every dataset carries its **source** and **licence**, and a dataset can **fill a
   calculator input** directly (for example the roughness dataset feeding ε).
 
+## Documentation
+
+- **[Technical reference](docs/MechForge-technical-reference.html)** &mdash; every calculator with its
+  equation, inputs (units, validation, options), outputs, calculation logic, numeric constants and
+  engineering references, plus the architecture, the unit families, the report pipeline and the build
+  instructions. It is generated from the engine source, so it cannot drift:
+  `python tools/docs/generate_reference.py`.
+- The authoritative product specification is `MechForge_README_v2.md`.
+
 ## Verification
 
 Correctness is treated as a first-class feature, and is checked twice:
