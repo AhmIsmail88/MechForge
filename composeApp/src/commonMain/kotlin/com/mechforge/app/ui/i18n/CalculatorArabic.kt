@@ -127,6 +127,161 @@ object CalculatorArabic {
                 "qsBtuh" to "الحمل الحراري المحسوس (إمبريال)",
             ),
         ),
+        "reynolds-number" to CalculatorArabicContent(
+            name = "رقم رينولدز",
+            description = "تحديد نظام السريان - صفحي أو انتقالي أو مضطرب - من السرعة والقطر واللزوجة الحركية.",
+            inputs = mapOf(
+                "v" to "السرعة",
+                "d" to "القطر الداخلي",
+                "nu" to "اللزوجة الحركية",
+            ),
+            results = mapOf(
+                "re" to "رقم رينولدز",
+            ),
+        ),
+
+        "darcy-weisbach" to CalculatorArabicContent(
+            name = "فقد الاحتكاك (دارسي-فايسباخ)",
+            description = "فقد الرفع بالاحتكاك في ماسورة من السرعة والقطر والطول ومعامل الاحتكاك.",
+            inputs = mapOf(
+                "v" to "السرعة",
+                "d" to "القطر الداخلي",
+                "l" to "طول الماسورة",
+                "re" to "رقم رينولدز",
+                "eps" to "الخشونة المطلقة",
+                "f" to "معامل الاحتكاك",
+            ),
+            results = mapOf(
+                "f" to "معامل الاحتكاك f",
+                "hf" to "فقد الرفع بالاحتكاك",
+            ),
+        ),
+
+        "friction-factor" to CalculatorArabicContent(
+            name = "معامل الاحتكاك (كولبروك-وايت)",
+            description = "معامل احتكاك دارسي بطريقة كولبروك-وايت من رقم رينولدز والخشونة النسبية.",
+            inputs = mapOf(
+                "re" to "رقم رينولدز",
+                "eps" to "الخشونة المطلقة",
+                "d" to "القطر الداخلي",
+            ),
+            results = mapOf(
+                "f" to "معامل الاحتكاك",
+                "reld" to "الخشونة النسبية ε/D",
+            ),
+        ),
+
+        "minor-losses" to CalculatorArabicContent(
+            name = "الفقد في الوصلات والصمامات",
+            description = "فقد الرفع في الوصلات والصمامات من معامل الفقد والسرعة.",
+            inputs = mapOf(
+                "k" to "معامل الفقد K",
+                "v" to "السرعة",
+            ),
+            results = mapOf(
+                "hm" to "فقد الرفع الفرعي",
+            ),
+        ),
+
+        "hazen-williams" to CalculatorArabicContent(
+            name = "هازن-ويليامز (خطوط المياه)",
+            description = "فقد الرفع والتصرف والسرعة في مواسير المياه بمعادلة هازن-ويليامز.",
+            inputs = mapOf(
+                "c" to "معامل هازن-ويليامز C",
+                "d" to "القطر الداخلي",
+                "s" to "الميل الهيدروليكي",
+            ),
+            results = mapOf(
+                "gradient" to "الميل الهيدروليكي",
+                "hf" to "فقد الرفع لكل 1000 م",
+                "q" to "التصرف",
+                "v" to "السرعة",
+            ),
+        ),
+
+        "manning" to CalculatorArabicContent(
+            name = "معادلة مانينج (قنوات مفتوحة)",
+            description = "التصرف والسرعة في القنوات المفتوحة بمعادلة مانينج.",
+            inputs = mapOf(
+                "n" to "خشونة مانينج n",
+                "r" to "نصف القطر الهيدروليكي",
+                "s" to "ميل الطاقة",
+                "a" to "مساحة السريان",
+            ),
+            results = mapOf(
+                "q" to "التصرف",
+                "qSi" to "التصرف (وحدات دولية)",
+                "v" to "متوسط السرعة",
+            ),
+        ),
+
+        "npsh-available" to CalculatorArabicContent(
+            name = "NPSH المتاح",
+            description = "صافي رفع الشفط الموجب المتاح من الضغط الجوي وضغط البخار وكثافة السائل وفقد خط الشفط.",
+            inputs = mapOf(
+                "patm" to "الضغط المطلق على السطح",
+                "pv" to "ضغط تبخر السائل",
+                "rho" to "كثافة السائل",
+                "hs" to "رفع الشفط الاستاتيكي",
+                "hf" to "فقد خط الشفط",
+            ),
+            results = mapOf(
+                "npsha" to "NPSH المتاح",
+                "phead" to "مساهمة ضغط الرأس",
+            ),
+        ),
+
+        "pump-affinity-laws" to CalculatorArabicContent(
+            name = "قوانين تشابه المضخات",
+            description = "التدفق والرفع والقدرة عند سرعة جديدة أو قطر مروحة بعد التقليم.",
+            inputs = mapOf(
+                "q1" to "التدفق عند السرعة الأصلية",
+                "h1" to "الرفع عند السرعة الأصلية",
+                "p1" to "القدرة عند السرعة الأصلية",
+                "n1" to "السرعة الأصلية",
+                "n2" to "السرعة الجديدة",
+                "d1" to "قطر المروحة الأصلي (اختياري)",
+                "d2" to "قطر المروحة بعد التقليم (اختياري)",
+            ),
+            results = mapOf(
+                "q2" to "التدفق عند السرعة الجديدة",
+                "h2" to "الرفع عند السرعة الجديدة",
+                "p2" to "القدرة عند السرعة الجديدة",
+                "q2t" to "التدفق بعد التقليم",
+                "h2t" to "الرفع بعد التقليم",
+                "p2t" to "القدرة بعد التقليم",
+            ),
+        ),
+
+        "hose-nozzle-flow" to CalculatorArabicContent(
+            name = "تصرف خرطوم وفوهة الحريق",
+            description = "تصرف الفوهة من قطرها وضغطها ومعامل التصرف.",
+            inputs = mapOf(
+                "d" to "قطر الفوهة",
+                "p" to "ضغط الفوهة",
+                "c" to "معامل تصرف الفوهة",
+            ),
+            results = mapOf(
+                "q" to "تصرف الفوهة (إمبريال)",
+                "qLmin" to "تصرف الفوهة (لتر/دقيقة)",
+                "qM3h" to "تصرف الفوهة (م³/ساعة)",
+            ),
+        ),
+
+        "orifice-flow" to CalculatorArabicContent(
+            name = "تصرف الفتحة (الأوريفيس)",
+            description = "التصرف عبر فتحة تحت فرق ضغط، مع سرعة النفث النظرية.",
+            inputs = mapOf(
+                "cd" to "معامل التصرف",
+                "d" to "قطر الفتحة",
+                "h" to "الفرق في الرفع",
+            ),
+            results = mapOf(
+                "q" to "التصرف",
+                "qSi" to "التصرف (وحدات دولية)",
+                "v" to "سرعة النفث النظرية",
+            ),
+        ),
     )
 
     fun name(calculatorId: String, fallback: String): String =
