@@ -52,6 +52,17 @@ object ManningCalculator : Calculator(Def) {
                 "Discharge: Q = A·v = ${Fmt.n(a, 5)} × ${Fmt.n(v, 4)} = ${Fmt.n(q, 6)} m³/s = ${Fmt.n(q * 3600.0, 3)} m³/h",
             ),
             warnings = if (v < 0.6 && q > 0) listOf("Velocity below 0.6 m/s — check self-cleansing requirements for the design flow.") else emptyList(),
+            stepsAr = listOf(
+                "R^(2/3) = ${Fmt.n(r, 4)}^(2/3) = ${Fmt.n(r.pow(2.0 / 3.0), 5)}",
+                "S^(1/2) = √${Fmt.n(s, 5)} = ${Fmt.n(s.pow(0.5), 5)}",
+                "السرعة: v = (1/n)·R^(2/3)·S^(1/2) = (1/${Fmt.n(n, 4)}) × ${Fmt.n(r.pow(2.0 / 3.0), 5)} × ${Fmt.n(s.pow(0.5), 5)} = ${Fmt.n(v, 4)} m/s",
+                "التصرف: Q = A·v = ${Fmt.n(a, 5)} × ${Fmt.n(v, 4)} = ${Fmt.n(q, 6)} m³/s = ${Fmt.n(q * 3600.0, 3)} m³/h",
+            ),
+            warningsAr = if (v < 0.6 && q > 0) {
+                listOf("سرعة أقل من 0.6 m/s - راجع متطلبات التنظيف الذاتي للتصرف التصميمي.")
+            } else {
+                emptyList()
+            },
         )
     }
 }

@@ -60,6 +60,21 @@ object HazenWilliamsCalculator : Calculator(Def) {
                 if (v > 3.0) add("Velocity above 3 m/s — review surge/erosion and pressure class.")
                 if (v < 0.6) add("Velocity below 0.6 m/s — sedimentation risk in raw-water mains.")
             },
+            stepsAr = listOf(
+                "D^2.63 = ${Fmt.n(d, 4)}^2.63 = ${Fmt.n(d.pow(2.63), 6)}",
+                "S^0.54 = ${Fmt.n(s, 5)}^0.54 = ${Fmt.n(s.pow(0.54), 6)}",
+                "التصرف: Q = 0.278·C·D^2.63·S^0.54 = 0.278 × ${Fmt.n(c, 0)} × ${Fmt.n(d.pow(2.63), 6)} × ${Fmt.n(s.pow(0.54), 6)} = ${Fmt.n(q, 6)} m³/s = ${Fmt.n(q * 3600.0, 2)} m³/h",
+                "السرعة: v = Q/A = ${Fmt.n(q, 6)} / ${Fmt.n(area, 6)} = ${Fmt.n(v, 3)} m/s",
+                "فقد الرفع (L = 1000 m): h_f = 10.67·L·Q^1.852/(C^1.852·D^4.87) = ${Fmt.n(hf1000, 3)} m",
+            ),
+            warningsAr = buildList {
+                if (v > 3.0) {
+                    add("سرعة أعلى من 3 m/s - راجع الصدمة والتآكل ودرجة ضغط الماسورة.")
+                }
+                if (v < 0.6) {
+                    add("سرعة أقل من 0.6 m/s - خطر ترسيب في خطوط المياه الخام.")
+                }
+            },
         )
     }
 }
