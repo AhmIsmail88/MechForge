@@ -41,18 +41,23 @@ object GearRatioCalculator : Calculator(Def) {
         val steps = mutableListOf(
             "Ratio: i = z₂/z₁ = ${Fmt.n(z2, 0)} / ${Fmt.n(z1, 0)} = ${Fmt.n(i, 4)}",
         )
+        val stepsAr = mutableListOf(
+            "النسبة: i = z₂/z₁ = ${Fmt.n(z2, 0)} / ${Fmt.n(z1, 0)} = ${Fmt.n(i, 4)}",
+        )
 
         if (has(inputs, "n1")) {
             val n1 = value(inputs, "n1")
             val n2 = n1 / i
             results += result("n2", "Driven Speed", n2, "rpm", isPrimary = true)
             steps += "Output speed: n₂ = n₁/i = ${Fmt.n(n1, 1)} / ${Fmt.n(i, 4)} = ${Fmt.n(n2, 1)} rpm"
+            stepsAr += "سرعة الخرج: n₂ = n₁/i = ${Fmt.n(n1, 1)} / ${Fmt.n(i, 4)} = ${Fmt.n(n2, 1)} rpm"
         }
         if (has(inputs, "t1")) {
             val t1 = value(inputs, "t1")
             val t2 = t1 * i
             results += result("t2", "Driven Torque (ideal)", t2, "nm", isPrimary = true)
             steps += "Output torque: T₂ = T₁·i = ${Fmt.n(t1, 2)} × ${Fmt.n(i, 4)} = ${Fmt.n(t2, 2)} N·m (ideal, frictionless)"
+            stepsAr += "عزم الخرج: T₂ = T₁·i = ${Fmt.n(t1, 2)} × ${Fmt.n(i, 4)} = ${Fmt.n(t2, 2)} N·m (مثالي بدون احتكاك)"
         }
         if (has(inputs, "m")) {
             val m = value(inputs, "m")
@@ -61,13 +66,20 @@ object GearRatioCalculator : Calculator(Def) {
             results += result("d1", "Pitch Diameter (pinion)", d1 * 1000.0, "mm")
             results += result("d2", "Pitch Diameter (gear)", d2 * 1000.0, "mm")
             steps += "Pitch diameters: d₁ = m·z₁ = ${Fmt.n(d1 * 1000.0, 2)} mm ; d₂ = m·z₂ = ${Fmt.n(d2 * 1000.0, 2)} mm"
+            stepsAr += "أقطار التقسيم: d₁ = m·z₁ = ${Fmt.n(d1 * 1000.0, 2)} mm ؛ d₂ = m·z₂ = ${Fmt.n(d2 * 1000.0, 2)} mm"
         }
 
         return CalcOutput(
             results = results,
             steps = steps,
+            stepsAr = stepsAr,
             warnings = if (i > 6.0) {
                 listOf("Single-stage ratio above 6:1 — consider a two-stage arrangement for load capacity and size.")
+            } else {
+                emptyList()
+            },
+            warningsAr = if (i > 6.0) {
+                listOf("نسبة مرحلة واحدة أعلى من 6:1 — فكّر في ترتيب على مرحلتين لقدرة الحمل والحجم.")
             } else {
                 emptyList()
             },
