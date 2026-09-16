@@ -75,6 +75,20 @@ object PumpPowerCalculator : Calculator(Def) {
                     (motor?.let { "${Fmt.n(it, 2)} kW" } ?: "above 90 kW (custom selection)"),
             ),
             warnings = warnings,
+            stepsAr = listOf(
+                "القدرة الهيدروليكية: P_h = ρ·g·Q·H = ${Fmt.n(rho, 1)} × 9.80665 × ${Fmt.n(q, 6)} × ${Fmt.n(h, 3)} = ${Fmt.n(hydraulicKw)} kW",
+                "قدرة العمود: P = P_h / η = ${Fmt.n(hydraulicKw)} / ${Fmt.n(eta, 4)} = ${Fmt.n(shaftKw)} kW",
+                "اختر أصغر قدرة محرك قياسية IEC أكبر من أو تساوي قدرة العمود → " +
+                    (motor?.let { "${Fmt.n(it, 2)} kW" } ?: "أعلى من 90 kW (اختيار خاص)"),
+            ),
+            warningsAr = buildList {
+                if (eta > 0.85) {
+                    add("كفاءة أعلى من 85 % تفاؤلية لمعظم أنواع المضخات؛ تحقق منها على منحنى المضخة.")
+                }
+                if (motor == null) {
+                    add("قدرة العمود تتجاوز أكبر قدرة قياسية IEC (90 kW)؛ اختر محركًا أكبر أو خاصًا.")
+                }
+            },
         )
     }
 

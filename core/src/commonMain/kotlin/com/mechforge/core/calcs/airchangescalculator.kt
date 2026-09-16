@@ -128,6 +128,46 @@ object AirChangesCalculator : Calculator(Def) {
                 }
                 addAll(FanCoverage.warnings(q, fanProvided, fansNeeded, fanCount))
             },
+            stepsAr = listOf(
+                if (hasQ && hasV) {
+                    "التدفق: ${Fmt.n(q * 3600.0, 1)} m3/h   حجم الغرفة: ${Fmt.n(v, 2)} m3"
+                } else if (hasV && hasAch) {
+                    "حجم الغرفة: ${Fmt.n(v, 2)} m3   معدل التغيير المستهدف: ${Fmt.n(ach, 2)} 1/h"
+                } else {
+                    "التدفق: ${Fmt.n(q * 3600.0, 1)} m3/h   معدل التغيير: ${Fmt.n(ach, 2)} 1/h"
+                },
+                "Q = ACH*V/3600 = ${Fmt.n(ach, 2)} × ${Fmt.n(v, 2)} / 3600 = ${Fmt.n(q, 5)} m3/s",
+                "سعة المروحة = ${Fmt.n(q * 3600.0, 1)} m3/h = ${Fmt.n(q / 4.719474432e-4, 0)} CFM = ${Fmt.n(q * 1000.0, 1)} L/s",
+                "ACH = Q*3600/V = ${Fmt.n(q * 3600.0, 1)} / ${Fmt.n(v, 2)} = ${Fmt.n(ach, 2)} 1/h (تغيير هواء كل ${Fmt.n(minutesPerChange, 1)} دقيقة)",
+            ),
+            warningsAr = buildList {
+                if (ach < 2.0) {
+                    add("أقل من 2 ACH - تحقق من المعدل المستهدف مقابل متطلبات التهوية المطبقة على هذا الفراغ.")
+                }
+                if (ach > 60.0) {
+                    add("أكثر من 60 ACH غير معتاد - تأكد من المعدل المستهدف وراجع أثر الضوضاء وفقد الضغط.")
+                }
+                // the same fan caveats as FanCoverage, in Arabic
+                val installedAr = fanProvided
+                if (installedAr != null) {
+                    if (q > 0.0 && installedAr < q) {
+                        add(
+                            "سعة المراوح المختارة أقل من المتطلب المحسوب بنسبة " +
+                                Fmt.n((q - installedAr) / q * 100.0, 1) + " % - أضف سعة أو راجع الهدف."
+                        )
+                    }
+                    if (fansNeeded != null && fanCount != null && fanCount > 0.0 && fanCount < fansNeeded) {
+                        add("عدد المراوح المختار لا يكفي لتأمين التدفق المحسوب: مطلوب $fansNeeded مروحة من هذه السعة.")
+                    }
+                    val marginAr = FanCoverage.marginPercent(installedAr, q)
+                    if (marginAr != null && marginAr > 100.0) {
+                        add(
+                            "السعة المختارة أكثر من ضعف المتطلب (+" + Fmt.n(marginAr, 0) +
+                                " %) - راجع اختيار المراوح للكفاءة والضوضاء ومدى التحكم."
+                        )
+                    }
+                }
+            },
         )
     }
 }
