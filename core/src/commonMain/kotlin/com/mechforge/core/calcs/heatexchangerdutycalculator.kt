@@ -53,6 +53,10 @@ object HeatExchangerDutyCalculator : Calculator(Def) {
             "m_dot = ${Fmt.n(m, 4)} kg/s   cp = ${Fmt.n(cp / 1000.0, 4)} kJ/(kg.K)   dT = ${Fmt.n(dT, 2)} K",
             "Q = m_dot*cp*dT = ${Fmt.n(m, 4)} x ${Fmt.n(cp / 1000.0, 4)} x ${Fmt.n(dT, 2)} = ${Fmt.n(qFluid / 1000.0, 3)} kW",
         )
+        val stepsAr = mutableListOf(
+            "m_dot = ${Fmt.n(m, 4)} kg/s   cp = ${Fmt.n(cp / 1000.0, 4)} kJ/(kg.K)   dT = ${Fmt.n(dT, 2)} K",
+            "Q = m_dot*cp*dT = ${Fmt.n(m, 4)} × ${Fmt.n(cp / 1000.0, 4)} × ${Fmt.n(dT, 2)} = ${Fmt.n(qFluid / 1000.0, 3)} kW",
+        )
 
         val hasAreaSide = has(inputs, "u") && has(inputs, "a") &&
             has(inputs, "thin") && has(inputs, "thout") && has(inputs, "tcin") && has(inputs, "tcout")
@@ -72,20 +76,36 @@ object HeatExchangerDutyCalculator : Calculator(Def) {
                 results += result("qArea", "Heat Duty (area side)", qArea / 1000.0, "kw", isPrimary = true)
                 results += result("lmtd", "LMTD", lmtd, "delk")
                 steps += "LMTD = ${Fmt.n(lmtd, 3)} K (${if (counter) "counter-current" else "parallel-flow"})"
+                stepsAr += "LMTD = ${Fmt.n(lmtd, 3)} K (${if (counter) "متعاكس" else "متوازي"})"
                 steps += "Area side: Q = U*A*LMTD = ${Fmt.n(u, 1)} x ${Fmt.n(a, 4)} x ${Fmt.n(lmtd, 3)} = ${Fmt.n(qArea / 1000.0, 3)} kW"
+                stepsAr += "جانب المساحة: Q = U*A*LMTD = ${Fmt.n(u, 1)} × ${Fmt.n(a, 4)} × ${Fmt.n(lmtd, 3)} = ${Fmt.n(qArea / 1000.0, 3)} kW"
                 steps += "Cross-check: fluid side ${Fmt.n(qFluid / 1000.0, 3)} kW vs area side ${Fmt.n(qArea / 1000.0, 3)} kW (difference ${Fmt.n(abs(qFluid - qArea) / maxOf(abs(qFluid), 1e-9) * 100.0, 1)}%)"
+                stepsAr += "مقارنة: جانب السائل ${Fmt.n(qFluid / 1000.0, 3)} kW مقابل جانب المساحة ${Fmt.n(qArea / 1000.0, 3)} kW (الفرق ${Fmt.n(abs(qFluid - qArea) / maxOf(abs(qFluid), 1e-9) * 100.0, 1)}%)"
             } else {
                 steps += "Area side not computed: the terminal temperature differences are not positive for the selected arrangement."
+                stepsAr += "جانب المساحة لم يُحسب: الفروق الطرفية في الحرارة غير موجبة للترتيب المختار."
             }
         }
 
         return CalcOutput(
             results = results,
             steps = steps,
+            stepsAr = stepsAr,
             warnings = buildList {
                 if (!has(inputs, "cp")) add("Specific heat not provided - assumed 4186 J/(kg.K) (water).")
                 if (!hasAreaSide) add("Area side (U x A x LMTD) skipped - provide U, A and the four terminal temperatures for the cross-check.")
                 if (dT < 0.0) add("Outlet is colder than the inlet - the duty is negative (heat removed from this stream).")
+            },
+            warningsAr = buildList {
+                if (!has(inputs, "cp")) {
+                    add("لم تُدخل الحرارة النوعية - افتُرضت 4186 J/(kg.K) (مياه).")
+                }
+                if (!hasAreaSide) {
+                    add("جانب المساحة (U × A × LMTD) لم يُحسب - أدخل U و A والأربع حرارات الطرفية للمقارنة.")
+                }
+                if (dT < 0.0) {
+                    add("حرارة الخروج أقل من الدخول - الحمل سالب (حرارة تُسحب من هذا التيار).")
+                }
             },
         )
     }
