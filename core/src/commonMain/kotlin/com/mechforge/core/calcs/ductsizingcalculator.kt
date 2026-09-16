@@ -57,6 +57,20 @@ object DuctSizingCalculator : Calculator(Def) {
                 if (v > 8.0) add("Target velocity above 8 m/s — check noise criteria for the occupied space.")
                 if (!has(inputs, "r")) add("Aspect ratio not provided — assumed 1.0 (square equivalent).")
             },
+            stepsAr = listOf(
+                "المساحة: A = Q/v = ${Fmt.n(q, 5)} / ${Fmt.n(v, 3)} = ${Fmt.n(area, 5)} m²",
+                "القطر الدائري المكافئ: D_eq = √(4A/π) = ${Fmt.n(dEq, 4)} m = ${Fmt.n(dEq * 1000.0, 0)} mm",
+                "المستطيل (W/H = ${Fmt.n(ratio, 2)}): العرض = ${Fmt.n(w * 1000.0, 0)} mm، الارتفاع = ${Fmt.n(h * 1000.0, 0)} mm",
+            ),
+            warningsAr = buildList {
+                add("الناتج هو الحد الأدنى النظري؛ اختر مقاس الدكت القياسي التالي المساوي أو الأكبر.")
+                if (v > 8.0) {
+                    add("سرعة مستهدفة أعلى من 8 m/s - راجع معايير الضوضاء للفراغ المأهول.")
+                }
+                if (!has(inputs, "r")) {
+                    add("لم تُدخل نسبة الأبعاد - افتُرضت 1.0 (المكافئ المربع).")
+                }
+            },
         )
     }
 }

@@ -39,6 +39,7 @@ object AirflowConverterCalculator : Calculator(Def) {
                 result("lmin", "Litres per minute", q * 1e3 * 60.0, "lmin", isPrimary = false),
             ),
             steps = listOf("Converted from ${UnitsSymbol(entered)} via exact factors."),
+            stepsAr = listOf("تم التحويل من ${UnitsSymbol(entered)} باستخدام معاملات دقيقة."),
             warnings = emptyList(),
         )
     }
