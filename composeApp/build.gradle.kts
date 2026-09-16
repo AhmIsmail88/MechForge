@@ -82,8 +82,8 @@ android {
         applicationId = "com.mechforge.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
     }
 
     signingConfigs {
@@ -143,7 +143,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Exe)
             packageName = "MechForge"
-            packageVersion = "0.2.0"
+            packageVersion = "0.3.0"
             description = "MechForge — Mechanical Engineering Toolkit"
             vendor = "MechForge"
 

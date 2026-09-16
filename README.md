@@ -8,7 +8,7 @@
 
 Hydraulics · HVAC · Thermodynamics · Mechanical design · Piping · Water &amp; wastewater · Fire protection · Equipment
 
-<img src="docs/assets/badges/version.svg" alt="version 0.2.0">
+<img src="docs/assets/badges/version.svg" alt="version 0.3.0">
 <img src="docs/assets/badges/platform.svg" alt="Android 8+ and Desktop JVM">
 <img src="docs/assets/badges/kotlin.svg" alt="Kotlin 2.2.20">
 <img src="docs/assets/badges/compose.svg" alt="Compose Multiplatform 1.9.0">
@@ -46,6 +46,32 @@ next to the result — never just a bare number.
   reference and a signature block.
 - **One engine, two apps**: the same Kotlin Multiplatform engine and the same Compose UI
   are used by the Android app and the desktop (JVM) app.
+
+## What is in 0.3.0
+
+- **63 calculators.** A heat-dissipation calculation joins the HVAC set: enter the sensible heat load
+  and the allowable air temperature rise and the tool returns the fan capacity
+  (`m_dot = P / (c_p * dT)`, `Q = m_dot / rho`), naming the air properties it used and printing the
+  caveats that go with the choice.
+- **Fan selection fields.** The ventilation calculators (ACH and heat dissipation) accept the
+  capacity of one fan and the number of fans selected, then report how many fans of that size the
+  calculated airflow takes, the selected capacity and the margin - and say so when the selection
+  falls short or is more than double the requirement.
+- **Project workspace.** A calculation belongs to a project. The project record carries the
+  identification, the responsibility, the document control and the design basis; the project
+  exports a calculation register and a calculation package (cover, register, then one clean page
+  per calculation); and a saved calculation freezes the project data it was made under, so revising
+  the project later cannot rewrite a sheet that was already issued.
+- **Project dashboard.** Status split with percentages, the discipline breakdown and the recent
+  calculations, per project.
+- **Report quality checks.** Before an export the app reports a missing project, a blank project
+  record, a missing revision or status, a sheet that is not linked to a saved calculation and how
+  many values were assumed. And a sheet states that the printed values are the calculation result,
+  while design approval is a separate document action.
+- **Engineering foundations.** A golden test suite (139 scenarios, 564 comparisons, 63 calculators,
+  re-derived independently of the engine), documented assumptions that the engine announces
+  instead of applying silently, physical-range warnings, and a technical reference regenerated from
+  the sources.
 
 ## Calculator catalogue
 
@@ -237,5 +263,5 @@ bundled runtime - no Java installation is needed on the target machine. Two note
 
 ---
 
-<sub>MechForge 0.2.0 · this file is the project overview; the authoritative product
+<sub>MechForge 0.3.0 · this file is the project overview; the authoritative product
 specification lives in <code>MechForge_README_v2.md</code>.</sub>
