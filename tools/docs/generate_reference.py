@@ -137,6 +137,38 @@ def parse_results(text: str):
     return uniq
 
 
+def parse_text_entries(body: str, key: str):
+    """The human-readable entries of a `key = buildList/listOf { ... }` block.
+
+    Each add(...) / list entry contributes one entry: its string literals are joined, so a
+    multi-line concatenation comes back as one sentence. ${...} templates are kept verbatim -
+    they are filled from the computed values when the calculator runs.
+    """
+    m = re.search(key + r"\s*=\s*(?:buildList|listOf|mutableListOf)\s*[({]", body)
+    if not m:
+        return []
+    opener = body[m.end() - 1]
+    if opener == "(":
+        block = paren_block(body, m.end() - 1)
+        entries_raw = re.split(r',\s*\n', block)
+    else:
+        block = brace_block(body, m.end() - 1)
+        entries_raw = re.split(r'\badd\(', block)
+    entries = []
+    for chunk in entries_raw:
+        literals = re.findall(r'"((?:[^"\\]|\\.)*)"', chunk)
+        if literals:
+            text = "".join(literals).strip()
+            if text:
+                entries.append(re.sub(r"\s+", " ", text))
+    # keep order, drop duplicates
+    seen, out = set(), []
+    for e in entries:
+        if e not in seen:
+            seen.add(e)
+            out.append(e)
+    return out
+
 def parse_logic(text: str):
     """Assignment / branch lines of the calculate() body - the calculation itself."""
     m = re.search(r"override fun calculate\(.*?\): CalcOutput\s*\{", text, re.S)
@@ -224,6 +256,8 @@ def main() -> int:
                 "inputs": parse_inputs(block),
                 "results": parse_results(body),
                 "logic": parse_logic(body),
+                "steps": parse_text_entries(body, "steps"),
+                "warnings": parse_text_entries(body, "warnings"),
                 "constants": parse_constants(text),
                 "option_lists": parse_option_lists(text),
             })
@@ -257,6 +291,8 @@ def main() -> int:
                 "inputs": parse_inputs(tpl_block),
                 "results": parse_results(body),
                 "logic": parse_logic(body),
+                "steps": parse_text_entries(body, "steps"),
+                "warnings": parse_text_entries(body, "warnings"),
                 "constants": parse_constants(text),
                 "option_lists": [],
                 "family": cd.group(3),
@@ -434,6 +470,16 @@ def main() -> int:
             A("<p><b>Calculation logic</b> (straight from the engine)</p><pre>")
             A(escape("\n".join(c["logic"])))
             A("</pre>")
+        if c.get("steps"):
+            A("<p><b>Solution steps</b> (the narrative the report prints; ${...} are filled from the "
+              "computed values)</p><ol>")
+            for s in c["steps"]:
+                A(f"<li><code>{escape(s)}</code></li>")
+            A("</ol>")
+        if c.get("warnings"):
+            A("<p><b>Warnings and engineering caveats</b></p>")
+            for w in c["warnings"]:
+                A(f"<div class='warn'>{escape(w)}</div>")
         if c["constants"]:
             A("<p><b>Constants used</b></p><table><tr><th>name</th><th>value</th></tr>")
             for n, v in c["constants"]:
