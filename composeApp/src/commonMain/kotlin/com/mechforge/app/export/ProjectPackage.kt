@@ -86,6 +86,18 @@ object ProjectPackage {
                     title = record.title,
                     labels = labels,
                     signature = signature,
+                    localizedName = { fallback ->
+                        com.mechforge.app.ui.CalcText.name(calculator.def, labels == ReportLabels.ARABIC)
+                    },
+                    localizedLabel = { id, fallback ->
+                        val inArabic = labels == ReportLabels.ARABIC
+                        val isInput = calculator.def.inputs.any { it.id == id }
+                        if (isInput) {
+                            com.mechforge.app.ui.CalcText.inputLabel(calculator.def.id, id, fallback, inArabic)
+                        } else {
+                            com.mechforge.app.ui.CalcText.resultLabel(calculator.def.id, id, fallback, inArabic)
+                        }
+                    },
                 )
             } else {
                 // the record exists but cannot be replayed: say so instead of printing a blank page

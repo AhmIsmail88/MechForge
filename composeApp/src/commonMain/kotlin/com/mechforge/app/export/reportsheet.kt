@@ -25,9 +25,12 @@ object ReportSheet {
         signature: List<Pair<String, String>> = emptyList(),
         documentControl: List<Pair<String, String>> = emptyList(),
         disclaimer: String? = null,
+        localizedName: (String) -> String = { it },
+        localizedLabel: (String, String) -> String = { _, fallback -> fallback },
     ): List<ReportBlock> {
         val blocks = mutableListOf<ReportBlock>()
 
+        val sheetTitle = title ?: localizedName(calculator.def.name)
         if (!title.isNullOrBlank() && title != calculator.def.name) {
             blocks += ReportBlock.Heading(labels.documentTitle)
             blocks += ReportBlock.TableRow(listOf(labels.documentTitle, title))
@@ -38,7 +41,8 @@ object ReportSheet {
             val iv = inputs[spec.id] ?: return@mapNotNull null
             val unit = Units.byId(iv.displayUnitId)
             val value = "${UiFormat.n(unit.fromBase(iv.baseValue))} ${unit.symbol}"
-            val label = if (spec.symbol.isBlank()) spec.label else "${spec.symbol}  ${spec.label}"
+            val name = localizedLabel(spec.id, spec.label)
+            val label = if (spec.symbol.isBlank()) name else "${spec.symbol}  $name"
             ReportBlock.TableRow(listOf(label, value))
         }
         if (inputRows.isNotEmpty()) {
@@ -65,7 +69,7 @@ object ReportSheet {
                 val unit = Units.byId(r.unitId)
                 val marker = if (r.isRecommended) "* " else ""
                 val value = "${UiFormat.n(r.value)} ${unit.symbol}"
-                blocks += ReportBlock.TableRow(listOf(marker + r.label, value))
+                blocks += ReportBlock.TableRow(listOf(marker + localizedLabel(r.id, r.label), value))
             }
         }
 

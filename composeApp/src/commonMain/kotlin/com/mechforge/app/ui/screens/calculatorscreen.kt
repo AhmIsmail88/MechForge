@@ -448,6 +448,10 @@ fun CalculatorScreen(
                                         signature = signature,
                                         documentControl = control,
                                         disclaimer = labels.resultDisclaimer,
+                                        localizedName = { fallback -> CalcText.name(def, rtl) },
+                                        localizedLabel = { id, fallback ->
+                                            CalcText.resultLabel(def.id, id, fallback, rtl)
+                                        },
                                     )
                                     val path = deps.exporter.savePdf(def.id, def.name, meta, blocks, deps.logoStore.load(), rtl)
                                     val qaNote = if (qa.isEmpty()) "" else "  |  QA: " + qa.joinToString("; ") { it.message }
@@ -514,6 +518,10 @@ fun CalculatorScreen(
                                         signature = signature,
                                         documentControl = control,
                                         disclaimer = labels.resultDisclaimer,
+                                        localizedName = { fallback -> CalcText.name(def, rtl) },
+                                        localizedLabel = { id, fallback ->
+                                            CalcText.resultLabel(def.id, id, fallback, rtl)
+                                        },
                                     )
                                     val path = deps.exporter.saveXlsx(def.id, def.name, meta, blocks, rtl)
                                     val qaNote = if (qa.isEmpty()) "" else "  |  QA: " + qa.joinToString("; ") { it.message }
