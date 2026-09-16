@@ -111,6 +111,51 @@ object HeatDissipationCalculator : Calculator(Def) {
                 add("Airflow is inversely proportional to the allowable rise: halving dT doubles the fan capacity.")
                 addAll(FanCoverage.warnings(q, provided, fansNeeded, fanCount))
             },
+            stepsAr = listOf(
+                "الحمل الحراري: P = ${Fmt.n(p / 1000.0, 3)} kW، وفرق الحرارة المسموح: dT = ${Fmt.n(dt, 2)} K",
+                "خواص الهواء: rho = ${Fmt.n(rho, 4)} kg/m3، و c_p = ${Fmt.n(cp, 1)} J/(kg.K)",
+                "معدل الكتلة: m_dot = P/(c_p*dT) = ${Fmt.n(p, 1)} / (${Fmt.n(cp, 1)} × ${Fmt.n(dt, 2)}) = ${Fmt.n(mDot, 5)} kg/s",
+                "التدفق الحجمي: Q = m_dot/rho = ${Fmt.n(mDot, 5)} / ${Fmt.n(rho, 4)} = ${Fmt.n(q, 5)} m3/s",
+                "سعة المروحة = ${Fmt.n(qM3h, 1)} m3/h = ${Fmt.n(qCfm, 0)} CFM = ${Fmt.n(qLs, 1)} L/s",
+                "مراجعة الفرق: dT = P/(rho*c_p*Q) = ${Fmt.n(dt, 2)} K عند هذا التدفق",
+            ) + buildList {
+                if (fanCap != null && fansNeeded != null) {
+                    add(
+                        "مراوح بسعة ${Fmt.n(fanCap * 3600.0, 1)} m3/h للمروحة: مطلوب $fansNeeded مروحة" +
+                            (provided?.let { " (السعة المختارة ${Fmt.n(it * 3600.0, 1)} m3/h)" } ?: "")
+                    )
+                }
+            },
+            warningsAr = buildList {
+                if (dt < 5.0) {
+                    add("فرق الحرارة المسموح أقل من 5 K يحتاج تدفقًا كبيرًا - راجع حرارة التصميم والمساحة التي يتطلبها مسار الهواء.")
+                }
+                if (dt > 20.0) {
+                    add("فرق الحرارة المسموح أكبر من 20 K قد يسخّن المعدات في الفراغ - تحقق من حرارة الغرفة المسموحة لا من التدفق وحده.")
+                }
+                add("التدفق يتناسب عكسيًا مع فرق الحرارة المسموح: تقليل الفرق إلى النصف يضاعف سعة المروحة.")
+                // the same three fan caveats as FanCoverage, in Arabic; a test keeps the two lists
+                // the same length so a future condition cannot drift
+                val installedAr = provided
+                if (installedAr != null) {
+                    if (q > 0.0 && installedAr < q) {
+                        add(
+                            "سعة المراوح المختارة أقل من المتطلب المحسوب بنسبة " +
+                                Fmt.n((q - installedAr) / q * 100.0, 1) + " % - أضف سعة أو راجع الهدف."
+                        )
+                    }
+                    if (fansNeeded != null && fanCount != null && fanCount > 0.0 && fanCount < fansNeeded) {
+                        add("عدد المراوح المختار لا يكفي لتأمين التدفق المحسوب: مطلوب $fansNeeded مروحة من هذه السعة.")
+                    }
+                    val marginAr = FanCoverage.marginPercent(installedAr, q)
+                    if (marginAr != null && marginAr > 100.0) {
+                        add(
+                            "السعة المختارة أكثر من ضعف المتطلب (+" + Fmt.n(marginAr, 0) +
+                                " %) - راجع اختيار المراوح للكفاءة والضوضاء ومدى التحكم."
+                        )
+                    }
+                }
+            },
         )
     }
 }

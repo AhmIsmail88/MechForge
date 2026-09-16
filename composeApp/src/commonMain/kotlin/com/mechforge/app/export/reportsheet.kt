@@ -55,9 +55,11 @@ object ReportSheet {
         blocks += ReportBlock.Paragraph(calculator.def.formulaDisplay)
 
         // Calculation steps --------------------------------------------------
-        if (output.steps.isNotEmpty()) {
+        val arabicOutput = labels == ReportLabels.ARABIC
+        val stepsToPrint = if (arabicOutput && output.stepsAr.isNotEmpty()) output.stepsAr else output.steps
+        if (stepsToPrint.isNotEmpty()) {
             blocks += ReportBlock.Heading(labels.calculationSteps)
-            for (step in output.steps) {
+            for (step in stepsToPrint) {
                 blocks += ReportBlock.Paragraph(step)
             }
         }
@@ -74,9 +76,10 @@ object ReportSheet {
         }
 
         // Warnings -----------------------------------------------------------
-        if (output.warnings.isNotEmpty()) {
+        val warningsToPrint = if (arabicOutput && output.warningsAr.isNotEmpty()) output.warningsAr else output.warnings
+        if (warningsToPrint.isNotEmpty()) {
             blocks += ReportBlock.Heading(labels.warnings)
-            for (w in output.warnings) {
+            for (w in warningsToPrint) {
                 blocks += ReportBlock.Warning(w)
             }
         }

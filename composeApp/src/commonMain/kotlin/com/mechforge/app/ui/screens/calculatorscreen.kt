@@ -361,16 +361,18 @@ fun CalculatorScreen(
                     Spacer(Modifier.height(8.dp))
                     Text(strings.calculatorFormula, style = MaterialTheme.typography.labelMedium)
                     Text(def.formulaDisplay, style = MaterialTheme.typography.bodyLarge)
-                    if (out.steps.isNotEmpty()) {
+                    val shownSteps = if (strings.isRtl && out.stepsAr.isNotEmpty()) out.stepsAr else out.steps
+                    if (shownSteps.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
                         Text(strings.calculatorSteps, style = MaterialTheme.typography.labelMedium)
-                        for (step in out.steps) {
+                        for (step in shownSteps) {
                             Text(step, style = MaterialTheme.typography.bodySmall)
                         }
                     }
-                    if (out.warnings.isNotEmpty()) {
+                    val shownWarnings = if (strings.isRtl && out.warningsAr.isNotEmpty()) out.warningsAr else out.warnings
+                    if (shownWarnings.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
-                        for (w in out.warnings) {
+                        for (w in shownWarnings) {
                             Text("⚠ $w", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                         }
                     }
