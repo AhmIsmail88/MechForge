@@ -175,6 +175,16 @@ object PeakFlowCalculator : Calculator(PeakFlowDef) {
                 add("Peaking factor is a design input — confirm it against the applicable design criteria or a population-based formula.")
                 if (pf > 4.0) add("Peaking factor above 4.0 is unusually high; verify the source of the value.")
             },
+            stepsAr = listOf(
+                "Q_peak = PF · Q_avg = ${Fmt.n(pf, 3)} × ${Fmt.n(q * 3600.0, 2)} m³/h = ${Fmt.n(peak * 3600.0, 2)} m³/h",
+                "المكافئ اليومي: ${Fmt.n(peak * 86400.0, 0)} m³/d",
+            ),
+            warningsAr = buildList {
+                add("معامل الذروة مُدخل تصميمي - أكّده مقابل معايير التصميم المطبقة أو معادلة مبنية على عدد السكان.")
+                if (pf > 4.0) {
+                    add("معامل ذروة أعلى من 4.0 مرتفع بشكل غير معتاد؛ تحقق من مصدر القيمة.")
+                }
+            },
         )
     }
 }
@@ -212,6 +222,11 @@ object HydraulicLoadingCalculator : Calculator(HydraulicLoadingDef) {
                 "HLR = Q/A = ${Fmt.n(q, 6)} m³/s / ${Fmt.n(a, 2)} m² = ${Fmt.n(hlr * 86400.0, 3)} m/d (${Fmt.n(hlr * 3600.0, 3)} m/h)",
             ),
             warnings = listOf("Acceptable loading rates are process-specific — verify against the design criteria for this unit."),
+            stepsAr = listOf(
+                "التدفق: ${Fmt.n(q * 86400.0, 0)} m³/d   المساحة: ${Fmt.n(a, 2)} m²",
+                "HLR = Q/A = ${Fmt.n(q, 6)} m³/s / ${Fmt.n(a, 2)} m² = ${Fmt.n(hlr * 86400.0, 3)} m/d (${Fmt.n(hlr * 3600.0, 3)} m/h)",
+            ),
+            warningsAr = listOf("معدلات التحميل المقبولة خاصة بالعملية - تحقق مقابل معايير التصميم لهذه الوحدة."),
         )
     }
 }
