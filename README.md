@@ -8,7 +8,7 @@
 
 Hydraulics · HVAC · Thermodynamics · Mechanical design · Piping · Water &amp; wastewater · Fire protection · Equipment
 
-<img src="docs/assets/badges/version.svg" alt="version 0.3.0">
+<img src="docs/assets/badges/version.svg" alt="version 0.4.0">
 <img src="docs/assets/badges/platform.svg" alt="Android 8+ and Desktop JVM">
 <img src="docs/assets/badges/kotlin.svg" alt="Kotlin 2.2.20">
 <img src="docs/assets/badges/compose.svg" alt="Compose Multiplatform 1.9.0">
@@ -46,6 +46,20 @@ next to the result — never just a bare number.
   reference and a signature block.
 - **One engine, two apps**: the same Kotlin Multiplatform engine and the same Compose UI
   are used by the Android app and the desktop (JVM) app.
+
+## What is in 0.4.0
+
+- **Arabic for every calculator.** All 63 calculators carry an Arabic name, an Arabic description
+  and Arabic labels for every input and result - the ventilation and cooling set, hydraulics and
+  pumps, mechanics and piping, fire protection, water and wastewater, thermodynamics, the heat
+  exchangers and the unit converters.
+- **A translation layer, not a second engine.** The Arabic text lives apart from the arithmetic:
+  the equations, units, validation and every number still come from the engine, and anything not
+  translated falls back to the English text, so a calculator can be translated at any time without
+  touching the calculation.
+- **Guarded by tests.** CalculatorArabicTest proves that every translated calculator, input and
+  result exists in the engine and that the strings really are Arabic - a rename in the engine
+  breaks the test instead of leaving a stale translation in the interface.
 
 ## What is in 0.3.0
 
@@ -263,5 +277,5 @@ bundled runtime - no Java installation is needed on the target machine. Two note
 
 ---
 
-<sub>MechForge 0.3.0 · this file is the project overview; the authoritative product
+<sub>MechForge 0.4.0 · this file is the project overview; the authoritative product
 specification lives in <code>MechForge_README_v2.md</code>.</sub>
