@@ -42,6 +42,11 @@ object TankVolumeCalculator : Calculator(TankDef) {
                 "Depth/area check: with a usable depth of 3.0 m the required plan area would be ${Fmt.n(v / 3.0, 1)} m².",
             ),
             warnings = listOf("Add freeboard and structural allowances; dead storage is not deducted here."),
+            stepsAr = listOf(
+                "V = Q·t = ${Fmt.n(q * 3600.0, 2)} m³/h × ${Fmt.n(t / 3600.0, 3)} h = ${Fmt.n(v, 3)} m³",
+                "مراجعة العمق والمساحة: بعمق صافٍ 3.0 m تكون المساحة الأفقية المطلوبة ${Fmt.n(v / 3.0, 1)} m².",
+            ),
+            warningsAr = listOf("أضف السماح الحر والسماح الإنشائي؛ التخزين الميت غير مخصوم هنا."),
         )
     }
 }
@@ -78,6 +83,10 @@ object DetentionTimeCalculator : Calculator(DetentionDef) {
                 "t = V/Q = ${Fmt.n(v, 2)} m³ / ${Fmt.n(q * 3600.0, 2)} m³/h = ${Fmt.n(t / 3600.0, 3)} h (${Fmt.n(t / 60.0, 1)} min)",
             ),
             warnings = listOf("Nominal detention time — actual time is reduced by short-circuiting."),
+            stepsAr = listOf(
+                "t = V/Q = ${Fmt.n(v, 2)} m³ / ${Fmt.n(q * 3600.0, 2)} m³/h = ${Fmt.n(t / 3600.0, 3)} h (${Fmt.n(t / 60.0, 1)} min)",
+            ),
+            warningsAr = listOf("زمن مكث اسمي - الزمن الفعلي يقل بسبب اختصار المسار داخل الحوض."),
         )
     }
 }
@@ -117,6 +126,14 @@ object ChlorineDoseCalculator : Calculator(DosingDef) {
             warnings = listOf(
                 "Mass of PURE chemical. Convert to product mass using its strength (e.g. ÷0.12 for 12% NaOCl solution).",
                 "Dose and contact-time requirements come from the applicable disinfection standard — verify CT compliance separately.",
+            ),
+            stepsAr = listOf(
+                "التدفق: ${Fmt.n(q * 86400.0, 0)} m³/d   الجرعة: ${Fmt.n(dose * 1000.0, 3)} mg/L",
+                "ṁ = Q·dose = ${Fmt.n(q, 6)} m³/s × ${Fmt.n(dose, 8)} kg/m³ = ${Fmt.n(massRate, 8)} kg/s = ${Fmt.n(massRate * 86400.0, 2)} kg/d",
+            ),
+            warningsAr = listOf(
+                "الكتلة محسوبة للمادة الكيميائية النقية: حوّلها إلى كتلة المنتج باستخدام قوته (مثال: القسمة على 0.12 لمحلول 12% هيبوكلوريت صوديوم).",
+                "متطلبات الجرعة وزمن التلامس من معيار التطهير المطبق - تحقق من مطابقة CT بشكل منفصل.",
             ),
         )
     }
