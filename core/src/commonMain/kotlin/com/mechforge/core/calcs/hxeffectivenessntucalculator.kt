@@ -69,6 +69,27 @@ object HxEffectivenessNtuCalculator : Calculator(Def) {
                 if (counter && cr > 0.95 && cr < 1.0) add("Cr close to 1: the counter-flow result uses a near-singular form - check the limit value.")
                 if (eps > 0.95) add("Effectiveness above 95 % needs a very large surface - check the area and the approach temperatures.")
             },
+            stepsAr = listOf(
+                "NTU = ${Fmt.n(ntu, 3)}   Cr = ${Fmt.n(cr, 3)}   الترتيب: ${if (counter) "متعاكس" else "متوازي"}",
+                if (abs(cr) < 1e-9) {
+                    "Cr = 0 (تغيّر طور): e = 1 - exp(-NTU) = ${Fmt.n(eps, 5)}"
+                } else if (counter && abs(1.0 - cr) < 1e-9) {
+                    "Cr = 1، حد التعاكس: e = NTU/(1+NTU) = ${Fmt.n(eps, 5)}"
+                } else if (counter) {
+                    "e = (1-exp(-NTU(1-Cr)))/(1-Cr*exp(-NTU(1-Cr))) = ${Fmt.n(eps, 5)}"
+                } else {
+                    "e = (1-exp(-NTU(1+Cr)))/(1+Cr) = ${Fmt.n(eps, 5)}"
+                },
+                "الفعالية = ${Fmt.n(eps * 100.0, 2)} %",
+            ),
+            warningsAr = buildList {
+                if (counter && cr > 0.95 && cr < 1.0) {
+                    add("Cr قريبة من 1: نتيجة التعاكس تستخدم صيغة قريبة من التفرد - راجع قيمة الحد.")
+                }
+                if (eps > 0.95) {
+                    add("فعالية أعلى من 95 % تحتاج مساحة كبيرة جدًا - راجع المساحة وفروق الحرارة الطرفية.")
+                }
+            },
         )
     }
 }
