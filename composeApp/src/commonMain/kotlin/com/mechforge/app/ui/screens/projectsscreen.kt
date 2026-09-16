@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
@@ -47,6 +48,7 @@ import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.data.Snapshots
 import com.mechforge.app.export.ProjectPackage
 import com.mechforge.app.export.ProjectRegister
+import com.mechforge.app.export.ProjectSummary
 import com.mechforge.app.export.ReportLabels
 import com.mechforge.app.ui.theme.glassBorder
 import com.mechforge.core.engine.CalculatorRegistry
@@ -72,6 +74,7 @@ fun ProjectsScreen(deps: AppDependencies) {
     var renameTarget by remember { mutableStateOf<Long?>(null) }
     var renameText by remember { mutableStateOf("") }
     var infoTarget by remember { mutableStateOf<Long?>(null) }
+    var dashboardTarget by remember { mutableStateOf<Long?>(null) }
     var infoDraft by remember { mutableStateOf<ProjectInfo?>(null) }
 
     Column(
@@ -154,6 +157,9 @@ fun ProjectsScreen(deps: AppDependencies) {
                             infoTarget = project.id
                             infoDraft = info
                         }) { Icon(Icons.Filled.Info, strings.projectInfoTitle) }
+                        IconButton(onClick = { dashboardTarget = project.id }) {
+                            Icon(Icons.Filled.Dashboard, strings.projectDashboard)
+                        }
                         IconButton(onClick = {
                             scope.launch {
                                 val record = deps.projects.info(project.id) ?: return@launch
@@ -279,6 +285,71 @@ fun ProjectsScreen(deps: AppDependencies) {
             },
             dismissButton = { TextButton(onClick = { renameTarget = null }) { Text(strings.cancel) } },
         )
+    }
+
+    dashboardTarget?.let { id ->
+        val labels = ReportLabels.of(deps.settings.reportIsArabic())
+        val project = deps.projects.info(id)
+        val rows = deps.history.byProject(id)
+        if (project != null) {
+            AlertDialog(
+                onDismissRequest = { dashboardTarget = null },
+                title = { Text(project.name) },
+                text = {
+                    Column(
+                        modifier = Modifier
+                            .heightIn(max = 420.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(strings.projectDashboard, style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            strings.savedCalculations(rows.size),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        val statusCounts = deps.history.countsByStatus(id)
+                            .filter { it.second > 0L }
+                            .map { it.first.ifBlank { labels.registerNoStatus } to it.second.toInt() }
+                        if (statusCounts.isNotEmpty()) {
+                            Text(labels.registerSummary, style = MaterialTheme.typography.titleSmall)
+                            for ((status, percent) in ProjectSummary.statusPercent(statusCounts)) {
+                                val count = statusCounts.first { it.first == status }.second
+                                Text("$status: $count  ($percent %)", style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                        val disciplines = ProjectSummary.disciplines(
+                            calculatorIds = rows.map { it.calculator_id },
+                            disciplineOf = { calcId ->
+                                runCatching { CalculatorRegistry.byIdOrThrow(calcId).def.category.displayName }.getOrNull()
+                            },
+                            unknownLabel = labels.registerNoStatus,
+                        )
+                        if (disciplines.isNotEmpty()) {
+                            Text(strings.projectDisciplines, style = MaterialTheme.typography.titleSmall)
+                            for (d in disciplines) {
+                                Text("${d.name}: ${d.count}", style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                        val recent = ProjectSummary.recent(
+                            rows.map { row ->
+                                Triple(
+                                    row.calculation_number ?: row.id.toString(),
+                                    row.title,
+                                    ProjectPackage.dateOf(row.timestamp),
+                                )
+                            },
+                        )
+                        if (recent.isNotEmpty()) {
+                            Text(strings.projectRecent, style = MaterialTheme.typography.titleSmall)
+                            for (r in recent) {
+                                Text("${r.label}  |  ${r.title}  |  ${r.date}", style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                },
+                confirmButton = { TextButton(onClick = { dashboardTarget = null }) { Text(strings.cancel) } },
+            )
+        }
     }
 
     val draft = infoDraft

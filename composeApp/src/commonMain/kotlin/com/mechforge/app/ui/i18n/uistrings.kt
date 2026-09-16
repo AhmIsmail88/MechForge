@@ -146,6 +146,9 @@ interface UiStrings {
     val projectsDelete: String
     val projectsRegister: String
     val projectsPackage: String
+    val projectDashboard: String
+    val projectDisciplines: String
+    val projectRecent: String
 
     // ---- Settings -------------------------------------------------------
     val settingsTitle: String
@@ -353,6 +356,9 @@ object ArStrings : UiStrings {
         override val projectsDelete = "حذف"
         override val projectsRegister = "سجل الحسابات"
         override val projectsPackage = "حزمة التقارير"
+        override val projectDashboard = "لوحة المشروع"
+        override val projectDisciplines = "التخصصات"
+        override val projectRecent = "أحدث الحسابات"
 
     override val settingsTitle = "الإعدادات"
     override val settingsAppearance = "المظهر"
@@ -579,6 +585,9 @@ object EnStrings : UiStrings {
         override val projectsDelete = "Delete"
         override val projectsRegister = "Calculation register"
         override val projectsPackage = "Calculation package"
+        override val projectDashboard = "Project dashboard"
+        override val projectDisciplines = "Disciplines"
+        override val projectRecent = "Recent calculations"
 
     override val settingsTitle = "Settings"
     override val settingsAppearance = "Appearance"
