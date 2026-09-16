@@ -29,7 +29,8 @@ class CalculatorArabicTest {
     )
 
     /** Extra inputs that unlock the optional results, in their base unit. */
-    private val optionalGates = setOf("fancap", "nfans")
+    // optional inputs whose presence unlocks optional results the translation names
+    private val optionalGates = setOf("fancap", "nfans", "n1", "t1", "m", "u", "a", "z")
 
     private val producedByCalculator: Map<String, Set<String>> by lazy {
         val produced = mutableMapOf<String, MutableSet<String>>()

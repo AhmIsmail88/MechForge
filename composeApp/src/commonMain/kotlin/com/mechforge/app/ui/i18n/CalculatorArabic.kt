@@ -827,6 +827,236 @@ object CalculatorArabic {
                 "inD" to "الطول المكافئ بالأقطار",
             ),
         ),
+        "carnot-efficiency" to CalculatorArabicContent(
+            name = "كفاءة كارنو",
+            description = "أقصى كفاءة نظرية لمحرك حراري بين مخزنين حراريين.",
+            inputs = mapOf(
+                "th" to "حرارة المخزن الساخن",
+                "tc" to "حرارة المخزن البارد",
+            ),
+            results = mapOf(
+                "eta" to "كفاءة كارنو",
+                "ratio" to "الكفاءة (كسر)",
+            ),
+        ),
+
+        "compression-ratio" to CalculatorArabicContent(
+            name = "نسبة الضغط (متعدد المراحل)",
+            description = "نسبة الضغط الكلية وعدد المراحل المتساوية المطلوبة عند حد أقصى لكل مرحلة.",
+            inputs = mapOf(
+                "p1" to "ضغط الدخول",
+                "p2" to "ضغط التصريف",
+                "crmax" to "أقصى نسبة لكل مرحلة",
+            ),
+            results = mapOf(
+                "cr" to "نسبة الضغط الكلية",
+                "n" to "عدد المراحل المطلوبة",
+                "crStage" to "النسبة لكل مرحلة",
+                "pint" to "ضغط ما بين المرحلتين",
+            ),
+        ),
+
+        "compressor-power" to CalculatorArabicContent(
+            name = "قدرة الضاغط",
+            description = "القدرة المثالية والفعلية وقدرة العمود من ظروف الدخول والخروج.",
+            inputs = mapOf(
+                "m" to "معدل الكتلة",
+                "t1" to "حرارة الدخول",
+                "p1" to "ضغط الدخول",
+                "p2" to "ضغط التصريف",
+                "cp" to "الحرارة النوعية",
+                "k" to "نسبة الحرارة النوعية",
+                "eta" to "الكفاءة الأيزنتروبية",
+            ),
+            results = mapOf(
+                "pideal" to "القدرة المثالية (أيزنتروبية)",
+                "pshaft" to "قدرة العمود",
+                "t2s" to "حرارة التصريف الأيزنتروبية",
+                "t2a" to "حرارة التصريف الفعلية",
+                "t2ac" to "حرارة التصريف الفعلية (سلزيوس)",
+                "ratio" to "نسبة الضغط",
+            ),
+        ),
+
+        "gear-ratio" to CalculatorArabicContent(
+            name = "نسبة التروس",
+            description = "نسبة التروس وسرعة الخرج وعزمه من عدد أسنان الترسين.",
+            inputs = mapOf(
+                "z1" to "أسنان الترس القائد",
+                "z2" to "أسنان الترس المقتاد",
+                "n1" to "سرعة الترس القائد (اختياري)",
+                "t1" to "عزم الترس القائد (اختياري)",
+                "m" to "الموديول (اختياري)",
+            ),
+            results = mapOf(
+                "i" to "نسبة التروس",
+                "n2" to "سرعة الخرج",
+                "t2" to "عزم الخرج (مثالي)",
+                "d1" to "قطر الترس الصغير",
+                "d2" to "قطر الترس الكبير",
+            ),
+        ),
+
+        "heat-exchanger-duty" to CalculatorArabicContent(
+            name = "حمل المبادل الحراري",
+            description = "الحمل الحراري والفرق الحراري اللوغاريتمي من التدفق والحرارات.",
+            inputs = mapOf(
+                "m" to "معدل الكتلة",
+                "cp" to "الحرارة النوعية",
+                "tin" to "حرارة الدخول",
+                "tout" to "حرارة الخروج",
+                "u" to "معامل الانتقال الكلي U (اختياري)",
+                "a" to "مساحة الانتقال A (اختياري)",
+                "thin" to "حرارة الساخن الداخلة (اختياري)",
+                "thout" to "حرارة الساخن الخارجة (اختياري)",
+                "tcin" to "حرارة البارد الداخلة (اختياري)",
+                "tcout" to "حرارة البارد الخارجة (اختياري)",
+                "arr" to "الترتيب (1 = متعاكس، 0 = متوازي)",
+            ),
+            results = mapOf(
+                "q" to "الحمل الحراري (جانب السائل)",
+                "qArea" to "الحمل الحراري (جانب المساحة)",
+                "qBtuh" to "الحمل الحراري (إمبريال)",
+                "lmtd" to "الفرق الحراري اللوغاريتمي",
+                "dt" to "فرق الحرارة",
+            ),
+        ),
+
+        "hx-effectiveness-ntu" to CalculatorArabicContent(
+            name = "فعالية المبادل (ε-NTU)",
+            description = "فعالية المبادل من عدد وحدات الانتقال ونسبة السعات والترتيب.",
+            inputs = mapOf(
+                "ntu" to "عدد وحدات الانتقال NTU",
+                "cr" to "نسبة السعات",
+                "arr" to "الترتيب (1 = متعاكس، 0 = متوازي)",
+            ),
+            results = mapOf(
+                "eps" to "الفعالية",
+                "epsFrac" to "الفعالية (كسر)",
+                "ntuUsed" to "عدد الوحدات المستخدم",
+                "crUsed" to "نسبة السعات المستخدمة",
+            ),
+        ),
+
+        "ideal-gas" to CalculatorArabicContent(
+            name = "الغاز المثالي",
+            description = "الكثافة والكتلة والحجم النوعي من معادلة الغاز المثالي.",
+            inputs = mapOf(
+                "p" to "الضغط المطلق",
+                "t" to "الحرارة المطلقة",
+                "m" to "الكتلة المولية",
+                "v" to "الحجم (اختياري)",
+            ),
+            results = mapOf(
+                "rho" to "كثافة الغاز",
+                "mass" to "كتلة الغاز",
+                "sv" to "الحجم النوعي",
+            ),
+        ),
+
+        "isentropic-relation" to CalculatorArabicContent(
+            name = "العلاقات الأيزنتروبية",
+            description = "الحرارة ونسب الضغط والكثافة والحرارة في عملية أيزنتروبية.",
+            inputs = mapOf(
+                "p1" to "ضغط الدخول",
+                "p2" to "ضغط الخروج",
+                "t1" to "حرارة الدخول",
+                "k" to "نسبة الحرارة النوعية",
+            ),
+            results = mapOf(
+                "t2" to "حرارة الخروج",
+                "t2c" to "حرارة الخروج (سلزيوس)",
+                "pratio" to "نسبة الضغط P₂/P₁",
+                "tratio" to "نسبة الحرارة T₂/T₁",
+                "dratio" to "نسبة الكثافة ρ₂/ρ₁",
+            ),
+        ),
+
+        "lmtd" to CalculatorArabicContent(
+            name = "الفرق الحراري اللوغاريتمي (LMTD)",
+            description = "الفرق الحراري اللوغاريتمي المتوسط وحمل المبادل من الحرارات الأربع.",
+            inputs = mapOf(
+                "thin" to "حرارة الساخن الداخلة",
+                "thout" to "حرارة الساخن الخارجة",
+                "tcin" to "حرارة البارد الداخلة",
+                "tcout" to "حرارة البارد الخارجة",
+                "arr" to "الترتيب (1 = متعاكس، 0 = متوازي)",
+                "u" to "معامل الانتقال الكلي U (اختياري)",
+                "a" to "مساحة الانتقال A (اختياري)",
+            ),
+            results = mapOf(
+                "lmtd" to "الفرق الحراري اللوغاريتمي",
+                "dt1" to "الفرق الطرفي الأول",
+                "dt2" to "الفرق الطرفي الثاني",
+                "q" to "الحمل الحراري",
+            ),
+        ),
+
+        "pipe-sizing" to CalculatorArabicContent(
+            name = "تحديد قطر الماسورة",
+            description = "القطر الداخلي المطلوب من معدل السريان والسرعة التصميمية.",
+            inputs = mapOf(
+                "q" to "معدل السريان",
+                "v" to "السرعة التصميمية",
+            ),
+            results = mapOf(
+                "d" to "القطر الداخلي المطلوب",
+                "area" to "مساحة السريان",
+            ),
+        ),
+
+        "thermal-efficiency" to CalculatorArabicContent(
+            name = "الكفاءة الحرارية",
+            description = "الكفاءة الحرارية والحرارة المطرودة من الشغل والحرارة الداخلة.",
+            inputs = mapOf(
+                "w" to "الشغل الصافي الخارج",
+                "q" to "الحرارة الداخلة",
+            ),
+            results = mapOf(
+                "eta" to "الكفاءة الحرارية",
+                "ratio" to "الكفاءة (كسر)",
+                "rejected" to "الحرارة المطرودة",
+            ),
+        ),
+        "pressure-converter" to CalculatorArabicContent(
+            name = "محوّل الضغط",
+            description = "تحويل قيمة ضغط إلى كل وحدات الضغط المدعومة.",
+            inputs = mapOf(
+                "v" to "القيمة",
+            ),
+        ),
+
+        "flow-converter" to CalculatorArabicContent(
+            name = "محوّل التدفق",
+            description = "تحويل قيمة تدفق إلى كل وحدات التدفق المدعومة.",
+            inputs = mapOf(
+                "v" to "القيمة",
+            ),
+        ),
+
+        "power-converter" to CalculatorArabicContent(
+            name = "محوّل القدرة",
+            description = "تحويل قيمة قدرة إلى كل وحدات القدرة المدعومة.",
+            inputs = mapOf(
+                "v" to "القيمة",
+            ),
+        ),
+
+        "length-converter" to CalculatorArabicContent(
+            name = "محوّل الأطوال",
+            description = "تحويل قيمة طول إلى كل وحدات الطول المدعومة.",
+            inputs = mapOf(
+                "v" to "القيمة",
+            ),
+        ),
+
+        "temperature-converter" to CalculatorArabicContent(
+            name = "محوّل درجات الحرارة",
+            description = "تحويل قيمة حرارة إلى كل وحدات الحرارة المدعومة.",
+            inputs = mapOf(
+                "v" to "القيمة",
+            ),
+        ),
     )
 
     fun name(calculatorId: String, fallback: String): String =
