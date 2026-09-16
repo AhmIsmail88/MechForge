@@ -72,6 +72,18 @@ object SpringRateCalculator : Calculator(Def) {
                     add("Spring index D/d = ${Fmt.n(springIndex, 2)} is outside the usual 4–12 range; check manufacturability and stress concentration.")
                 }
             },
+            stepsAr = listOf(
+                "d⁴ = ${Fmt.n(d * 1000.0, 2)}⁴ mm⁴ = ${Fmt.n(d.pow(4), 12)} m⁴ ؛ D³ = ${Fmt.n(mean * 1000.0, 2)}³ mm³",
+                "k = G·d⁴/(8·D³·n) = ${Fmt.n(g / 1e9, 1)} GPa × ${Fmt.n(d.pow(4), 12)} / (8 × ${Fmt.n(mean.pow(3), 9)} × ${Fmt.n(coils, 1)}) = ${Fmt.n(k, 1)} N/m = ${Fmt.n(k / 1000.0, 3)} N/mm",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "g")) {
+                    add("لم يُدخل معامل القص - افتُرض 79.3 GPa (سلك صلب).")
+                }
+                if (springIndex < 4.0 || springIndex > 12.0) {
+                    add("مؤشر الياي D/d = ${Fmt.n(springIndex, 2)} خارج المدى المعتاد 4-12؛ راجع قابلية التصنيع وتركيز الإجهاد.")
+                }
+            },
         )
     }
 }
