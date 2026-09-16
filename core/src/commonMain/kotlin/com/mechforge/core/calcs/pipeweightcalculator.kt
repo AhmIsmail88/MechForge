@@ -64,18 +64,35 @@ object PipeWeightCalculator : Calculator(Def) {
             "Mass per metre: W = A*rho = ${Fmt.n(area, 8)} x ${Fmt.n(rho, 1)} = ${Fmt.n(weight, 2)} kg/m",
             "Internal diameter: ID = OD - 2t = ${Fmt.n(boreDiameter * 1000.0, 1)} mm",
         )
+        val stepsAr = mutableListOf(
+            "مساحة المعدن: A = π×(OD − t)×t = π × (${Fmt.n(od * 1000.0, 1)} − ${Fmt.n(t * 1000.0, 2)}) mm × ${Fmt.n(t * 1000.0, 2)} mm = ${Fmt.n(area, 8)} m2",
+            "الوزن لكل متر: W = A×rho = ${Fmt.n(area, 8)} × ${Fmt.n(rho, 1)} = ${Fmt.n(weight, 2)} kg/m",
+            "القطر الداخلي: ID = OD − 2t = ${Fmt.n(boreDiameter * 1000.0, 1)} mm",
+        )
         if (hasContent) {
             steps += "Content per metre: A_id x rho_c = ${Fmt.n(contentArea, 8)} m2 x ${Fmt.n(value(inputs, "rhoc"), 1)} = ${Fmt.n(contentWeight, 2)} kg/m"
             steps += "Operating mass: ${Fmt.n(weight, 2)} + ${Fmt.n(contentWeight, 2)} = ${Fmt.n(totalWeight, 2)} kg/m"
+            stepsAr += "وزن المحتوى لكل متر: A_id × rho_c = ${Fmt.n(contentArea, 8)} m2 × ${Fmt.n(value(inputs, "rhoc"), 1)} = ${Fmt.n(contentWeight, 2)} kg/m"
+            stepsAr += "الوزن التشغيلي: ${Fmt.n(weight, 2)} + ${Fmt.n(contentWeight, 2)} = ${Fmt.n(totalWeight, 2)} kg/m"
         }
 
         return CalcOutput(
             results = results,
             steps = steps,
+            stepsAr = stepsAr,
             warnings = buildList {
                 if (!has(inputs, "rho")) add("Density not provided - assumed 7850 kg/m3 (carbon steel). Result labelled kg/m.")
                 if (!hasContent) add("Enter a content density to get the operating (filled) weight needed for supports and hydrotest.")
                 add("Coatings, lining, insulation and fittings are excluded; add them for the installed weight.")
+            },
+            warningsAr = buildList {
+                if (!has(inputs, "rho")) {
+                    add("لم تُدخل الكثافة - افتُرضت 7850 kg/m3 (صلب كربوني). الناتج بوحدة kg/m.")
+                }
+                if (!hasContent) {
+                    add("أدخل كثافة المحتوى للحصول على الوزن التشغيلي (الممتلئ) اللازم للدعامات والاختبار الهيدروستاتيكي.")
+                }
+                add("الطلاءات والتبطين والعزل والوصلات غير محسوبة؛ أضفها للوصول إلى وزن التركيب.")
             },
         )
     }
