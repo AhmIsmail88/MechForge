@@ -52,6 +52,14 @@ object SprinklerDischargeCalculator : Calculator(Def) {
                 "Q = K * sqrt(P) = ${Fmt.n(k, 4)} x ${Fmt.n(sqrt(pBar), 5)} = ${Fmt.n(qLmin, 2)} L/min = ${Fmt.n(qGpm, 2)} gpm",
             ),
             warnings = warnings,
+            stepsAr = listOf(
+                "K = ${Fmt.n(k, 4)} L/min/bar^0.5   P = ${Fmt.n(pBar, 4)} bar",
+                "√(P) = ${Fmt.n(sqrt(pBar), 5)}",
+                "Q = K × √(P) = ${Fmt.n(k, 4)} × ${Fmt.n(sqrt(pBar), 5)} = ${Fmt.n(qLmin, 2)} L/min = ${Fmt.n(qGpm, 2)} gpm",
+            ),
+            warningsAr = buildList {
+                add("جداول معامل K وأقل ضغوط الرشاشات بيانات كودية - خُذها من قوائم اعتماد الرشاش ومعايير تصميم NFPA 13 المطبقة.")
+            },
         )
     }
 }
