@@ -32,6 +32,8 @@ private val Def = CalculatorDefinition(
         InputSpec("q", "Airflow (fan capacity)", "Q", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
         InputSpec("vroom", "Room volume", "V", UnitFamily.VOLUME, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3"),
         InputSpec("ach", "Air changes per hour", "ACH", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "perh"),
+        InputSpec("fancap", "Fan capacity (per fan)", "Q_fan", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
+        InputSpec("nfans", "Number of fans installed", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),
     ),
 )
 
@@ -76,6 +78,26 @@ object AirChangesCalculator : Calculator(Def) {
 
         val minutesPerChange = 60.0 / ach
 
+        // the fan installation the engineer intends to use, sized against the airflow above
+        val fanCap = if (has(inputs, "fancap")) value(inputs, "fancap") else null
+        val fanCount = if (has(inputs, "nfans")) value(inputs, "nfans") else null
+        val fanProvided = FanCoverage.provided(fanCount, fanCap)
+        val fansNeeded = FanCoverage.fansNeeded(q, fanCap)
+        val fanMargin = FanCoverage.marginPercent(fanProvided, q)
+
+        val fanResults = buildList {
+            fansNeeded?.let {
+                add(result("fansNeeded", "Fans Required", it.toDouble(), "dash", isPrimary = true))
+            }
+            fanProvided?.let {
+                add(result("fanTotal", "Installed Fan Capacity", it * 3600.0, "m3h"))
+                add(result("fanTotalCfm", "Installed Fan Capacity (imperial)", it / 4.719474432e-4, "cfm"))
+            }
+            fanMargin?.let {
+                add(result("fanMargin", "Installed Capacity Margin", it, "pct"))
+            }
+        }
+
         return CalcOutput(
             results = listOf(
                 result("q", "Required Airflow (Fan Capacity)", q * 3600.0, "m3h", isPrimary = true),
@@ -84,7 +106,7 @@ object AirChangesCalculator : Calculator(Def) {
                 result("ach", "Air Changes per Hour", ach, "perh", isPrimary = true),
                 result("vroom", "Room Volume", v, "m3"),
                 result("time", "Time per Air Change", minutesPerChange, "min"),
-            ),
+            ) + fanResults,
             steps = listOf(
                 if (hasQ && hasV) {
                     "Airflow: ${Fmt.n(q * 3600.0, 1)} m3/h   Room volume: ${Fmt.n(v, 2)} m3"
@@ -104,6 +126,7 @@ object AirChangesCalculator : Calculator(Def) {
                 if (ach > 60.0) {
                     add("Above 60 ACH is unusual - confirm the target rate and check acoustic and pressure-drop implications.")
                 }
+                addAll(FanCoverage.warnings(q, fanProvided, fansNeeded, fanCount))
             },
         )
     }

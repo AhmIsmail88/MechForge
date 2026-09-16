@@ -6,6 +6,7 @@ import com.mechforge.core.calcs.BeamCantileverPointCalculator
 import com.mechforge.core.calcs.BeamSsUdlCalculator
 import com.mechforge.core.calcs.BearingL10Calculator
 import com.mechforge.core.calcs.Co2AgentQuantityCalculator
+import com.mechforge.core.calcs.HeatDissipationCalculator
 import com.mechforge.core.calcs.CompressionRatioCalculator
 import com.mechforge.core.calcs.FanLawsCalculator
 import com.mechforge.core.calcs.Fm200AgentQuantityCalculator
@@ -81,7 +82,7 @@ object CalculatorRegistry {
         ManningCalculator,
         HazenWilliamsCalculator,
         NpshAvailableCalculator,
-        // HVAC (10)
+        // HVAC (11)
         SensibleHeatCalculator,
         TotalCoolingLoadCalculator,
         AirflowConverterCalculator,
@@ -92,6 +93,7 @@ object CalculatorRegistry {
         DuctPressureLossCalculator,
         FanPowerCalculator,
         AirChangesCalculator,
+        HeatDissipationCalculator,
         // Thermodynamics (6)
         IdealGasCalculator,
         CarnotEfficiencyCalculator,

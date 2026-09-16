@@ -86,6 +86,11 @@ class EngineOutputDumpTest {
         dump("air-changes-hour", "fan-240m3-ach15", iv("vroom", 240.0, "m3"), iv("ach", 15.0, "perh"))
         dump("air-changes-hour", "fan-480m3-ach15", iv("vroom", 480.0, "m3"), iv("ach", 15.0, "perh"))
         dump("air-changes-hour", "reverse-2000cfm", iv("q", 2000.0, "cfm"), iv("vroom", 300.0, "m3"))
+        dump("air-changes-hour", "fans-240m3-ach15", iv("vroom", 240.0, "m3"), iv("ach", 15.0, "perh"), iv("fancap", 1200.0, "m3h"), iv("nfans", 2.0, "dash"))
+        dump("heat-dissipation", "base", iv("p", 10.0, "kw"), iv("dt", 10.0, "delk"), iv("rho", 1.2, "kgm3"), iv("cp", 1005.0, "jkgk"))
+        dump("heat-dissipation", "double-load", iv("p", 20.0, "kw"), iv("dt", 10.0, "delk"), iv("rho", 1.2, "kgm3"), iv("cp", 1005.0, "jkgk"))
+        dump("heat-dissipation", "wide-rise", iv("p", 10.0, "kw"), iv("dt", 15.0, "delk"), iv("rho", 1.2, "kgm3"), iv("cp", 1005.0, "jkgk"))
+        dump("heat-dissipation", "fans-2x1000", iv("p", 10.0, "kw"), iv("dt", 10.0, "delk"), iv("fancap", 1000.0, "m3h"), iv("nfans", 2.0, "dash"))
 
         // --- Thermodynamics ---
         dump("ideal-gas", "air-20c", iv("p", 101.325, "kpa"), iv("t", 20.0, "c"), iv("m", 28.965, "gmol"))

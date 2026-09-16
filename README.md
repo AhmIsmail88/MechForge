@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/assets/cover.png" width="100%" alt="MechForge - 62 verified mechanical engineering calculators, offline-first, Arabic and English, PDF and Excel reports">
+<img src="docs/assets/cover.png" width="100%" alt="MechForge - 63 verified mechanical engineering calculators, offline-first, Arabic and English, PDF and Excel reports">
 
-<img src="docs/assets/cover-ar.png" width="100%" alt="MechForge - مجموعة أدوات الهندسة الميكانيكية، 62 حاسبة متحققة، عربي وإنجليزي">
+<img src="docs/assets/cover-ar.png" width="100%" alt="MechForge - مجموعة أدوات الهندسة الميكانيكية، 63 حاسبة متحققة، عربي وإنجليزي">
 
 **A local-first mechanical-engineering toolkit for engineers who need to check their numbers.**
 
@@ -36,7 +36,7 @@ It is built around one idea: an engineering number is only useful if you can che
 **every calculator shows its formula, its calculation steps and its engineering reference**
 next to the result — never just a bare number.
 
-- **62 calculators**, each with declared inputs, units, validation and references.
+- **63 calculators**, each with declared inputs, units, validation and references.
 - **Offline-first**: no account, no telemetry, no network. The Android app declares **no
   INTERNET permission** at all.
 - **Arabic and English interface**, with a **report language** that is chosen separately
@@ -134,7 +134,7 @@ Correctness is treated as a first-class feature, and is checked twice:
    reference-library import and the report renderers.
 2. **An independent implementation**: `tools/verification/` re-derives the equations in
    Python from a dump of the engine's own output. The current run covers **129
-   scenarios**, **433 result comparisons** and **all 62 calculators**, with **0 value
+   scenarios**, **564 result comparisons** and **all 63 calculators**, with **0 value
    mismatches** and **0 scaling-law failures**.
 
 ```bash
@@ -148,7 +148,7 @@ python tools/verification/verify_calculations.py engine_dump.jsonl
 ## Architecture
 
 ```
-core/         Kotlin Multiplatform engine: units, validation, 62 calculators (no UI or DB dependencies)
+core/         Kotlin Multiplatform engine: units, validation, 63 calculators (no UI or DB dependencies)
 composeApp/   Compose Multiplatform app, shared by both platforms
               commonMain/   shared UI, data layer, report model
               androidMain/  Android entry point, manifest, icons, SQLite driver

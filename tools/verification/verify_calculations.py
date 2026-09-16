@@ -46,6 +46,25 @@ def expectation(calc, scenario, raw):
                                   22.0, 30.0, 37.0, 45.0, 55.0, 75.0, 90.0] if r * 1000 >= sh * 1000), 90.0)
         return {"hydraulic": ph, "shaft": sh, "motor": motor}
 
+    if calc == "heat-dissipation":
+        cp = x("cp") if "cp" in raw else 1005.0
+        rho = x("rho") if "rho" in raw else 1.2
+        mdot = x("p") / (cp * x("dt"))
+        q = mdot / rho
+        out = {
+            "q": q * 3600.0,
+            "qCfm": q / 4.719474432e-4,
+            "qLs": q * 1000.0,
+            "mdot": mdot,
+        }
+        if "fancap" in raw:
+            cap = x("fancap")
+            out["fansNeeded"] = float(math.ceil(q / cap - 1e-9))
+            if "nfans" in raw:
+                out["fanTotal"] = x("nfans") * cap * 3600.0
+                out["fanMargin"] = (x("nfans") * cap / q - 1.0) * 100.0
+        return out
+
     if calc == "pipe-velocity":
         return {"v": 4.0 * x("q") / (math.pi * x("d") ** 2)}
 
