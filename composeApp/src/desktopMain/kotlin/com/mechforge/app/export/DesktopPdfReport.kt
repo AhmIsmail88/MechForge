@@ -30,6 +30,8 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
          */
         private const val DPI = 300
         private const val W = 2480   // A4 @300dpi
+    private const val DW = 1240   // drawing space (A4 @150dpi units) - the canvas is scaled up
+    private const val DH = 1754
         private const val H = 3508
         private const val SCALE = 2f
         private const val MARGIN = 90
@@ -61,7 +63,7 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
         return img to g
     }
 
-    private fun originX(width: Int): Int = if (rtl) W - MARGIN - width else MARGIN
+    private fun originX(width: Int): Int = if (rtl) DW - MARGIN - width else MARGIN
 
     fun write(out: File, title: String, meta: List<Pair<String, String>>, blocks: List<ReportBlock>): Boolean {
         var (img, g) = newPage()
@@ -73,7 +75,7 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
             g.color = MUTED
             val ts = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(Date())
             val t = "MechForge  -  $ts  -  page $pageNo"
-            g.drawString(t, originX(g.fontMetrics.stringWidth(t)), H - 40)
+            g.drawString(t, originX(g.fontMetrics.stringWidth(t)), DH - 40)
             g.color = INK
         }
 
@@ -89,12 +91,12 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
         }
 
         fun need(px: Int) {
-            if (y + px > H - MARGIN - 60) roll()
+            if (y + px > DH - MARGIN - 60) roll()
         }
 
         fun wrapped(text: String, size: Int, bold: Boolean = false): List<String> {
             g.font = font(size, bold)
-            val max = W - 2 * MARGIN
+            val max = DW - 2 * MARGIN
             val out = mutableListOf<String>()
             var line = StringBuilder()
             for (word in text.split(" ")) {
@@ -131,7 +133,7 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
             headerY += 34
         }
         y = headerY + 18
-        g.drawLine(MARGIN, y, W - MARGIN, y)
+        g.drawLine(MARGIN, y, DW - MARGIN, y)
         y += 30
         g.color = INK
 
@@ -161,7 +163,7 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
                     g.color = ACCENT
                     g.drawString(b.text, originX(g.fontMetrics.stringWidth(b.text)), y)
                     y += 8
-                    g.drawLine(MARGIN, y, W - MARGIN, y)
+                    g.drawLine(MARGIN, y, DW - MARGIN, y)
                     y += 24
                     g.color = INK
                 }
@@ -186,20 +188,21 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
                     g.font = font(17)
                     val label = b.cells.getOrNull(0) ?: ""
                     val value = b.cells.getOrNull(1) ?: ""
-                    val colW = ((W - 2 * MARGIN) * 0.62).toInt()
-                    val labelX = if (rtl) W - MARGIN - colW else MARGIN
+                    g.font = font(17, true)
+                    val colW = ((DW - 2 * MARGIN) * 0.62).toInt()
+                    val labelX = if (rtl) DW - MARGIN - colW else MARGIN
                     val valueX = if (rtl) MARGIN else MARGIN + colW + 10
                     g.drawString(label, labelX, y)
                     if (value.isNotEmpty()) g.drawString(value, valueX, y)
                     y += 22
                     g.color = Color(0xDF, 0xE4, 0xEA)
-                    g.drawLine(MARGIN, y - 17, W - MARGIN, y - 17)
+                    g.drawLine(MARGIN, y - 17, DW - MARGIN, y - 17)
                     g.color = INK
                 }
                 is ReportBlock.Divider -> {
                     need(20)
                     g.color = Color(0xDF, 0xE4, 0xEA)
-                    g.drawLine(MARGIN, y, W - MARGIN, y)
+                    g.drawLine(MARGIN, y, DW - MARGIN, y)
                     g.color = INK
                     y += 18
                 }
@@ -208,7 +211,7 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
                     val boxH = lines.size * 22 + 20
                     need(boxH + 12)
                     g.color = Color(0xFF, 0xF6, 0xE0)
-                    g.fillRect(MARGIN, y - 18, W - 2 * MARGIN, boxH)
+                    g.fillRect(MARGIN, y - 18, DW - 2 * MARGIN, boxH)
                     g.color = Color(0xD9, 0xA7, 0x2A)
                     g.fillRect(MARGIN, y - 18, 5, boxH)
                     g.color = MUTED

@@ -126,4 +126,39 @@ class PdfReportSmokeTest {
         assertTrue(!text.contains("/DCTDecode"), "sample still uses lossy JPEG pages")
         println("PDF_SAMPLE_OK bytes=${target.length()}")
     }
+
+    @Test
+    fun writesTheArabicSampleSheetForReview() {
+        System.setProperty("java.awt.headless", "true")
+        val calc = CalculatorRegistry.byIdOrThrow("pump-power")
+        val inputs = mapOf(
+            "q" to InputValue("q", Units.byId("m3h").toBase(100.0), "m3h"),
+            "h" to InputValue("h", Units.byId("m").toBase(50.0), "m"),
+            "eta" to InputValue("eta", Units.byId("pct").toBase(80.0), "pct"),
+            "rho" to InputValue("rho", Units.byId("kgm3").toBase(1000.0), "kgm3"),
+        )
+        val labels = ReportLabels.ARABIC
+        val blocks = ReportSheet.build(
+            calc, inputs, calc.run(inputs), "نقطة تشغيل الطلمبة - مثال", labels,
+            listOf(labels.preparedBy to "م. أحمد", labels.checkedBy to "أ. إسماعيل", labels.approvedBy to ""),
+        )
+        val dir = File("../dist").apply { mkdirs() }
+        val target = File(dir, "MechForge-sample-report-ar.pdf")
+        val ok = DesktopPdfReport(rtl = true).write(
+            target,
+            "قدرة الطلمبة الهيدروليكية وقدرة العمود",
+            listOf(
+                "المشروع" to "مشروع تجريبي",
+                "العميل" to "عميل مثال",
+                "المهندس" to "م. أحمد",
+                "التاريخ" to "2026-09-16",
+            ),
+            blocks,
+        )
+        assertTrue(ok, "Arabic sample renderer reported failure")
+        assertTrue(target.exists() && target.length() > 10_000, "Arabic sample missing")
+        val text = target.readText(Charsets.ISO_8859_1)
+        assertTrue(text.contains("/Width 2480"), "Arabic sample is not 300 dpi")
+        println("PDF_SAMPLE_AR_OK bytes=${target.length()}")
+    }
 }
