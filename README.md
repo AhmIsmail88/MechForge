@@ -78,6 +78,33 @@ standard 45 kg cylinder charge).
 Both renderers consume the same structured report model, so the two outputs can never
 drift apart.
 
+## Projects and document control
+
+A calculation is not a loose form: it belongs to a project, and the project - not the settings -
+owns the data a report prints.
+
+- **Project record.** Each project carries its identification (number, code, type, location,
+  country, client, consultant, contractor, end user), the engineering responsibility (prepared,
+  checked and approved by, discipline), the document control (document number, revision, revision
+  date, and a status of Draft, For Review, For Approval, Approved or As Built) and the design
+  basis (applicable codes, code edition, design conditions, notes).
+- **Active project.** The project a calculation is saved under. The project card marks it, the
+  calculator reports it without any re-typing, and an installation with a single project picks
+  the newest one automatically.
+- **Frozen snapshot.** Saving a calculation stores the project data that was in force at that
+  moment, so revising the project later cannot rewrite a calculation that was already issued:
+  opening an old calculation prints the data frozen with it.
+- **Calculation register.** Every project exports a register - number, calculator, revision,
+  status, prepared by, date - with a status summary, to PDF or Excel.
+- **Calculation package.** A cover with the project data, the register, then every calculation on
+  a clean page, delivered as one PDF.
+- **Report quality checks.** Before an export the app reports what is missing: no project, a
+  project record that is still blank, no revision, an empty document status, a sheet that is not
+  linked to a saved calculation, and how many values were assumed. The checks never block the
+  export - the engineer decides what is good enough to issue.
+- **Result versus approval.** A sheet states that the printed values are the calculation result,
+  while design approval is a separate document action recorded in the project register.
+
 ## Reference library
 
 Engineering data lives next to the calculator, not inside it:
