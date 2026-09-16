@@ -84,6 +84,24 @@ object LmtdCalculator : Calculator(Def) {
                     add("Smallest terminal difference is below 5 K — the required area becomes very sensitive to the assumed U and the flow rates.")
                 }
             },
+            stepsAr = buildList {
+                add("الترتيب: ${if (counter) "متعاكس" else "متوازي"}")
+                add("الفروق الطرفية: ΔT₁ = ${Fmt.n(dt1, 2)} K، ΔT₂ = ${Fmt.n(dt2, 2)} K")
+                add("LMTD = (ΔT₁ − ΔT₂)/ln(ΔT₁/ΔT₂) = (${Fmt.n(dt1, 2)} − ${Fmt.n(dt2, 2)})/ln(${Fmt.n(dt1, 2)}/${Fmt.n(dt2, 2)}) = ${Fmt.n(lmtd, 3)} K")
+                if (has(inputs, "u") && has(inputs, "a")) {
+                    val uAr = value(inputs, "u")
+                    val aAr = value(inputs, "a")
+                    add(
+                        "الحمل: Q = U·A·LMTD = ${Fmt.n(uAr, 1)} × ${Fmt.n(aAr, 4)} × ${Fmt.n(lmtd, 3)} = " +
+                            "${Fmt.n(uAr * aAr * lmtd / 1000.0, 3)} kW"
+                    )
+                }
+            },
+            warningsAr = buildList {
+                if (minOf(dt1, dt2) < 5.0) {
+                    add("أصغر فرق طرفي أقل من 5 K — المساحة المطلوبة تصبح شديدة الحساسية لمعامل U ومعدلات السريان.")
+                }
+            },
         )
     }
 }
