@@ -67,6 +67,25 @@ object FanPowerCalculator : Calculator(Def) {
                 },
             ),
             warnings = warnings,
+            stepsAr = listOf(
+                "القدرة الهوائية: P_air = Q·Δp = ${Fmt.n(q, 5)} × ${Fmt.n(dp, 1)} = ${Fmt.n(pAir, 2)} W",
+                "قدرة العمود: P_shaft = P_air/η_fan = ${Fmt.n(pAir, 2)} / ${Fmt.n(etaFan, 4)} = ${Fmt.n(pShaft, 2)} W = ${Fmt.n(pShaft / 1000.0, 3)} kW",
+                "قدرة المحرك: P_motor = P_shaft/η_drive = ${Fmt.n(pMotor / 1000.0, 3)} kW",
+                if (motorRating != null) {
+                    "قدرة المحرك القياسية المختارة IEC: ${Fmt.n(motorRating, 3)} kW (أقرب قدرة قياسية عند أو أعلى من قدرة المحرك)"
+                } else {
+                    "قدرة المحرك أعلى من أكبر قدرة قياسية في القائمة - راجع المُصنّع."
+                },
+            ),
+            warningsAr = buildList {
+                if (etaFan > 0.8) {
+                    add("كفاءة مروحة أعلى من 80 % تفاؤلية للمراوح الصغيرة؛ تحقق عند نقطة التشغيل على منحنى المروحة.")
+                }
+                add("قدرة المحرك هي أقرب قدرة قياسية IEC؛ راجع خفض القدرة حسب الحرارة والارتفاع وطريقة البدء وعزم المروحة قبل الشراء.")
+                if (motorRating == null) {
+                    add("قدرة المحرك تتجاوز أكبر قدرة قياسية في القائمة - راجع اختيار المحرك.")
+                }
+            },
         )
     }
 }

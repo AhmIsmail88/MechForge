@@ -66,6 +66,23 @@ object SensibleHeatCalculator : Calculator(Def) {
                 "Imperial check (standard air form): 1.08 × CFM × ΔT(°F) equivalent = ${Fmt.n(qsBtuh, 0)} BTU/h",
             ),
             warnings = warnings,
+            stepsAr = listOf(
+                "معدل الكتلة: ṁ = ρ·V̇ = ${Fmt.n(rho, 3)} × ${Fmt.n(q, 4)} = ${Fmt.n(massFlow, 4)} kg/s",
+                "ΔT = ${Fmt.n(tOut, 2)} − ${Fmt.n(tIn, 2)} = ${Fmt.n(deltaT, 2)} K",
+                "Q_s = ṁ·c_p·ΔT = ${Fmt.n(massFlow, 4)} × 1.005 × ${Fmt.n(deltaT, 2)} = ${Fmt.n(qsKw, 3)} kW",
+                "مراجعة إمبريالية (صيغة الهواء القياسية): 1.08 × CFM × ΔT(°F) = ${Fmt.n(qsBtuh, 0)} BTU/h",
+            ),
+            warningsAr = buildList {
+                if (abs(deltaT) < 1e-9) {
+                    add("حرارتا الإمداد والراجع متساويتان - الحمل صفر.")
+                }
+                if (deltaT > 0) {
+                    add("ΔT > 0 - هذا حمل تسخين (الهواء يكتسب حرارة).")
+                }
+                if (!has(inputs, "rho")) {
+                    add("لم تُدخل كثافة الهواء - افتُرضت 1.2 kg/m³ (هواء قياسي عند نحو 20 °C).")
+                }
+            },
         )
     }
 
