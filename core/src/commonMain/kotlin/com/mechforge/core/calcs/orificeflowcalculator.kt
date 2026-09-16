@@ -53,6 +53,16 @@ object OrificeFlowCalculator : Calculator(Def) {
                 "Discharge: Q = Cd·A·√(2gH) = ${Fmt.n(cd, 3)} × ${Fmt.n(area, 6)} × ${Fmt.n(velocity, 4)} = ${Fmt.n(q, 6)} m³/s = ${Fmt.n(q * 3600.0, 3)} m³/h",
             ),
             warnings = if (!has(inputs, "cd")) listOf("Cd not provided — assumed 0.62 (sharp-edged orifice).") else emptyList(),
+            stepsAr = listOf(
+                "مساحة الفتحة: A = π·d²/4 = π × ${Fmt.n(d, 4)}² / 4 = ${Fmt.n(area, 6)} m²",
+                "السرعة النظرية: √(2gH) = √(2 × 9.80665 × ${Fmt.n(h, 3)}) = ${Fmt.n(velocity, 4)} m/s",
+                "التصرف: Q = Cd·A·√(2gH) = ${Fmt.n(cd, 3)} × ${Fmt.n(area, 6)} × ${Fmt.n(velocity, 4)} = ${Fmt.n(q, 6)} m³/s = ${Fmt.n(q * 3600.0, 3)} m³/h",
+            ),
+            warningsAr = if (!has(inputs, "cd")) {
+                listOf("لم يُدخل معامل التصرف - افتُرض 0.62 (فتحة حادة الحواف).")
+            } else {
+                emptyList()
+            },
         )
     }
 }
