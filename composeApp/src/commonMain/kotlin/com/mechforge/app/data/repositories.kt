@@ -47,6 +47,15 @@ class HistoryRepository(private val db: MechForgeDatabase) {
         )
     }
 
+    /** Every calculation saved under one project, newest first (the project register). */
+    fun byProject(projectId: Long): List<Calculation_history> =
+        db.historyQueries.selectHistoryByProject(projectId).executeAsList()
+
+    /** How many calculations of a project stand at each document status. */
+    fun countsByStatus(projectId: Long): List<Pair<String, Long>> =
+        db.historyQueries.countHistoryByStatus(projectId).executeAsList()
+            .map { (it.status ?: "") to it.total }
+
     fun byId(id: Long): Calculation_history? =
         db.historyQueries.getHistoryById(id).executeAsOneOrNull()
 

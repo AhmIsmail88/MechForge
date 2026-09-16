@@ -23,6 +23,13 @@ INSERT INTO calculation_history(calculator_id, title, timestamp, inputs_json, re
                                 project_id, project_snapshot, calculation_number, revision, status)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
+selectHistoryByProject:
+SELECT * FROM calculation_history WHERE project_id = ? ORDER BY timestamp DESC;
+
+countHistoryByStatus:
+SELECT status, COUNT(*) AS total FROM calculation_history
+WHERE project_id = ? GROUP BY status ORDER BY total DESC;
+
 countHistoryByProject:
 SELECT COUNT(*) FROM calculation_history WHERE project_id = ?;
 

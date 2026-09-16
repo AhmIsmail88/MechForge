@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
@@ -34,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +43,11 @@ import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.data.ProjectInfo
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.export.ProjectRegister
+import com.mechforge.app.export.ReportLabels
 import com.mechforge.app.ui.theme.glassBorder
+import com.mechforge.core.engine.CalculatorRegistry
+import kotlinx.coroutines.launch
 
 /**
  * The project area: a list of projects, and the engineering record of each one.
@@ -56,6 +62,8 @@ fun ProjectsScreen(deps: AppDependencies) {
     val strings = LocalStrings.current
     val projects by deps.projects.all().collectAsState(initial = emptyList())
     val activeId by deps.projects.activeProjectIdFlow().collectAsState(initial = null)
+    val scope = rememberCoroutineScope()
+    var lastExport by remember { mutableStateOf("") }
     var showCreate by remember { mutableStateOf(false) }
     var createName by remember { mutableStateOf("") }
     var renameTarget by remember { mutableStateOf<Long?>(null) }
@@ -81,6 +89,9 @@ fun ProjectsScreen(deps: AppDependencies) {
             Text(strings.projectsEmptyHint, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
+        if (lastExport.isNotBlank()) {
+            Text(lastExport, style = MaterialTheme.typography.bodySmall)
+        }
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(projects, key = { it.id }) { project ->
                 val info = deps.projects.info(project.id)
@@ -111,6 +122,18 @@ fun ProjectsScreen(deps: AppDependencies) {
                                 info?.revision?.takeIf { it.isNotBlank() }?.let { "Rev. $it" },
                                 info?.status?.takeIf { it.isNotBlank() },
                             ).joinToString("  -  ")
+                            val statusSummary = deps.history.countsByStatus(project.id)
+                                .filter { it.second > 0L }
+                                .joinToString("  -  ") { (status, count) ->
+                                    "${status.ifBlank { "-" }} $count"
+                                }
+                            if (statusSummary.isNotBlank()) {
+                                Text(
+                                    statusSummary,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                             if (details.isNotBlank()) {
                                 Text(
                                     details,
@@ -128,6 +151,41 @@ fun ProjectsScreen(deps: AppDependencies) {
                             infoTarget = project.id
                             infoDraft = info
                         }) { Icon(Icons.Filled.Info, strings.projectInfoTitle) }
+                        IconButton(onClick = {
+                            scope.launch {
+                                val info = deps.projects.info(project.id) ?: return@launch
+                                val rtl = deps.settings.reportIsArabic()
+                                val labels = ReportLabels.of(rtl)
+                                val today = java.time.LocalDate.now().toString()
+                                val entries = deps.history.byProject(project.id).map { row ->
+                                    val name = runCatching {
+                                        CalculatorRegistry.byIdOrThrow(row.calculator_id).def.name
+                                    }.getOrElse { row.title }
+                                    ProjectRegister.Entry(
+                                        calculationNumber = row.calculation_number
+                                            ?: row.id.toString().padStart(3, '0'),
+                                        calculatorName = name,
+                                        revision = row.revision.orEmpty(),
+                                        status = row.status.orEmpty(),
+                                        preparedBy = info.preparedBy,
+                                        date = java.time.Instant.ofEpochMilli(row.timestamp)
+                                            .atOffset(java.time.ZoneOffset.UTC)
+                                            .toLocalDate()
+                                            .toString(),
+                                    )
+                                }
+                                val blocks = ProjectRegister.build(info, entries, labels, today)
+                                val path = deps.exporter.savePdf(
+                                    defaultName = "register_" + (info.projectNumber.ifBlank { project.name }),
+                                    title = labels.registerTitle,
+                                    meta = emptyList(),
+                                    blocks = blocks,
+                                    logo = deps.logoStore.load(),
+                                    rtl = rtl,
+                                )
+                                lastExport = if (path != null) path else ""
+                            }
+                        }) { Icon(Icons.Filled.List, strings.projectsRegister) }
                         IconButton(onClick = {
                             renameTarget = project.id
                             renameText = project.name

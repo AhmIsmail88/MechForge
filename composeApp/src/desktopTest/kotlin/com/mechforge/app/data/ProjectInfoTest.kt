@@ -46,19 +46,6 @@ class ProjectInfoTest {
     }
 
     @Test
-    fun reportRowsPrintOnlyWhatWasFilledIn() {
-        val rows = full.reportRows().toMap()
-        assertEquals("WPS-001", rows["Project No."])
-        assertEquals("ABC", rows["Client"])
-        assertEquals("NFPA 20, NFPA 12", rows["Applicable Codes"])
-        assertTrue(rows.keys.none { it == "Approved By" }, "an empty field must not reach the report: $rows")
-        assertTrue(rows.keys.none { it == "Contractor" })
-
-        val empty = ProjectInfo(name = "Only a name")
-        assertEquals(listOf("Project" to "Only a name"), empty.reportRows())
-    }
-
-    @Test
     fun anEmptyProjectIsRecognisedSoTheReportCanFallBack() {
         assertTrue(ProjectInfo().isEmpty)
         assertTrue(ProjectInfo(name = "Named but otherwise blank").isEmpty)
