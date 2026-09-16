@@ -2,7 +2,30 @@ CREATE TABLE projects (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
-  created_at INTEGER NOT NULL
+  created_at INTEGER NOT NULL,
+  -- project-centric record (engineering audit sections 4, 5, 11): the project, not Settings,
+  -- owns the engineering and document-control data that a calculation report prints.
+  project_number TEXT,
+  project_code TEXT,
+  project_type TEXT,
+  location TEXT,
+  country TEXT,
+  client TEXT,
+  consultant TEXT,
+  contractor TEXT,
+  end_user TEXT,
+  prepared_by TEXT,
+  checked_by TEXT,
+  approved_by TEXT,
+  discipline TEXT,
+  revision TEXT,
+  revision_date INTEGER,
+  status TEXT,
+  document_number TEXT,
+  codes TEXT,
+  code_edition TEXT,
+  design_conditions TEXT,
+  notes TEXT
 );
 
 insertProject:
@@ -11,9 +34,39 @@ INSERT INTO projects(name, description, created_at) VALUES (?, ?, ?);
 updateProjectName:
 UPDATE projects SET name = ? WHERE id = ?;
 
+updateProjectInfo:
+UPDATE projects SET
+  name = ?,
+  description = ?,
+  project_number = ?,
+  project_code = ?,
+  project_type = ?,
+  location = ?,
+  country = ?,
+  client = ?,
+  consultant = ?,
+  contractor = ?,
+  end_user = ?,
+  prepared_by = ?,
+  checked_by = ?,
+  approved_by = ?,
+  discipline = ?,
+  revision = ?,
+  revision_date = ?,
+  status = ?,
+  document_number = ?,
+  codes = ?,
+  code_edition = ?,
+  design_conditions = ?,
+  notes = ?
+WHERE id = ?;
+
 deleteProject:
 DELETE FROM projects WHERE id = ?;
 
 selectAllProjects:
 SELECT projects.*, (SELECT COUNT(*) FROM saved_calculations WHERE saved_calculations.project_id = projects.id) AS saved_count
 FROM projects ORDER BY created_at DESC;
+
+selectProjectById:
+SELECT * FROM projects WHERE id = ?;

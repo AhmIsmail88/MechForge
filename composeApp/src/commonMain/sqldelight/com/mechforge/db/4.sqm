@@ -1,0 +1,35 @@
+-- Migration v4 -> v5: project-centric calculation records (engineering audit sections 4, 5, 11).
+--
+-- The project carries the identification, the engineering responsibility, the document control
+-- and the design basis; a saved calculation stores a SNAPSHOT of that data so a later project
+-- revision never rewrites an issued calculation. Data-preserving: existing rows keep their
+-- name/description and every new column is nullable.
+
+ALTER TABLE projects ADD COLUMN project_number TEXT;
+ALTER TABLE projects ADD COLUMN project_code TEXT;
+ALTER TABLE projects ADD COLUMN project_type TEXT;
+ALTER TABLE projects ADD COLUMN location TEXT;
+ALTER TABLE projects ADD COLUMN country TEXT;
+ALTER TABLE projects ADD COLUMN client TEXT;
+ALTER TABLE projects ADD COLUMN consultant TEXT;
+ALTER TABLE projects ADD COLUMN contractor TEXT;
+ALTER TABLE projects ADD COLUMN end_user TEXT;
+ALTER TABLE projects ADD COLUMN prepared_by TEXT;
+ALTER TABLE projects ADD COLUMN checked_by TEXT;
+ALTER TABLE projects ADD COLUMN approved_by TEXT;
+ALTER TABLE projects ADD COLUMN discipline TEXT;
+ALTER TABLE projects ADD COLUMN revision TEXT;
+ALTER TABLE projects ADD COLUMN revision_date INTEGER;
+ALTER TABLE projects ADD COLUMN status TEXT;
+ALTER TABLE projects ADD COLUMN document_number TEXT;
+ALTER TABLE projects ADD COLUMN codes TEXT;
+ALTER TABLE projects ADD COLUMN code_edition TEXT;
+ALTER TABLE projects ADD COLUMN design_conditions TEXT;
+ALTER TABLE projects ADD COLUMN notes TEXT;
+
+ALTER TABLE saved_calculations ADD COLUMN project_snapshot TEXT;
+ALTER TABLE saved_calculations ADD COLUMN calculation_number TEXT;
+ALTER TABLE saved_calculations ADD COLUMN revision TEXT;
+ALTER TABLE saved_calculations ADD COLUMN status TEXT;
+ALTER TABLE saved_calculations ADD COLUMN steps_json TEXT;
+ALTER TABLE saved_calculations ADD COLUMN warnings_json TEXT;

@@ -5,10 +5,23 @@ CREATE TABLE saved_calculations (
   timestamp INTEGER NOT NULL,
   inputs_json TEXT NOT NULL,
   results_json TEXT NOT NULL,
-  project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL
+  project_id INTEGER REFERENCES projects(id) ON DELETE SET NULL,
+  -- frozen copy of the project data used at save time, so a later project revision cannot
+  -- silently rewrite an issued calculation (engineering audit section 5.1)
+  project_snapshot TEXT,
+  calculation_number TEXT,
+  revision TEXT,
+  status TEXT,
+  steps_json TEXT,
+  warnings_json TEXT
 );
 
 insertSaved:
+INSERT INTO saved_calculations(calculator_id, name, timestamp, inputs_json, results_json, project_id,
+                               project_snapshot, calculation_number, revision, status, steps_json, warnings_json)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+insertSavedLegacy:
 INSERT INTO saved_calculations(calculator_id, name, timestamp, inputs_json, results_json, project_id)
 VALUES (?, ?, ?, ?, ?, ?);
 
