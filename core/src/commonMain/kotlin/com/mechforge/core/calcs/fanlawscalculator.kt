@@ -66,6 +66,24 @@ object FanLawsCalculator : Calculator(Def) {
                 if (r < 0.5 || r > 1.5) add("Speed ratio far from 1: the fan laws assume the same system curve and no damper change - verify on the fan curve.")
                 if (p2 > p1 / 1000.0 * 1.5) add("Power rises steeply with speed (N^3) - check the motor rating at the new duty.")
             },
+            stepsAr = listOf(
+                "نسبة السرعة: N2/N1 = ${Fmt.n(n2, 1)} / ${Fmt.n(n1, 1)} = ${Fmt.n(r, 4)}",
+                "نسبة الكثافة: rho2/rho1 = ${Fmt.n(rho2, 4)} / ${Fmt.n(rho1, 4)} = ${Fmt.n(densityRatio, 4)}",
+                "التدفق: Q2 = Q1 × r = ${Fmt.n(q1 * r * 3600.0, 1)} m3/h (الكثافة لا تؤثر على التدفق)",
+                "الضغط: dP2 = dP1 × r^2 × (rho2/rho1) = ${Fmt.n(dp1, 1)} × ${Fmt.n(r * r, 4)} × ${Fmt.n(densityRatio, 4)} = ${Fmt.n(dp2, 1)} Pa",
+                "القدرة: P2 = P1 × r^3 × (rho2/rho1) = ${Fmt.n(p1 / 1000.0, 3)} × ${Fmt.n(r * r * r, 4)} × ${Fmt.n(densityRatio, 4)} = ${Fmt.n(p2, 3)} kW",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "rho1") || !has(inputs, "rho2")) {
+                    add("لم تُدخل الكثافات - افتُرضت 1.2 kg/m3 للاثنين (بدون تصحيح للكثافة).")
+                }
+                if (r < 0.5 || r > 1.5) {
+                    add("نسبة السرعة بعيدة عن 1: قوانين المراوح تفترض نفس منحنى النظام وبدون تغيير في المخمدات - تحقق على منحنى المروحة.")
+                }
+                if (p2 > p1 / 1000.0 * 1.5) {
+                    add("القدرة ترتفع بحدّة مع السرعة (N^3) - راجع قدرة المحرك عند نقطة التشغيل الجديدة.")
+                }
+            },
         )
     }
 }
