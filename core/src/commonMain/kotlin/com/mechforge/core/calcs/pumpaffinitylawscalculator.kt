@@ -51,6 +51,12 @@ object PumpAffinityLawsCalculator : Calculator(Def) {
             "Head: H2 = H1 x r^2 = ${Fmt.n(h1, 3)} x ${Fmt.n(r * r, 4)} = ${Fmt.n(h1 * r * r, 3)} m",
             "Power: P2 = P1 x r^3 = ${Fmt.n(p1 / 1000.0, 3)} x ${Fmt.n(r * r * r, 4)} = ${Fmt.n(p1 / 1000.0 * r * r * r, 3)} kW",
         )
+        val stepsAr = mutableListOf(
+            "نسبة السرعة: N2/N1 = ${Fmt.n(n2, 1)} / ${Fmt.n(n1, 1)} = ${Fmt.n(r, 4)}",
+            "التدفق: Q2 = Q1 × r = ${Fmt.n(q1 * 3600.0, 2)} × ${Fmt.n(r, 4)} = ${Fmt.n(q1 * r * 3600.0, 2)} m3/h",
+            "الرفع: H2 = H1 × r^2 = ${Fmt.n(h1, 3)} × ${Fmt.n(r * r, 4)} = ${Fmt.n(h1 * r * r, 3)} m",
+            "القدرة: P2 = P1 × r^3 = ${Fmt.n(p1 / 1000.0, 3)} × ${Fmt.n(r * r * r, 4)} = ${Fmt.n(p1 / 1000.0 * r * r * r, 3)} kW",
+        )
 
         if (has(inputs, "d1") && has(inputs, "d2")) {
             val d1 = value(inputs, "d1")
@@ -61,6 +67,8 @@ object PumpAffinityLawsCalculator : Calculator(Def) {
             results += result("p2t", "Power at D2 (trim)", p1 / 1000.0 * rd * rd * rd, "kw")
             steps += "Trim ratio: D2/D1 = ${Fmt.n(rd, 4)}"
             steps += "Trim case: Q = ${Fmt.n(q1 * rd * 3600.0, 2)} m3/h, H = ${Fmt.n(h1 * rd * rd, 3)} m, P = ${Fmt.n(p1 / 1000.0 * rd * rd * rd, 3)} kW"
+            stepsAr += "نسبة التقليم: D2/D1 = ${Fmt.n(rd, 4)}"
+            stepsAr += "حالة التقليم: Q = ${Fmt.n(q1 * rd * 3600.0, 2)} m3/h، H = ${Fmt.n(h1 * rd * rd, 3)} m، P = ${Fmt.n(p1 / 1000.0 * rd * rd * rd, 3)} kW"
         }
 
         return CalcOutput(
@@ -72,6 +80,21 @@ object PumpAffinityLawsCalculator : Calculator(Def) {
                 if (has(inputs, "d1") && has(inputs, "d2")) {
                     val rd = value(inputs, "d2") / value(inputs, "d1")
                     if (rd < 0.85 || rd > 1.05) add("Trim beyond about 15%: affinity laws are approximate - use the manufacturer's trimmed curve.")
+                }
+            },
+            stepsAr = stepsAr,
+            warningsAr = buildList {
+                if (r <= 0.0) {
+                    add("نسبة السرعة ليست موجبة - راجع السرعات المُدخلة.")
+                }
+                if (r < 0.5 || r > 2.0) {
+                    add("نسبة السرعة خارج المدى 0.5-2.0: قوانين التشابه تصبح غير موثوقة وقد تكون المضخة غير مستقرة.")
+                }
+                if (has(inputs, "d1") && has(inputs, "d2")) {
+                    val rdAr = value(inputs, "d2") / value(inputs, "d1")
+                    if (rdAr < 0.85 || rdAr > 1.05) {
+                        add("التقليم يتجاوز نحو 15%: قوانين التشابه تقريبية - استخدم منحنى التقليم من المصنّع.")
+                    }
                 }
             },
         )
