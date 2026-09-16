@@ -160,6 +160,10 @@ class AndroidPdfReport(private val logoBytes: ByteArray? = null, private val rtl
 
         for (b in blocks) {
             when (b) {
+                is ReportBlock.PageBreak -> {
+                    // a height taller than any page takes the writer's existing page break path
+                    ensure(PAGE_H.toFloat())
+                }
                 is ReportBlock.Heading -> {
                     ensure(26f)
                     draw(b.text, headingPaint, gap = 4f)

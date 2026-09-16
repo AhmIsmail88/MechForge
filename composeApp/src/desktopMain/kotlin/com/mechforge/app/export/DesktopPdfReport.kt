@@ -206,6 +206,9 @@ class DesktopPdfReport(private val logoBytes: ByteArray? = null, private val rtl
                     g.color = INK
                     y += 18
                 }
+                is ReportBlock.PageBreak -> {
+                    if (y > MARGIN + 40) roll()
+                }
                 is ReportBlock.Warning -> {
                     val lines = wrapped(b.text, 16)
                     val boxH = lines.size * 22 + 20

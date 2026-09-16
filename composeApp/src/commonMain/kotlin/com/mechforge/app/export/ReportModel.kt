@@ -11,5 +11,11 @@ sealed interface ReportBlock {
     data class KeyValue(val label: String, val value: String) : ReportBlock
     data class TableRow(val cells: List<String>) : ReportBlock
     data object Divider : ReportBlock
+
+    /**
+     * Starts a new page in the paginated renderers, so a calculation package can begin every
+     * calculation on a clean page. A spreadsheet has no pages, so there it renders a separator.
+     */
+    data object PageBreak : ReportBlock
     data class Warning(val text: String) : ReportBlock
 }

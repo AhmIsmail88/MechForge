@@ -31,6 +31,12 @@ object Snapshots {
         }
     }
 
+    /** Replays a saved result set, or null when the record predates the current model. */
+    fun decodeResults(jsonText: String): com.mechforge.core.engine.CalcOutput? =
+        runCatching {
+            json.decodeFromString(com.mechforge.core.engine.CalcOutput.serializer(), jsonText)
+        }.getOrNull()
+
     fun encodeResults(output: com.mechforge.core.engine.CalcOutput): String =
         json.encodeToString(
             com.mechforge.core.engine.CalcOutput.serializer(),

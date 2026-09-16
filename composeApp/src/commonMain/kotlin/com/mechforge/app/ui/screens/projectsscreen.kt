@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
@@ -43,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.data.ProjectInfo
 import com.mechforge.app.ui.i18n.LocalStrings
+import com.mechforge.app.data.Snapshots
+import com.mechforge.app.export.ProjectPackage
 import com.mechforge.app.export.ProjectRegister
 import com.mechforge.app.export.ReportLabels
 import com.mechforge.app.ui.theme.glassBorder
@@ -151,6 +154,48 @@ fun ProjectsScreen(deps: AppDependencies) {
                             infoTarget = project.id
                             infoDraft = info
                         }) { Icon(Icons.Filled.Info, strings.projectInfoTitle) }
+                        IconButton(onClick = {
+                            scope.launch {
+                                val record = deps.projects.info(project.id) ?: return@launch
+                                val rtl = deps.settings.reportIsArabic()
+                                val labels = ReportLabels.of(rtl)
+                                val today = java.time.LocalDate.now().toString()
+                                val records = deps.history.byProject(project.id).map { row ->
+                                    ProjectPackage.Record(
+                                        calculationNumber = row.calculation_number
+                                            ?: row.id.toString().padStart(3, '0'),
+                                        calculatorId = row.calculator_id,
+                                        title = row.title,
+                                        revision = row.revision.orEmpty(),
+                                        status = row.status.orEmpty(),
+                                        timestamp = row.timestamp,
+                                        inputsJson = row.inputs_json,
+                                        resultsJson = row.results_json,
+                                    )
+                                }
+                                val blocks = ProjectPackage.build(
+                                    project = record,
+                                    records = records,
+                                    labels = labels,
+                                    date = today,
+                                    signature = listOf(
+                                        labels.preparedBy to record.preparedBy,
+                                        labels.checkedBy to record.checkedBy,
+                                    ),
+                                    decodeInputs = { Snapshots.decodeInputs(it) },
+                                    decodeOutput = { Snapshots.decodeResults(it) },
+                                )
+                                val path = deps.exporter.savePdf(
+                                    defaultName = "package_" + (record.projectNumber.ifBlank { project.name }),
+                                    title = labels.packageTitle,
+                                    meta = emptyList(),
+                                    blocks = blocks,
+                                    logo = deps.logoStore.load(),
+                                    rtl = rtl,
+                                )
+                                lastExport = path ?: ""
+                            }
+                        }) { Icon(Icons.Filled.Share, strings.projectsPackage) }
                         IconButton(onClick = {
                             scope.launch {
                                 val info = deps.projects.info(project.id) ?: return@launch

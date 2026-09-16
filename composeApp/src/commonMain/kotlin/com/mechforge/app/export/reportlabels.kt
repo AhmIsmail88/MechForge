@@ -32,6 +32,10 @@ data class ReportLabels(
     val registerCalculator: String,
     val registerPreparedBy: String,
     val registerEmpty: String,
+    /** Heading of the project calculation package. */
+    val packageTitle: String,
+    /** Printed when a saved calculation can no longer be replayed. */
+    val packageRecordUnavailable: String,
     val inputs: String,
     val formula: String,
     val calculationSteps: String,
@@ -71,6 +75,8 @@ data class ReportLabels(
             registerCalculator = "Calculator",
             registerPreparedBy = "Prepared by",
             registerEmpty = "No calculations saved under this project yet.",
+            packageTitle = "Project calculation package",
+            packageRecordUnavailable = "This saved calculation could not be replayed; open it from the history to see its inputs.",
             inputs = "Inputs",
             formula = "Formula",
             calculationSteps = "Calculation steps",
@@ -110,6 +116,8 @@ data class ReportLabels(
             registerCalculator = "الحاسبة",
             registerPreparedBy = "إعداد",
             registerEmpty = "لا توجد حسابات محفوظة لهذا المشروع بعد.",
+            packageTitle = "حزمة حسابات المشروع",
+            packageRecordUnavailable = "تعذّر إعادة تشغيل هذا الحساب المحفوظ؛ افتحه من السجل لعرض مدخلاته.",
             inputs = "المدخلات",
             formula = "المعادلة",
             calculationSteps = "خطوات الحل",

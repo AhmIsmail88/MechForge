@@ -65,6 +65,8 @@ internal object XlsxReport {
                 is ReportBlock.Paragraph -> rows.add(listOf(Cell(block.text, Style.PARAGRAPH), Cell("", Style.PARAGRAPH)))
                 is ReportBlock.Warning -> rows.add(listOf(Cell(block.text, Style.WARNING), Cell("", Style.WARNING)))
                 ReportBlock.Divider -> rows.add(emptyList())
+                // a spreadsheet has no pages: the page break becomes a separator row
+                ReportBlock.PageBreak -> rows.add(emptyList())
             }
         }
 
