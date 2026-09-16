@@ -52,6 +52,19 @@ object ThermalExpansionCalculator : Calculator(Def) {
                     add("Total expansion exceeds 25 mm — expansion loops, anchors or expansion joints are likely required. Check the applicable design basis.")
                 }
             },
+            stepsAr = listOf(
+                "α = ${Fmt.n(alpha / 1e-6, 1)} µm/(m·K) = ${Fmt.n(alpha, 8)} 1/K",
+                "ΔL = α·L·ΔT = ${Fmt.n(alpha, 8)} × ${Fmt.n(l, 2)} m × ${Fmt.n(dt, 1)} K = ${Fmt.n(dl * 1000.0, 2)} mm",
+                "لكل متر من الماسورة: ${Fmt.n(expansionPerMetre * 1000.0, 3)} mm/m",
+            ),
+            warningsAr = buildList {
+                if (!has(inputs, "alpha")) {
+                    add("لم يُدخل معامل التمدد - افتُرض 12 µm/(m·K) (صلب كربوني).")
+                }
+                if (dl > 0.025) {
+                    add("التمدد الكلي يتجاوز 25 mm - غالبًا ستلزم حلقات تمدد أو مثبتات أو وصلات تمدد. راجع أساس التصميم المطبق.")
+                }
+            },
         )
     }
 }
