@@ -73,29 +73,25 @@ object DuctVelocityCalculator : Calculator(Def) {
                 } else {
                     "Rectangular duct area: A = W*H = ${Fmt.n(value(inputs, "w"), 4)} x ${Fmt.n(value(inputs, "h"), 4)} = ${Fmt.n(area, 5)} m2"
                 },
-                if (hasRound) {
-                    "Round duct area: A = PI*D^2/4 = PI x ${Fmt.n(value(inputs, "d"), 4)}^2 / 4 = ${Fmt.n(area, 5)} m2"
-                } else {
-                    "Rectangular duct area: A = W*H = ${Fmt.n(value(inputs, "w"), 4)} x ${Fmt.n(value(inputs, "h"), 4)} = ${Fmt.n(area, 5)} m2"
-                },
-                if (hasRound) {
-                    "Round duct area: A = PI*D^2/4 = PI x ${Fmt.n(value(inputs, "d"), 4)}^2 / 4 = ${Fmt.n(area, 5)} m2"
-                } else {
-                    "Rectangular duct area: A = W*H = ${Fmt.n(value(inputs, "w"), 4)} x ${Fmt.n(value(inputs, "h"), 4)} = ${Fmt.n(area, 5)} m2"
-                },
-                if (hasRound) {
-                    "Round duct area: A = PI*D^2/4 = PI x ${Fmt.n(value(inputs, "d"), 4)}^2 / 4 = ${Fmt.n(area, 5)} m2"
-                } else {
-                    "Rectangular duct area: A = W*H = ${Fmt.n(value(inputs, "w"), 4)} x ${Fmt.n(value(inputs, "h"), 4)} = ${Fmt.n(area, 5)} m2"
-                },
-                if (hasRound) {
-                    "Round duct area: A = PI*D^2/4 = PI x ${Fmt.n(value(inputs, "d"), 4)}^2 / 4 = ${Fmt.n(area, 5)} m2"
-                } else {
-                    "Rectangular duct area: A = W*H = ${Fmt.n(value(inputs, "w"), 4)} x ${Fmt.n(value(inputs, "h"), 4)} = ${Fmt.n(area, 5)} m2"
-                },
                 "Velocity: v = Q/A = ${Fmt.n(q, 5)} / ${Fmt.n(area, 5)} = ${Fmt.n(v, 3)} m/s (${Fmt.n(v / 0.00508, 0)} ft/min)",
             ),
             warnings = warnings,
+            stepsAr = listOf(
+                if (hasRound) {
+                    "مساحة الدكت الدائري: A = π·D²/4 = π × ${Fmt.n(value(inputs, "d"), 4)}² / 4 = ${Fmt.n(area, 5)} m2"
+                } else {
+                    "مساحة الدكت المستطيل: A = W×H = ${Fmt.n(value(inputs, "w"), 4)} × ${Fmt.n(value(inputs, "h"), 4)} = ${Fmt.n(area, 5)} m2"
+                },
+                "السرعة: v = Q/A = ${Fmt.n(q, 5)} / ${Fmt.n(area, 5)} = ${Fmt.n(v, 3)} m/s (${Fmt.n(v / 0.00508, 0)} ft/min)",
+            ),
+            warningsAr = buildList {
+                if (v > 8.0) {
+                    add("سرعة أعلى من 8 m/s - الضوضاء وفقد الضغط مرتفعان في الفراغات المأهولة.")
+                }
+                if (v < 2.0) {
+                    add("سرعة أقل من 2 m/s - الدكت أكبر من اللازم لمسار رئيسي؛ راجع قيود المساحة مقابل التكلفة.")
+                }
+            },
         )
     }
 }

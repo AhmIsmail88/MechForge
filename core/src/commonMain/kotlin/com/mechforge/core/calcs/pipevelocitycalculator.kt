@@ -49,6 +49,18 @@ object PipeVelocityCalculator : Calculator(Def) {
                 "Velocity: v = Q / A = ${Fmt.n(q, 6)} / ${Fmt.n(PI * d * d / 4.0, 6)} = ${Fmt.n(v, 3)} m/s",
             ),
             warnings = warnings,
+            stepsAr = listOf(
+                "المساحة: A = π·D²/4 = π × ${Fmt.n(d, 4)}² / 4 = ${Fmt.n(PI * d * d / 4.0, 6)} m²",
+                "السرعة: v = Q / A = ${Fmt.n(q, 6)} / ${Fmt.n(PI * d * d / 4.0, 6)} = ${Fmt.n(v, 3)} m/s",
+            ),
+            warningsAr = buildList {
+                if (v > 3.0) {
+                    add("سرعة أعلى من 3 m/s - راجع التآكل والضوضاء وفقد الضغط في أنظمة المياه.")
+                }
+                if (v < 0.3) {
+                    add("سرعة أقل من 0.3 m/s - خطر ترسيب في خطوط المياه.")
+                }
+            },
         )
     }
 

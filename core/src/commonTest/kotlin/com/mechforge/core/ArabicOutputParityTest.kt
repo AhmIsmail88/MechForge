@@ -67,11 +67,13 @@ class ArabicOutputParityTest {
     fun aCalculatorWithoutArabicTextIsUntouched() {
         // the majority of calculators have no Arabic steps yet: their output must stay exactly as it
         // was, which is what makes the feature additive
-        val calculator = CalculatorRegistry.byIdOrThrow("pipe-velocity")
+        // a calculator that has not been translated yet
+        val calculator = CalculatorRegistry.byIdOrThrow("reynolds-number")
         val out = calculator.run(
             mapOf(
-                "q" to InputValue("q", 0.05, "m3s"),
+                "v" to InputValue("v", 2.0, "ms"),
                 "d" to InputValue("d", 0.1, "m"),
+                "nu" to InputValue("nu", 1e-6, "m2s"),
             )
         )
         assertTrue(out.steps.isNotEmpty())
