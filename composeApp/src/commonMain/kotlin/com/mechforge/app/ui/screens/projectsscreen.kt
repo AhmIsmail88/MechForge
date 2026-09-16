@@ -304,6 +304,12 @@ fun ProjectsScreen(deps: AppDependencies) {
                     ProjectField(strings.fieldProjectStatus, draft.status) { infoDraft = draft.copy(status = it) }
                     ProjectField(strings.fieldProjectPreparedBy, draft.preparedBy) { infoDraft = draft.copy(preparedBy = it) }
                     ProjectField(strings.fieldProjectCheckedBy, draft.checkedBy) { infoDraft = draft.copy(checkedBy = it) }
+                    ProjectField(strings.fieldProjectDepartment, draft.department) { infoDraft = draft.copy(department = it) }
+                    ProjectField(strings.fieldProjectPackage, draft.calculationPackage) { infoDraft = draft.copy(calculationPackage = it) }
+                    ProjectField(strings.fieldProjectDrawingRef, draft.drawingReference) { infoDraft = draft.copy(drawingReference = it) }
+                    ProjectField(strings.fieldProjectSpecRef, draft.specificationReference) { infoDraft = draft.copy(specificationReference = it) }
+                    ProjectField(strings.fieldProjectSpecification, draft.projectSpecification) { infoDraft = draft.copy(projectSpecification = it) }
+                    ProjectField(strings.fieldProjectDesignStandard, draft.designStandard) { infoDraft = draft.copy(designStandard = it) }
                     ProjectField(strings.fieldProjectCodes, draft.codes) { infoDraft = draft.copy(codes = it) }
                     ProjectField(strings.fieldProjectCodeEdition, draft.codeEdition) { infoDraft = draft.copy(codeEdition = it) }
                 }

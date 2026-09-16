@@ -29,6 +29,10 @@ data class ProjectInfo(
     val checkedBy: String = "",
     val approvedBy: String = "",
     val discipline: String = "",
+    val department: String = "",
+    val calculationPackage: String = "",
+    val drawingReference: String = "",
+    val specificationReference: String = "",
     val revision: String = "",
     val revisionDate: Long? = null,
     val status: String = "",
@@ -36,12 +40,16 @@ data class ProjectInfo(
     val codes: String = "",
     val codeEdition: String = "",
     val designConditions: String = "",
+    val projectSpecification: String = "",
+    val designStandard: String = "",
     val notes: String = "",
 ) {
     /** True when nothing but the project name is known, so the report can fall back to Settings. */
     val isEmpty: Boolean
         get() = listOf(
-            description, projectNumber, projectCode, projectType, location, country, client, consultant,
+            description, projectNumber, projectCode,
+            department, calculationPackage, drawingReference, specificationReference,
+            projectSpecification, designStandard, projectType, location, country, client, consultant,
             contractor, endUser, preparedBy, checkedBy, approvedBy, discipline, revision,
             documentNumber, codes, codeEdition, designConditions, notes,
         ).all { it.isBlank() } && revisionDate == null

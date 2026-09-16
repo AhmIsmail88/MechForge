@@ -18,6 +18,10 @@ CREATE TABLE projects (
   checked_by TEXT,
   approved_by TEXT,
   discipline TEXT,
+  department TEXT,
+  calculation_package TEXT,
+  drawing_reference TEXT,
+  specification_reference TEXT,
   revision TEXT,
   revision_date INTEGER,
   status TEXT,
@@ -25,6 +29,8 @@ CREATE TABLE projects (
   codes TEXT,
   code_edition TEXT,
   design_conditions TEXT,
+  project_specification TEXT,
+  design_standard TEXT,
   notes TEXT
 );
 
@@ -51,6 +57,10 @@ UPDATE projects SET
   checked_by = ?,
   approved_by = ?,
   discipline = ?,
+  department = ?,
+  calculation_package = ?,
+  drawing_reference = ?,
+  specification_reference = ?,
   revision = ?,
   revision_date = ?,
   status = ?,
@@ -58,6 +68,8 @@ UPDATE projects SET
   codes = ?,
   code_edition = ?,
   design_conditions = ?,
+  project_specification = ?,
+  design_standard = ?,
   notes = ?
 WHERE id = ?;
 

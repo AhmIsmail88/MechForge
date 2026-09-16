@@ -1,0 +1,11 @@
+-- Migration v6 -> v7: the rest of the project record (engineering audit section 4):
+-- the engineering responsibility (department, calculation package, drawing and specification
+-- references) and the design basis (project specification, design standard). Nullable columns
+-- only, so every existing project survives.
+
+ALTER TABLE projects ADD COLUMN department TEXT;
+ALTER TABLE projects ADD COLUMN calculation_package TEXT;
+ALTER TABLE projects ADD COLUMN drawing_reference TEXT;
+ALTER TABLE projects ADD COLUMN specification_reference TEXT;
+ALTER TABLE projects ADD COLUMN project_specification TEXT;
+ALTER TABLE projects ADD COLUMN design_standard TEXT;

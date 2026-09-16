@@ -135,6 +135,12 @@ interface UiStrings {
     val fieldProjectCheckedBy: String
     val fieldProjectCodes: String
     val fieldProjectCodeEdition: String
+    val fieldProjectDepartment: String
+    val fieldProjectPackage: String
+    val fieldProjectDrawingRef: String
+    val fieldProjectSpecRef: String
+    val fieldProjectSpecification: String
+    val fieldProjectDesignStandard: String
     val projectSetActive: String
     val projectActive: String
     val projectsDelete: String
@@ -336,6 +342,12 @@ object ArStrings : UiStrings {
         override val fieldProjectCheckedBy = "مراجعة"
         override val fieldProjectCodes = "الأكواد المطبقة"
         override val fieldProjectCodeEdition = "إصدار الكود"
+        override val fieldProjectDepartment = "القسم"
+        override val fieldProjectPackage = "حزمة الحسابات"
+        override val fieldProjectDrawingRef = "مرجع الرسم"
+        override val fieldProjectSpecRef = "مرجع المواصفة"
+        override val fieldProjectSpecification = "مواصفة المشروع"
+        override val fieldProjectDesignStandard = "معيار التصميم"
         override val projectSetActive = "تعيين كمشروع نشط"
         override val projectActive = "المشروع النشط"
         override val projectsDelete = "حذف"
@@ -556,6 +568,12 @@ object EnStrings : UiStrings {
         override val fieldProjectCheckedBy = "Checked by"
         override val fieldProjectCodes = "Applicable codes"
         override val fieldProjectCodeEdition = "Code edition"
+        override val fieldProjectDepartment = "Department"
+        override val fieldProjectPackage = "Calculation package"
+        override val fieldProjectDrawingRef = "Drawing reference"
+        override val fieldProjectSpecRef = "Specification reference"
+        override val fieldProjectSpecification = "Project specification"
+        override val fieldProjectDesignStandard = "Design standard"
         override val projectSetActive = "Set as active project"
         override val projectActive = "Active project"
         override val projectsDelete = "Delete"

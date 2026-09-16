@@ -89,6 +89,10 @@ class MigrationTest {
             checked_by = null,
             approved_by = null,
             discipline = "Fire Protection",
+            department = null,
+            calculation_package = null,
+            drawing_reference = null,
+            specification_reference = null,
             revision = "02",
             revision_date = null,
             status = "For Review",
@@ -96,6 +100,8 @@ class MigrationTest {
             codes = "NFPA 20",
             code_edition = "2022",
             design_conditions = "Ambient 45 C",
+            project_specification = null,
+            design_standard = null,
             notes = null,
             id = project.id,
         )
@@ -151,6 +157,50 @@ class MigrationTest {
         assertEquals(project.id, savedRow.project_id)
         assertTrue(savedRow.project_snapshot!!.contains("Wastewater Pump Station 01"))
         assertEquals(1L, db.historyQueries.countHistoryByProject(project.id).executeAsOne())
+
+        // v6 -> v7: the rest of the project record (audit section 4) - responsibility and the
+        // design basis. Existing projects keep their data and the new columns start empty.
+        val projectV7 = db.projectsQueries.selectProjectById(project.id).executeAsOne()
+        assertTrue(projectV7.department == null && projectV7.design_standard == null)
+        db.projectsQueries.updateProjectInfo(
+            name = "Wastewater Pump Station 01",
+            description = "audit",
+            project_number = "WPS-001",
+            project_code = null,
+            project_type = null,
+            location = null,
+            country = null,
+            client = null,
+            consultant = null,
+            contractor = null,
+            end_user = null,
+            prepared_by = null,
+            checked_by = null,
+            approved_by = null,
+            discipline = null,
+            department = "Fire Protection",
+            calculation_package = "FP-PKG-001",
+            drawing_reference = "WPS-FP-001",
+            specification_reference = "SPEC-2026",
+            revision = "02",
+            revision_date = null,
+            status = null,
+            document_number = null,
+            codes = null,
+            code_edition = null,
+            design_conditions = null,
+            project_specification = "Project spec 2026",
+            design_standard = "NFPA",
+            notes = null,
+            id = project.id,
+        )
+        val reloadedV7 = db.projectsQueries.selectProjectById(project.id).executeAsOne()
+        assertEquals("Fire Protection", reloadedV7.department)
+        assertEquals("FP-PKG-001", reloadedV7.calculation_package)
+        assertEquals("WPS-FP-001", reloadedV7.drawing_reference)
+        assertEquals("SPEC-2026", reloadedV7.specification_reference)
+        assertEquals("Project spec 2026", reloadedV7.project_specification)
+        assertEquals("NFPA", reloadedV7.design_standard)
 
         driver.close()
     }
