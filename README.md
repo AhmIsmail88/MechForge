@@ -8,7 +8,7 @@
 
 Hydraulics · HVAC · Thermodynamics · Mechanical design · Piping · Water &amp; wastewater · Fire protection · Equipment
 
-<img src="docs/assets/badges/version.svg" alt="version 0.4.0">
+<img src="docs/assets/badges/version.svg" alt="version 0.5.0">
 <img src="docs/assets/badges/platform.svg" alt="Android 8+ and Desktop JVM">
 <img src="docs/assets/badges/kotlin.svg" alt="Kotlin 2.2.20">
 <img src="docs/assets/badges/compose.svg" alt="Compose Multiplatform 1.9.0">
@@ -46,6 +46,20 @@ next to the result — never just a bare number.
   reference and a signature block.
 - **One engine, two apps**: the same Kotlin Multiplatform engine and the same Compose UI
   are used by the Android app and the desktop (JVM) app.
+
+## What is in 0.5.0
+
+- **Arabic for the whole catalogue.** Every one of the 63 calculators now prints its solution steps
+  and its engineering caveats in Arabic as well as in English - the ventilation and cooling set, the
+  hydraulics and pumps, mechanics, piping, fire protection, water and wastewater, thermodynamics, the
+  heat exchangers and the unit converters.
+- **Text only, never a value.** The Arabic lines are built next to the English ones from the same
+  numbers; the equations, units, validation and results are untouched, and a calculator without
+  Arabic simply falls back to English.
+- **Guarded by a parity test.** `ArabicOutputParityTest` runs the golden scenarios and refuses any
+  Arabic line that does not carry the same values as its English counterpart. It caught seven real
+  slips during this work, including a missing reliability percentage and an agent name that holds a
+  digit.
 
 ## What is in 0.4.0
 
@@ -277,5 +291,5 @@ bundled runtime - no Java installation is needed on the target machine. Two note
 
 ---
 
-<sub>MechForge 0.4.0 · this file is the project overview; the authoritative product
+<sub>MechForge 0.5.0 · this file is the project overview; the authoritative product
 specification lives in <code>MechForge_README_v2.md</code>.</sub>
