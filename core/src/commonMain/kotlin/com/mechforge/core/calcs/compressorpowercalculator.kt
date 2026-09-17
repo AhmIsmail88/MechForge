@@ -54,7 +54,15 @@ object CompressorPowerCalculator : Calculator(Def) {
         val idealPower = m * cp * (t2s - t1)
         val shaftPower = m * cp * (t2a - t1)
 
+        val stepsAr = listOf(
+            "نسبة الضغط: P₂/P₁ = ${Fmt.n(ratio, 3)}",
+            "التصريف الأيزنتروبي: T₂s = T₁·(P₂/P₁)^((k−1)/k) = ${Fmt.n(t1, 2)} × ${Fmt.n(ratio, 3)}^${Fmt.n((k - 1.0) / k, 4)} = ${Fmt.n(t2s, 2)} K",
+            "التصريف الفعلي: T₂a = T₁ + (T₂s − T₁)/η_is = ${Fmt.n(t1, 2)} + (${Fmt.n(t2s, 2)} − ${Fmt.n(t1, 2)})/${Fmt.n(eta, 3)} = ${Fmt.n(t2a, 2)} K (${Fmt.n(t2a - 273.15, 1)} °C)",
+            "قدرة العمود: P = ṁ·c_p·(T₂a − T₁) = ${Fmt.n(m, 4)} × ${Fmt.n(cp / 1000.0, 3)} kJ/(kg·K) × (${Fmt.n(t2a, 2)} − ${Fmt.n(t1, 2)}) K = ${Fmt.n(shaftPower / 1000.0, 2)} kW",
+        )
+
         return CalcOutput(
+            stepsAr = stepsAr,
             results = listOf(
                 result("t2s", "Isentropic Discharge Temperature", t2s, "k"),
                 result("t2a", "Actual Discharge Temperature", t2a, "k", isPrimary = true),
@@ -73,6 +81,11 @@ object CompressorPowerCalculator : Calculator(Def) {
                 if (!has(inputs, "eta")) add("Isentropic efficiency not provided — assumed 0.80.")
                 if (!has(inputs, "cp")) add("c_p not provided — assumed 1.005 kJ/(kg·K) (air).")
                 if (t2a > 473.15) add("Discharge temperature above 200 °C — check material limits and consider intercooling.")
+            },
+            warningsAr = buildList {
+                if (!has(inputs, "eta")) add("لم تُدخل الكفاءة الأيزنتروبية - افتُرضت 0.80.")
+                if (!has(inputs, "cp")) add("لم تُدخل c_p - افتُرضت 1.005 kJ/(kg·K) (هواء).")
+                if (t2a > 473.15) add("حرارة التصريف أعلى من 200 °C - راجع حدود المواد وفكّر في تبريد بيني.")
             },
         )
     }
