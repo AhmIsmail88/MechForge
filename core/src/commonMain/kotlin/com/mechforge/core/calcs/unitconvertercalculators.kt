@@ -58,7 +58,12 @@ abstract class FamilyConverter(
                 "Entered: ${Fmt.n(enteredUnit.fromBase(base), 6)} ${enteredUnit.symbol}",
                 "Converted to SI base unit and back into every ${family.displayName} unit.",
             ),
+            stepsAr = listOf(
+                "المُدخل: ${Fmt.n(enteredUnit.fromBase(base), 6)} ${enteredUnit.symbol}",
+                "تم التحويل إلى وحدة النظام الأساسية ثم إلى كل وحدات العائلة.",
+            ),
             warnings = emptyList(),
+            warningsAr = emptyList(),
         )
     }
 }
