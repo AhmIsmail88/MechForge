@@ -68,12 +68,12 @@ class ArabicOutputParityTest {
         // the majority of calculators have no Arabic steps yet: their output must stay exactly as it
         // was, which is what makes the feature additive
         // a calculator that has not been translated yet
-        val calculator = CalculatorRegistry.byIdOrThrow("reynolds-number")
+        val calculator = CalculatorRegistry.byIdOrThrow("ideal-gas")
         val out = calculator.run(
             mapOf(
-                "v" to InputValue("v", 2.0, "ms"),
-                "d" to InputValue("d", 0.1, "m"),
-                "nu" to InputValue("nu", 1e-6, "m2s"),
+                "p" to InputValue("p", 101325.0, "pa"),
+                "t" to InputValue("t", 293.15, "k"),
+                "m" to InputValue("m", 0.0289644, "kgmol"),
             )
         )
         assertTrue(out.steps.isNotEmpty())

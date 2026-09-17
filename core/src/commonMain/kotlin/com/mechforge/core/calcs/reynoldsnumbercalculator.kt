@@ -46,7 +46,21 @@ object ReynoldsNumberCalculator : Calculator(Def) {
                 "Re = v·D / ν = ${Fmt.n(v, 3)} × ${Fmt.n(d, 4)} / ${Fmt.n(nu, 9)} = ${Fmt.n(re, 0)}",
                 "Flow regime: $regime (laminar < 2300, transitional 2300–4000, turbulent > 4000)",
             ),
+            stepsAr = listOf(
+                "Re = v·D / ν = ${Fmt.n(v, 3)} × ${Fmt.n(d, 4)} / ${Fmt.n(nu, 9)} = ${Fmt.n(re, 0)}",
+                "نظام السريان: " + when {
+                    re < FrictionFactor.LAMINAR_LIMIT -> "صفحي"
+                    re <= 4000.0 -> "انتقالي"
+                    else -> "مضطرب"
+                } + " (صفحي < 2300، انتقالي 2300-4000، مضطرب > 4000)",
+            ),
             warnings = listOfNotNull(FrictionFactor.regimeWarning(re)),
+            warningsAr = buildList {
+                // the same condition as FrictionFactor.regimeWarning
+                if (re >= 2300.0 && re <= 4000.0) {
+                    add("رقم رينولدز في المنطقة الانتقالية (2300-4000)؛ معامل الاحتكاك غير مؤكد فيها - تعامل مع النتيجة بحذر.")
+                }
+            },
         )
     }
 
