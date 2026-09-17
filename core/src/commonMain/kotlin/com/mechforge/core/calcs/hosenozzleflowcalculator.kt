@@ -56,9 +56,21 @@ object HoseNozzleFlowCalculator : Calculator(Def) {
                   "Q = 29.7 * C * d^2 * sqrt(P) = 29.7 x ${Fmt.n(nozzleCoeff, 3)} x ${Fmt.n(dIn * dIn, 4)} x ${Fmt.n(sqrt(pPsi), 4)} = ${Fmt.n(qGpm, 2)} gpm",
                 "= ${Fmt.n(qLmin, 1)} L/min = ${Fmt.n(qM3h, 2)} m3/h",
             ),
+            stepsAr = listOf(
+                "d = ${Fmt.n(dIn, 3)} in   P = ${Fmt.n(pPsi, 1)} psi",
+                "√(P) = ${Fmt.n(sqrt(pPsi), 4)}",
+                "Q = 29.7 × C × d² × √(P) = 29.7 × ${Fmt.n(nozzleCoeff, 3)} × ${Fmt.n(dIn * dIn, 4)} × ${Fmt.n(sqrt(pPsi), 4)} = ${Fmt.n(qGpm, 2)} gpm",
+                "= ${Fmt.n(qLmin, 1)} L/min = ${Fmt.n(qM3h, 2)} m3/h",
+            ),
             warnings = buildList {
                 add("Coefficient 29.7 is the standard fire-service form (gpm, in, psi). Verify the nozzle manufacturer data for smooth-bore and fog nozzles.")
                 if (pPsi < 50.0 || pPsi > 100.0) add("Nozzle pressure outside the usual 50-100 psi (3.5-7 bar) band - check it against the nozzle and pump ratings.")
+            },
+            warningsAr = buildList {
+                add("المعامل 29.7 هو الصيغة القياسية لخدمة الحريق (gpm، بوصة، psi). تحقق من بيانات مُصنّع الفوهة للفوهات الملساء والضبابية.")
+                if (pPsi < 50.0 || pPsi > 100.0) {
+                    add("ضغط الفوهة خارج المدى المعتاد 50-100 psi (3.5-7 bar) - راجعه مقابل تصنيفات الفوهة والمضخة.")
+                }
             },
         )
     }
