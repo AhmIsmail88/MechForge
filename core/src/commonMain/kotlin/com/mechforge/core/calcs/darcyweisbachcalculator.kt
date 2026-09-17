@@ -68,6 +68,7 @@ object DarcyWeisbachCalculator : Calculator(Def) {
         }
 
         val warnings = mutableListOf<String>()
+        val warningsAr = mutableListOf<String>()
         val f: Double
         var re: Double? = null
         var relRough = 0.0
@@ -85,7 +86,12 @@ object DarcyWeisbachCalculator : Calculator(Def) {
             f = FrictionFactor.darcy(reVal, relRough)
             re = reVal
             FrictionFactor.regimeWarning(reVal)?.let { warnings += it }
+            // the same condition as FrictionFactor.regimeWarning
+            if (reVal >= 2300.0 && reVal <= 4000.0) {
+                warningsAr += "رقم رينولدز في المنطقة الانتقالية (2300-4000)؛ معامل الاحتكاك غير مؤكد فيها - تعامل مع النتيجة بحذر."
+            }
             if (!hasEps) warnings += "Roughness not provided — treated as a hydraulically smooth pipe."
+            if (!hasEps) warningsAr += "لم تُدخل الخشونة - تم التعامل مع الماسورة كملساء هيدروليكيًا."
         }
 
         val hf = f * (length / d) * v * v / (2.0 * G)
@@ -106,7 +112,19 @@ object DarcyWeisbachCalculator : Calculator(Def) {
                         "${Fmt.n(v, 3)}²/(2 × 9.80665) = ${Fmt.n(hf, 3)} m"
                 )
             },
+            stepsAr = buildList {
+                if (re != null) {
+                    add("معامل الاحتكاك: كولبروك-وايت عند Re = ${Fmt.n(re, 0)} (ε/D = ${Fmt.n(relRough, 6)}) ← f = ${Fmt.n(f, 5)}")
+                } else {
+                    add("باستخدام معامل الاحتكاك المُدخل f = ${Fmt.n(f, 5)}")
+                }
+                add(
+                    "فقد الرفع: h_f = f·(L/D)·v²/(2g) = ${Fmt.n(f, 5)} × (${Fmt.n(length, 2)}/${Fmt.n(d, 4)}) × " +
+                        "${Fmt.n(v, 3)}²/(2 × 9.80665) = ${Fmt.n(hf, 3)} m"
+                )
+            },
             warnings = warnings,
+            warningsAr = warningsAr,
         )
     }
 
