@@ -91,7 +91,24 @@ object PipeWallThicknessCalculator : Calculator(Def) {
                 "Required nominal thickness: ${Fmt.n(tMin * 1000.0, 4)} / (1 - ${Fmt.n(mill * 100.0, 2)} %) = ${Fmt.n(tNominal * 1000.0, 4)} mm",
                 "Order the next heavier standard wall thickness (select by schedule and verify against the pipe standard).",
             ),
+            stepsAr = listOf(
+                "p = ${Fmt.n(p / 1e5, 4)} bar   D = ${Fmt.n(d * 1000.0, 2)} mm   S = ${Fmt.n(s / 1e6, 1)} MPa   E = ${Fmt.n(e, 3)}   Y = ${Fmt.n(y, 3)}",
+                "t = p·D/(2·(S·E + p·Y)) = ${Fmt.n(p, 1)} × ${Fmt.n(d, 5)} / (2 × (${Fmt.n(s, 1)} × ${Fmt.n(e, 3)} + ${Fmt.n(p, 1)} × ${Fmt.n(y, 3)})) = ${Fmt.n(tPressure * 1000.0, 4)} mm",
+                "السماكة الدنيا: t + CA = ${Fmt.n(tPressure * 1000.0, 4)} + ${Fmt.n(ca * 1000.0, 3)} = ${Fmt.n(tMin * 1000.0, 4)} mm",
+                "السماكة الاسمية المطلوبة: ${Fmt.n(tMin * 1000.0, 4)} / (1 − ${Fmt.n(mill * 100.0, 2)} %) = ${Fmt.n(tNominal * 1000.0, 4)} mm",
+                "اطلب السماكة القياسية الأثقل التالية (حسب الـ schedule، وراجع مقابل معيار المواسير).",
+            ),
             warnings = warnings,
+            warningsAr = buildList {
+                add("S يجب أن تكون الإجهاد المسموح وفق الكود عند حرارة التصميم، وE و Y مطابقين للماسورة والمادة - أكّدها مقابل ASME B31.3 (أو الكود الحاكم) قبل الطلب.")
+                if (e < 1.0) {
+                    add("E = ${Fmt.n(e, 3)}: الإجهاد المسموح مخفّض لوصلة ملحومة - أكّد معامل الوصلة لمستوى الفحص المحدد.")
+                }
+                if (ca <= 0.0) {
+                    add("لم يُدخل بدل التآكل - الأكواد تشترط بدلًا حسب الخدمة (صفر للخدمة النظيفة غير المسبِّبة للتآكل).")
+                }
+                add("السماكة الاسمية لازم تغطي تفاوت الطاحونة وأي ترقيق (الثني أو القلاووظ أو التجليف)؛ وعادة يُختار الجدول الأثقل التالي.")
+            },
         )
     }
 }
