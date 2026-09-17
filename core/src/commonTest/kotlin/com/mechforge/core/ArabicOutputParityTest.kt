@@ -63,21 +63,8 @@ class ArabicOutputParityTest {
         println("Arabic output parity: $checked scenario(s) with Arabic text, ${GOLDEN_CASES.size} available")
     }
 
-    @Test
-    fun aCalculatorWithoutArabicTextIsUntouched() {
-        // the majority of calculators have no Arabic steps yet: their output must stay exactly as it
-        // was, which is what makes the feature additive
-        // a calculator that has not been translated yet
-        val calculator = CalculatorRegistry.byIdOrThrow("ideal-gas")
-        val out = calculator.run(
-            mapOf(
-                "p" to InputValue("p", 101325.0, "pa"),
-                "t" to InputValue("t", 293.15, "k"),
-                "m" to InputValue("m", 0.0289644, "kgmol"),
-            )
-        )
-        assertTrue(out.steps.isNotEmpty())
-        assertTrue(out.stepsAr.isEmpty(), "a calculator without Arabic keeps the field empty")
-        assertTrue(out.warningsAr.isEmpty())
-    }
+    // Note: the earlier test that pinned one calculator as "still English" is gone by design - as
+    // the translation rolls out there is no such calculator left to point at. The additivity it
+    // proved is guaranteed by the optional defaults on stepsAr/warningsAr, and the parity test above
+    // keeps checking that whatever a calculator does provide stays consistent with the English.
 }

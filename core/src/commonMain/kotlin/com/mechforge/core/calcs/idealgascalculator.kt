@@ -62,7 +62,18 @@ object IdealGasCalculator : Calculator(Def) {
             }
         }
 
-        return CalcOutput(results = results, steps = steps, warnings = emptyList())
+        val stepsAr = mutableListOf(
+            "ρ = p·M / (R̄·T) = ${Fmt.n(p, 1)} Pa × ${Fmt.n(m * 1000.0, 3)} g/mol / (8.314462618 × ${Fmt.n(t, 2)} K) = ${Fmt.n(rho, 4)} kg/m³",
+            "الحجم النوعي: v = 1/ρ = ${Fmt.n(specificVolume, 5)} m³/kg",
+        )
+        if (has(inputs, "v")) {
+            val volumeAr = value(inputs, "v")
+            if (volumeAr > 0.0) {
+                stepsAr += "الكتلة في ${Fmt.n(volumeAr, 4)} m³: m = ρ·V = ${Fmt.n(rho * volumeAr, 5)} kg"
+            }
+        }
+
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = emptyList(), warningsAr = emptyList())
     }
 
 }
