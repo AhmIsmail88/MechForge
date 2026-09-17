@@ -40,7 +40,12 @@ object MinorLossCalculator : Calculator(Def) {
                 "Velocity head: v²/(2g) = ${Fmt.n(v, 3)}² / (2 × 9.80665) = ${Fmt.n(v * v / (2.0 * G), 5)} m",
                 "Minor loss: h_m = K·v²/(2g) = ${Fmt.n(k, 3)} × ${Fmt.n(v * v / (2.0 * G), 5)} = ${Fmt.n(hm, 4)} m",
             ),
+            stepsAr = listOf(
+                "رأس السرعة: v²/(2g) = ${Fmt.n(v, 3)}² / (2 × 9.80665) = ${Fmt.n(v * v / (2.0 * G), 5)} m",
+                "الفقد الفرعي: h_m = K·v²/(2g) = ${Fmt.n(k, 3)} × ${Fmt.n(v * v / (2.0 * G), 5)} = ${Fmt.n(hm, 4)} m",
+            ),
             warnings = emptyList(),
+            warningsAr = emptyList(),
         )
     }
 }

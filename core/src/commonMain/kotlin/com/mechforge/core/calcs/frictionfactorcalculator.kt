@@ -59,7 +59,26 @@ object FrictionFactorCalculator : Calculator(Def) {
                 },
                 "Flow regime: $regime",
             ),
+            stepsAr = listOf(
+                "الخشونة النسبية: ε/D = ${Fmt.n(if (has(inputs, "eps")) value(inputs, "eps") else 0.0, 6)} / ${Fmt.n(d, 4)} = ${Fmt.n(relRough, 6)}",
+                if (re < FrictionFactor.LAMINAR_LIMIT) {
+                    "سريان صفحي (Re < 2300): f = 64/Re = 64 / ${Fmt.n(re, 1)} = ${Fmt.n(f, 5)}"
+                } else {
+                    "سريان مضطرب: كولبروك-وايت بحل تكراري (تسامح 1e-12) ← f = ${Fmt.n(f, 5)}"
+                },
+                "نظام السريان: " + when {
+                    re < FrictionFactor.LAMINAR_LIMIT -> "صفحي"
+                    re <= 4000.0 -> "انتقالي"
+                    else -> "مضطرب"
+                },
+            ),
             warnings = listOfNotNull(FrictionFactor.regimeWarning(re)),
+            warningsAr = buildList {
+                // the same condition as FrictionFactor.regimeWarning
+                if (re >= 2300.0 && re <= 4000.0) {
+                    add("رقم رينولدز في المنطقة الانتقالية (2300-4000)؛ معامل الاحتكاك غير مؤكد فيها - تعامل مع النتيجة بحذر.")
+                }
+            },
         )
     }
 }
