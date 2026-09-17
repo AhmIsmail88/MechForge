@@ -83,7 +83,25 @@ object TotalCoolingLoadCalculator : Calculator(Def) {
                 }
                 add("Total: Q_t = Q_s + Q_l = ${Fmt.n(total, 3)} kW")
             },
+            stepsAr = buildList {
+                add("معدل الكتلة: ṁ = ρ·V̇ = ${Fmt.n(rho, 3)} × ${Fmt.n(q, 4)} = ${Fmt.n(massFlow, 4)} kg/s")
+                add("المحسوس: Q_s = ṁ·c_p·ΔT = ${Fmt.n(massFlow, 4)} × 1.005 × ${Fmt.n(deltaT, 2)} = ${Fmt.n(qs, 3)} kW")
+                if (hasHumidity) {
+                    add("الكامن: Q_l = ṁ·h_fg·Δw = ${Fmt.n(massFlow, 4)} × 2501 × ${Fmt.n(deltaW, 5)} = ${Fmt.n(ql, 3)} kW")
+                } else {
+                    add("الكامن: لم يُحسب (نسب الرطوبة ناقصة) ← 0 kW")
+                }
+                add("الإجمالي: Q_t = Q_s + Q_l = ${Fmt.n(total, 3)} kW")
+            },
             warnings = warnings,
+            warningsAr = buildList {
+                if (!hasHumidity) {
+                    add("لم تُدخل نسب الرطوبة - الحمل الكامن محسوب كصفر. أدخل نسبة الرطوبة (kg/kg هواء جاف) لتقسيم كامل.")
+                }
+                if (deltaT > 0) {
+                    add("ΔT > 0 - الهواء يكتسب حرارة محسوسة؛ وفي ملف التبريد عادة تنخفض الحرارة.")
+                }
+            },
         )
     }
 
