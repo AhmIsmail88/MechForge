@@ -174,6 +174,40 @@ object Fm200AgentQuantityCalculator : Calculator(Def) {
             add("Step 9  Assumptions: NFPA 2001 methodology; state the edition in force for the project (Settings > Report details > Code / edition) and confirm the concentration, S and the listed system with the manufacturer.")
         }
 
+        val stepsAr = buildList {
+            add("خطوة 1  الأحجام: الحجم الصافي V = ${Fmt.n(volume, 3)} m3" +
+                (if (gross != null) "   الإجمالي = ${Fmt.n(gross, 3)} m3   المستثنى = ${Fmt.n((excludedFromGross ?: 0.0).coerceAtLeast(0.0), 3)} m3" else "") +
+                "   (مكافئ غرفة بحجم ${Fmt.n(side, 2)} × ${Fmt.n(side, 2)} × ${Fmt.n(side, 2)} م)")
+            add("خطوة 2  العامل: HFC-227ea (FM-200)، M = ${Fmt.n(M_HFC_227EA, 5)} kg/mol")
+            add("خطوة 3  الخطر: ${hazard.first.label} ← تركيز التصميم C = ${Fmt.n(concentrationPct, 3)} %" +
+                if (has(inputs, "c")) " (مُدخل)" else " (من تصنيف الخطر)")
+            add(
+                if (sDerived) {
+                    "خطوة 4  S = R·T/(P·M) = ${Fmt.n(R_GAS, 5)} × ${Fmt.n(temperatureK, 3)} / (${Fmt.n(P_STD, 6)} × ${Fmt.n(M_HFC_227EA, 5)}) = ${Fmt.n(s, 6)} m3/kg (تقدير الغاز المثالي)"
+                } else {
+                    "خطوة 4  S = ${Fmt.n(s, 6)} m3/kg (مُدخل - قيمة NFPA 2001 أو قيمة مُدرجة)"
+                },
+            )
+            add("خطوة 5  C/(100−C) = ${Fmt.n(concentrationPct, 3)} / ${Fmt.n(100.0 - concentrationPct, 3)} = ${Fmt.n(ratio, 6)}")
+            add("خطوة 5  W_basic = (V_net / S) × (C/(100−C)) = (${Fmt.n(volume, 3)} / ${Fmt.n(s, 6)}) × ${Fmt.n(ratio, 6)} = ${Fmt.n(basic, 2)} kg")
+            add(
+                if (additional <= 0.0) {
+                    "خطوة 6  الكمية الإضافية = 0 kg (لا توجد ظروف خاصة مطبقة مُدخلة)"
+                } else {
+                    "خطوة 6  الكمية الإضافية = ${Fmt.n(additional, 2)} kg (مُدخلة للظروف الخاصة المذكورة)"
+                },
+            )
+            add("خطوة 7  W_final = W_basic + W_add = ${Fmt.n(basic, 2)} + ${Fmt.n(additional, 2)} = ${Fmt.n(final, 2)} kg")
+            if (has(inputs, "mcyl")) {
+                val chargeAr = value(inputs, "mcyl")
+                val countAr = ceil(final / chargeAr)
+                add("خطوة 8  الأسطوانات = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(chargeAr, 3)} kg) = ${Fmt.n(countAr, 0)} × ${Fmt.n(chargeAr, 3)} kg = ${Fmt.n(countAr * chargeAr, 2)} kg مُركّبة")
+            } else {
+                add("خطوة 8  أدخل شحنة الأسطوانة المُدرجة للحصول على اختيار الأسطوانات وهامش السعة.")
+            }
+            add("خطوة 9  الافتراضات: منهجية NFPA 2001؛ اذكر الإصدار الساري للمشروع (الإعدادات > تفاصيل التقرير > الكود/الإصدار) وأكّد التركيز و S والنظام المُدرج مع المُصنّع.")
+        }
+
         val warnings = buildList {
             if (netFromGross != null && kotlin.math.abs(netFromGross - volume) > 0.02 * volume) {
                 add("Volume check: gross - excluded = ${Fmt.n(netFromGross, 3)} m3 does not match the entered net volume ${Fmt.n(volume, 3)} m3. Correct the net volume before using the result.")
@@ -194,6 +228,26 @@ object Fm200AgentQuantityCalculator : Calculator(Def) {
             }
         }
 
-        return CalcOutput(results = results, steps = steps, warnings = warnings)
+        val warningsAr = buildList {
+            if (netFromGross != null && kotlin.math.abs(netFromGross - volume) > 0.02 * volume) {
+                add("فحص الحجم: الإجمالي − المستثنى = ${Fmt.n(netFromGross, 3)} m3 لا يطابق الحجم الصافي المُدخل ${Fmt.n(volume, 3)} m3. صحّح الحجم الصافي قبل استخدام النتيجة.")
+            }
+            if (gross != null && volume > gross) {
+                add("فحص الحجم: الحجم الصافي أكبر من حجم الغرفة الإجمالي - راجع الفاصلة العشرية (خطأ 100 مرة يعطي كمية عامل 100 مرة).")
+            }
+            if (sDerived) {
+                add("S تقدير بالغاز المثالي. استخدم الحجم النوعي للبخار من إصدار NFPA 2001 الساري أو جدول المُصنّع عند توفره وأدخله في خانة S.")
+            }
+            add("لا تُضاف أي بدلات تسريب أو مواسير أو احتياطي تلقائيًا. أي كمية إضافية يجب أن تأتي من أحكام NFPA 2001 الفعلية وظروف الحيز الفعلية وتُدخل منفصلة - محتوى المواسير والفوهات وتصميم الشبكة حساب نظام هندسي منفصل.")
+            add("أكّد أقل تركيز تصميم للخطر من إصدار NFPA 2001 الساري ومن دليل التصميم المُدرج لمُصنّع العامل.")
+            if (hazard.first.id == "c") {
+                add("Class C: للمخاطر الكهربائية المكهربة - خصوصًا فوق 480 V التي تبقى مكهربة أثناء وبعد التصريف - لا تفترض كفاية تركيز التصميم القياسي؛ نفّذ تحليل واختبار الخطر المطبق.")
+            }
+            if (additional > 0.0) {
+                add("الكمية الإضافية أدخلها المهندس؛ اذكر أساسها (فتحات غير قابلة للغلق، تسريب، شرط المُصنّع) في التقرير.")
+            }
+        }
+
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = warnings, warningsAr = warningsAr)
     }
 }
