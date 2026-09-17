@@ -104,11 +104,18 @@ object BoltTorqueCalculator : Calculator(Def) {
         val results = mutableListOf<com.mechforge.core.engine.ResultValue>()
         val steps = mutableListOf<String>()
         val warnings = mutableListOf<String>()
+        val stepsAr = mutableListOf<String>()
+        val warningsAr = mutableListOf<String>()
 
         warnings += if (!has(inputs, "k")) {
             "Nut factor not provided - assumed 0.20 (as-received steel, lightly oiled)."
         } else {
             "K depends strongly on lubrication, plating and washers; verify it for critical joints."
+        }
+        warningsAr += if (!has(inputs, "k")) {
+            "لم يُدخل معامل الصامولة - افتُرض 0.20 (صلب كما هو، مزيّت قليلًا)."
+        } else {
+            "K تعتمد بشدة على التزييت والطلاء والوردات؛ تحقق منها للوصلات الحرجة."
         }
 
         var force: Double? = null
@@ -120,23 +127,33 @@ object BoltTorqueCalculator : Calculator(Def) {
             results += result("t", "Tightening Torque", torque, "nm", isPrimary = true)
             results += result("f", "Preload (Bolt Tension)", force / 1000.0, "kn", isPrimary = true)
             steps += "Nut factor K = ${Fmt.n(k, 3)}, diameter d = ${Fmt.n(d * 1000.0, 2)} mm"
+            stepsAr += "معامل الصامولة K = ${Fmt.n(k, 3)}، القطر d = ${Fmt.n(d * 1000.0, 2)} mm"
             steps += if (hasF) {
                 "Torque: T = K*F*d = ${Fmt.n(k, 3)} x ${Fmt.n(force / 1000.0, 2)} kN x ${Fmt.n(d * 1000.0, 2)} mm = ${Fmt.n(torque, 2)} N.m"
             } else {
                 "Preload: F = T/(K*d) = ${Fmt.n(torque, 2)} / (${Fmt.n(k, 3)} x ${Fmt.n(d * 1000.0, 2)} mm) = ${Fmt.n(force / 1000.0, 2)} kN"
             }
+            stepsAr += if (hasF) {
+                "العزم: T = K·F·d = ${Fmt.n(k, 3)} × ${Fmt.n(force / 1000.0, 2)} kN × ${Fmt.n(d * 1000.0, 2)} mm = ${Fmt.n(torque, 2)} N·m"
+            } else {
+                "الشد المسبق: F = T/(K·d) = ${Fmt.n(torque, 2)} / (${Fmt.n(k, 3)} × ${Fmt.n(d * 1000.0, 2)} mm) = ${Fmt.n(force / 1000.0, 2)} kN"
+            }
             stressArea?.let { at ->
                 val sigma = force / at
                 results += result("sigma", "Bolt Tensile Stress", sigma / 1e6, "mpa")
                 steps += "Tensile stress: sigma = F/A_t = ${Fmt.n(force / 1000.0, 2)} kN / ${Fmt.n(at * 1e6, 2)} mm2 = ${Fmt.n(sigma / 1e6, 1)} MPa"
+                stepsAr += "إجهاد الشد: σ = F/A_t = ${Fmt.n(force / 1000.0, 2)} kN / ${Fmt.n(at * 1e6, 2)} mm2 = ${Fmt.n(sigma / 1e6, 1)} MPa"
                 if (proofStress != null) {
                     val utilization = force / (proofStress * 1e6 * at)
                     results += result("util", "Preload / Proof Load", utilization * 100.0, "pct")
                     steps += "Utilisation of the proof load: ${Fmt.n(utilization * 100.0, 1)} %"
+                    stepsAr += "نسبة الاستغلال من حمل الإثبات: ${Fmt.n(utilization * 100.0, 1)} %"
                     if (utilization > 0.90) {
                         warnings += "Preload is above 90 % of the proof load - the bolt is at risk of yielding during tightening."
+                        warningsAr += "الشد المسبق أعلى من 90 % من حمل الإثبات - البرغي معرض للخضوع أثناء الربط."
                     } else if (utilization < 0.40) {
                         warnings += "Preload is below 40 % of the proof load - the joint may loosen or the bolt may fatigue."
+                        warningsAr += "الشد المسبق أقل من 40 % من حمل الإثبات - الوصلة قد ترتخي أو يتعب البرغي."
                     }
                 }
             }
@@ -149,12 +166,17 @@ object BoltTorqueCalculator : Calculator(Def) {
             results += result("fRec", "Design Preload (${Fmt.n(preloadPct * 100.0, 0)} % of proof load)", fRec / 1000.0, "kn", isPrimary = force == null)
             results += result("tRec", "Torque for the Design Preload", tRec, "nm", isPrimary = force == null)
             steps += "Property class ${propertyClass!!.first.id}: proof strength S_p = ${Fmt.n(proofStress, 0)} MPa"
+            stepsAr += "درجة البرغي ${propertyClass!!.first.id}: إجهاد الإثبات S_p = ${Fmt.n(proofStress, 0)} MPa"
             steps += "Tensile stress area: A_t = PI/4*(d - 0.9382*p)^2 = ${Fmt.n(stressArea * 1e6, 2)} mm2"
+            stepsAr += "مساحة الشد: A_t = π/4×(d − 0.9382×p)² = ${Fmt.n(stressArea * 1e6, 2)} mm2"
             steps += "Design preload: F = ${Fmt.n(preloadPct * 100.0, 0)} % x ${Fmt.n(proofStress, 0)} MPa x ${Fmt.n(stressArea * 1e6, 2)} mm2 = ${Fmt.n(fRec / 1000.0, 2)} kN"
+            stepsAr += "الشد المسبق التصميمي: F = ${Fmt.n(preloadPct * 100.0, 0)} % × ${Fmt.n(proofStress, 0)} MPa × ${Fmt.n(stressArea * 1e6, 2)} mm2 = ${Fmt.n(fRec / 1000.0, 2)} kN"
             steps += "Torque for that preload: T = K*F*d = ${Fmt.n(tRec, 2)} N.m"
+            stepsAr += "العزم لهذا الشد المسبق: T = K·F·d = ${Fmt.n(tRec, 2)} N·m"
             warnings += "Check the bolt group, the joint stiffness and the required clamp force for the actual connection - this is the single-bolt preload, not the joint design."
+            warningsAr += "راجع مجموعة البراغي وجساءة الوصلة وقوة الضغط المطلوبة للوصلة الفعلية - هذا الشد المسبق لبرغي واحد وليس تصميم الوصلة."
         }
 
-        return CalcOutput(results = results, steps = steps, warnings = warnings)
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = warnings, warningsAr = warningsAr)
     }
 }
