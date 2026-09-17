@@ -162,6 +162,33 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
             add("Step 9  Assumptions: NFPA 12 methodology; state the edition in force for the project (Settings > Report details > Code / edition), and confirm the design concentration and flooding factor with the standard and the system manufacturer.")
         }
 
+        val stepsAr = buildList {
+            add("خطوة 1  الأحجام: الحجم الصافي V = ${Fmt.n(volume, 3)} m3" +
+                (if (gross != null) "   الإجمالي = ${Fmt.n(gross, 3)} m3   المستثنى = ${Fmt.n((excludedFromGross ?: 0.0).coerceAtLeast(0.0), 3)} m3" else "") +
+                "   (مكافئ غرفة بحجم ${Fmt.n(side, 2)} × ${Fmt.n(side, 2)} × ${Fmt.n(side, 2)} م)")
+            add("خطوة 2  العامل: ثاني أكسيد الكربون (CO2)، M = ${Fmt.n(M_CO2, 5)} kg/mol، حرارة التصميم ${Fmt.n(temperatureK, 3)} K")
+            add("خطوة 3  الخطر: ${hazard.first.label} ← تركيز التصميم C = ${Fmt.n(concentrationPct, 3)} %" +
+                if (has(inputs, "c")) " (مُدخل)" else " (من تصنيف الخطر)")
+            add(
+                if (fEntered) {
+                    "خطوة 4  معامل الغمر f = ${Fmt.n(floodingFactor, 4)} kg/m3 (مُدخل: جدول NFPA 12 أو بيانات مُدرجة). المكافئ بالغاز المثالي للمراجعة: ${Fmt.n(fIdeal, 4)} kg/m3"
+                } else {
+                    "خطوة 4  معامل الغمر f = ${Fmt.n(floodingFactor, 4)} kg/m3 (تقدير الغاز المثالي: f = ρ_بخار × C/(100−C) = ${Fmt.n(vapourDensity, 4)} × ${Fmt.n(ratio, 5)}). أدخل قيمة جدول NFPA 12 عند توفرها."
+                },
+            )
+            add("خطوة 5  W_basic = V_net × f = ${Fmt.n(volume, 3)} × ${Fmt.n(floodingFactor, 4)} = ${Fmt.n(basic, 2)} kg")
+            add(
+                if (additional <= 0.0) {
+                    "خطوة 6  كمية CO2 الإضافية = 0 kg (لا توجد فتحات غير قابلة للغلق أو تصحيحات مطبقة)"
+                } else {
+                    "خطوة 6  كمية CO2 الإضافية = ${Fmt.n(additional, 2)} kg (مُدخلة للظرف المذكور)"
+                },
+            )
+            add("خطوة 7  W_final = W_basic + W_add = ${Fmt.n(basic, 2)} + ${Fmt.n(additional, 2)} = ${Fmt.n(final, 2)} kg")
+            add("خطوة 8  الأسطوانات = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(charge, 1)} kg) = ${Fmt.n(cylinders, 0)} × ${Fmt.n(charge, 1)} kg = ${Fmt.n(installed, 1)} kg مُركّبة، والهامش ${Fmt.n(installed - final, 2)} kg (${Fmt.n((installed - final) / final * 100.0, 1)} %)")
+            add("خطوة 9  الافتراضات: منهجية NFPA 12؛ اذكر الإصدار الساري للمشروع (الإعدادات > تفاصيل التقرير > الكود/الإصدار)، وأكّد تركيز التصميم ومعامل الغمر مع المعيار ومُصنّع النظام.")
+        }
+
         val warnings = buildList {
             add("CO2 design concentrations are life threatening: the applicable standard's requirements for occupant evacuation, alarms, warning signs, ventilation and lockout must be met before commissioning.")
             if (netFromGross != null && abs(netFromGross - volume) > 0.02 * volume) {
@@ -178,6 +205,22 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
             add("Confirm the design concentration and the applicable flooding factor for the hazard with the NFPA 12 edition in force.")
         }
 
-        return CalcOutput(results = results, steps = steps, warnings = warnings)
+        val warningsAr = buildList {
+            add("تركيزات CO2 التصميمية مهددة للحياة: يجب استيفاء متطلبات المعيار المطبق لإخلاء الموجودين والإنذار ولوحات التحذير والتهوية والفصل قبل التشغيل.")
+            if (netFromGross != null && abs(netFromGross - volume) > 0.02 * volume) {
+                add("فحص الحجم: الإجمالي − المستثنى = ${Fmt.n(netFromGross, 3)} m3 لا يطابق الحجم الصافي المُدخل ${Fmt.n(volume, 3)} m3. صحّح الحجم الصافي قبل استخدام النتيجة.")
+            }
+            if (gross != null && volume > gross) {
+                add("فحص الحجم: الحجم الصافي أكبر من حجم الغرفة الإجمالي - راجع الفاصلة العشرية (خطأ 100 مرة يعطي كمية عامل 100 مرة).")
+            }
+            if (!fEntered) {
+                add("معامل الغمر المعروض قيمة نظرية بالغاز المثالي. حيث يوجد معامل غمر من جدول NFPA 12 أو بيانات مُدرجة، أدخله في خانة f واستخدمه للتصميم.")
+            }
+            add("لا تُضاف أي بدلات تلقائيًا: لا نسبة تسريب ولا نسبة مواسير ولا احتياطي. أي كمية CO2 إضافية يجب أن تأتي من أحكام NFPA 12 الفعلية وظروف الحيز الفعلية (مثل الفتحات غير القابلة للغلق) وتُدخل منفصلة - 0 kg عند عدم وجودها.")
+            add("عدد الأسطوانات ينتج من W_final وشحنة الأسطوانة؛ ولا يُضخَّم بأي بدل. تصميم المواسير والشبكة وزمن التصريف وتنفيس الضغط والتهوية بنود نظام هندسي منفصلة.")
+            add("أكّد تركيز التصميم ومعامل الغمر المطبق للخطر من إصدار NFPA 12 الساري.")
+        }
+
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = warnings, warningsAr = warningsAr)
     }
 }
