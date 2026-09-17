@@ -84,12 +84,22 @@ object WaterHammerCalculator : Calculator(Def) {
             "dP = rho*c*dv = ${Fmt.n(rho, 1)} x ${Fmt.n(c, 1)} x ${Fmt.n(dv, 3)} = ${Fmt.n(dpPa, 0)} Pa = ${Fmt.n(dpPa / 1e5, 3)} bar",
             "Surge head: dP/(rho*g) = ${Fmt.n(surgeHead, 1)} m",
         )
+        val stepsAr = mutableListOf(
+            if (cEntered) {
+                "سرعة الموجة: c = ${Fmt.n(c, 1)} m/s (مُدخلة)"
+            } else {
+                "سرعة الموجة: c = √(K/ρ) / √(1 + K·D/(E·t)) = ${Fmt.n(c, 1)} m/s (محسوبة من بيانات الماسورة)"
+            },
+            "dP = ρ·c·dv = ${Fmt.n(rho, 1)} × ${Fmt.n(c, 1)} × ${Fmt.n(dv, 3)} = ${Fmt.n(dpPa, 0)} Pa = ${Fmt.n(dpPa / 1e5, 3)} bar",
+            "رفع الصدم: dP/(ρ·g) = ${Fmt.n(surgeHead, 1)} m",
+        )
 
         if (has(inputs, "l")) {
             val l = value(inputs, "l")
             val tCritical = 2.0 * l / c
             results += result("tc", "Critical Closure Time", tCritical, "s")
             steps += "Critical closure time: t = 2L/c = 2 x ${Fmt.n(l, 1)} / ${Fmt.n(c, 1)} = ${Fmt.n(tCritical, 4)} s (closure faster than this gives the full Joukowsky rise)"
+            stepsAr += "زمن الغلق الحرج: t = 2L/c = 2 × ${Fmt.n(l, 1)} / ${Fmt.n(c, 1)} = ${Fmt.n(tCritical, 4)} s (الغلق الأسرع من ذلك يعطي ارتفاع Joukowsky الكامل)"
         }
 
         val warnings = buildList {
@@ -97,7 +107,16 @@ object WaterHammerCalculator : Calculator(Def) {
             add("This is the maximum (instantaneous closure) surge. For slower closures use the standard wave-speed characteristics or a surge-analysis package.")
             if (dv > 3.0) add("Velocity change above 3 m/s produces a very large surge - review the valve closure time and the pipe pressure class.")
         }
+        val warningsAr = buildList {
+            if (!cEntered && !has(inputs, "epipe")) {
+                add("لم يُدخل معامل مرونة الماسورة - افتُرض 200 GPa (صلب). استخدم قيمة مادة الماسورة الفعلية (المواسير البلاستيكية تعطي سرعات موجة أقل بكثير).")
+            }
+            add("هذا هو الصدم الأقصى (الغلق اللحظي). للغلق الأبطأ استخدم خصائص الموجة القياسية أو برنامج تحليل صدم.")
+            if (dv > 3.0) {
+                add("تغير سرعة أعلى من 3 m/s ينتج صدمًا كبيرًا جدًا - راجع زمن غلق الصمام ودرجة ضغط الماسورة.")
+            }
+        }
 
-        return CalcOutput(results = results, steps = steps, warnings = warnings)
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = warnings, warningsAr = warningsAr)
     }
 }
