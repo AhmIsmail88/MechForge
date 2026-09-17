@@ -48,6 +48,9 @@ object PowerEfficiencyConverterCalculator : Calculator(Def) {
         val steps = mutableListOf(
             "kW → TR: divide by ${KW_PER_TR} kW/TR → ${Fmt.n(pKw, 3)} kW = ${Fmt.n(tr, 3)} TR",
         )
+        val stepsAr = mutableListOf(
+            "kW ← TR: القسمة على ${KW_PER_TR} kW/TR ← ${Fmt.n(pKw, 3)} kW = ${Fmt.n(tr, 3)} TR",
+        )
 
         if (hasElec) {
             val pelec = value(inputs, "pelec") // W electrical
@@ -69,9 +72,14 @@ object PowerEfficiencyConverterCalculator : Calculator(Def) {
                 "EER = COP × 3.412 = ${Fmt.n(eer, 2)} BTU/h per W",
                 "kW/TR = P_elec / TR = ${Fmt.n(pelec / 1000.0, 3)} / ${Fmt.n(tr, 3)} = ${Fmt.n(kwPerTr, 3)}",
             )
+            stepsAr += listOf(
+                "معامل الأداء: COP = Q_th / P_elec = ${Fmt.n(pKw, 3)} / ${Fmt.n(pelec / 1000.0, 3)} = ${Fmt.n(cop, 3)}",
+                "معامل الكفاءة: EER = COP × 3.412 = ${Fmt.n(eer, 2)} BTU/h لكل واط",
+                "kW/TR = P_elec / TR = ${Fmt.n(pelec / 1000.0, 3)} / ${Fmt.n(tr, 3)} = ${Fmt.n(kwPerTr, 3)}",
+            )
         }
 
-        return CalcOutput(results = results, steps = steps, warnings = emptyList())
+        return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = emptyList(), warningsAr = emptyList())
     }
 
 }
