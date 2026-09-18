@@ -162,6 +162,17 @@ def parse_text_entries(body: str, key: str):
             text = "".join(literals).strip()
             if text:
                 entries.append(re.sub(r"\s+", " ", text))
+    if not entries:
+        # an incremental list: `key += "..."`, sometimes inside an if/else - each literal is
+        # one entry, which is what the document wants
+        for line in body.splitlines():
+            stripped = line.strip()
+            if stripped.startswith(key + " += "):
+                for literal in re.findall(r'"((?:[^"\\]|\\.)*)"', line):
+                    literal = literal.strip()
+                    if literal:
+                        entries.append(re.sub(r"\s+", " ", literal))
+
     # keep order, drop duplicates
     seen, out = set(), []
     for e in entries:
