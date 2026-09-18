@@ -287,7 +287,9 @@ def main() -> int:
                 "results": parse_results(body),
                 "logic": parse_logic(body),
                 "steps": parse_text_entries(body, "steps"),
+                "stepsAr": parse_text_entries(body, "stepsAr"),
                 "warnings": parse_text_entries(body, "warnings"),
+                "warningsAr": parse_text_entries(body, "warningsAr"),
                 "constants": parse_constants(text),
                 "option_lists": parse_option_lists(text),
             })
@@ -322,7 +324,9 @@ def main() -> int:
                 "results": parse_results(body),
                 "logic": parse_logic(body),
                 "steps": parse_text_entries(body, "steps"),
+                "stepsAr": parse_text_entries(body, "stepsAr"),
                 "warnings": parse_text_entries(body, "warnings"),
+                "warningsAr": parse_text_entries(body, "warningsAr"),
                 "constants": parse_constants(text),
                 "option_lists": [],
                 "family": cd.group(3),
@@ -518,6 +522,13 @@ def main() -> int:
             for s in c["steps"]:
                 A(f"<li><code>{escape(s)}</code></li>")
             A("</ol>")
+        if c.get("stepsAr"):
+            A("<p><b>Solution steps (Arabic)</b> &mdash; the same narrative the report prints in Arabic</p>")
+            A("<ol>" + "".join(f"<li><code>{escape(x)}</code></li>" for x in c["stepsAr"]) + "</ol>")
+        if c.get("warningsAr"):
+            A("<p><b>Warnings and engineering caveats (Arabic)</b></p>")
+            for w in c["warningsAr"]:
+                A(f"<div class='warn'>{escape(w)}</div>")
         if c.get("warnings"):
             A("<p><b>Warnings and engineering caveats</b></p>")
             for w in c["warnings"]:
