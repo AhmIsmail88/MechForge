@@ -153,6 +153,12 @@ compose.desktop {
             description = "MechForge — Mechanical Engineering Toolkit"
             vendor = "TAQARUB"
 
+            // Desktop, taskbar and Start-menu icon for the packaged application. Without this
+            // jpackage falls back to the generic Java icon.
+            windows {
+                iconFile.set(project.file("icons/mechforge.ico"))
+            }
+
             // The app persists through SQLite over JDBC: the trimmed runtime jpackage
             // builds must carry java.sql (and jdk.unsupported, which the driver touches),
             // otherwise the packaged app dies at startup with
