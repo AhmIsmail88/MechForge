@@ -33,5 +33,11 @@ jobs:
       # Deterministic, SDK-light task set: JVM engine tests, the desktop database
       # migration test, and the Android debug APK. The Android SDK is preinstalled on
       # the GitHub runners; AGP downloads any missing platform if needed.
+      # The technical reference is generated from the sources. This step fails the build if the
+      # document stops covering a calculator or drops its Arabic sections, which happened silently
+      # once before.
+      - name: Check the generated technical reference
+        run: python tools/docs/selfcheck.py
+
       - name: Build and test
         run: ${{ matrix.gradlew }} :core:jvmTest :composeApp:desktopTest :composeApp:assembleDebug --console=plain
