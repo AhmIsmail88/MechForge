@@ -1,3 +1,13 @@
+-- LEGACY TABLE - retained on purpose, not used by the application.
+--
+-- An earlier design saved one row per calculation here; the live register is
+-- calculation_history, which also carries the project link, the frozen project snapshot, the
+-- calculation number, the revision, the status and the engine's steps and warnings (see 5.sqm).
+--
+-- The table is kept rather than dropped: dropping it would be a destructive migration for no
+-- functional gain, since nothing reads or writes it. It is excluded from the project counters,
+-- which read calculation_history instead.
+
 CREATE TABLE saved_calculations (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   calculator_id TEXT NOT NULL,
