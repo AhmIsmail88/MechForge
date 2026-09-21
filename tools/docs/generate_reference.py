@@ -145,7 +145,7 @@ def parse_text_entries(body: str, key: str):
     multi-line concatenation comes back as one sentence. ${...} templates are kept verbatim -
     they are filled from the computed values when the calculator runs.
     """
-    m = re.search(key + r"\s*=\s*(?:buildList|listOf|mutableListOf)\s*[({]", body)
+    m = re.search(key + r"\s*=\s*(?:buildList|listOf|mutableListOf)\s*(?:<[^>]*>)?\s*[({]", body)
     if not m:
         return []
     opener = body[m.end() - 1]
@@ -163,12 +163,11 @@ def parse_text_entries(body: str, key: str):
             if text:
                 entries.append(re.sub(r"\s+", " ", text))
     if not entries:
-        # an incremental list: `key += "..."`, sometimes inside an if/else - each literal is
-        # one entry, which is what the document wants
+        # an incremental list: `key += "..."`, sometimes inside an if/else - each literal is one
+        # entry, which is what the document wants
         for line in body.splitlines():
-            stripped = line.strip()
-            if stripped.startswith(key + " += "):
-                for literal in re.findall(r'"((?:[^"\\]|\\.)*)"', line):
+            if line.strip().startswith(key + " += "):
+                for literal in re.findall('"([^"]*)"', line):
                     literal = literal.strip()
                     if literal:
                         entries.append(re.sub(r"\s+", " ", literal))
