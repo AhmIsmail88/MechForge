@@ -2,6 +2,7 @@ package com.mechforge.app.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -25,7 +26,7 @@ internal val EngineeringBlueContainer = Color(0xFFD5E4F7)
 internal val Graphite = Color(0xFF3C4043)
 internal val Cyan = Color(0xFF00A5C4)
 
-private val LightColors = lightColorScheme(
+internal val LightColors = lightColorScheme(
     primary = EngineeringBlue,
     onPrimary = Color.White,
     primaryContainer = EngineeringBlueContainer,
@@ -52,7 +53,7 @@ private val LightColors = lightColorScheme(
     outlineVariant = Color(0x1F101828),
 )
 
-private val DarkColors = darkColorScheme(
+internal val DarkColors = darkColorScheme(
     primary = Color(0xFF9CC5F5),
     onPrimary = Color(0xFF10283F),
     primaryContainer = Color(0xFF2A5480),
@@ -109,6 +110,11 @@ fun MechForgeTheme(
         LocalMechForgeColors provides mechColors,
         LocalStrings provides strings,
         LocalLayoutDirection provides layoutDirection,
+        // Default text colour for everything inside the theme. Material only sets this
+        // when it draws a Surface or a Scaffold; the desktop shell draws a Row over the
+        // backdrop instead, so without this every Text with no explicit colour fell back
+        // to black - legible on the light theme and invisible on the dark one.
+        LocalContentColor provides colors.onBackground,
     ) {
         MaterialTheme(
             colorScheme = colors,
