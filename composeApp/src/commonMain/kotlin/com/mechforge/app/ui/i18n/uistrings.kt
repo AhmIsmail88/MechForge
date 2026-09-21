@@ -30,6 +30,9 @@ interface UiStrings {
     val appName: String
     val appTagline: String
 
+    /** The studio that develops the app, shown under the product name. */
+    val companyName: String
+
     /** Development credit printed at the foot of the app. */
     val creditTaqarub: String
     val navHome: String
@@ -251,6 +254,7 @@ object ArStrings : UiStrings {
     override val appName = "MechForge"
     override val appTagline = "مجموعة أدوات الهندسة الميكانيكية"
     override val creditTaqarub = "من تطوير تقارب"
+    override val companyName = "تقارب"
     override val navHome = "الرئيسية"
     override val navConverter = "المحوّل"
     override val navHistory = "السجل"
@@ -481,6 +485,7 @@ object EnStrings : UiStrings {
     override val appName = "MechForge"
     override val appTagline = "Mechanical Engineering Toolkit"
     override val creditTaqarub = "Developed by TAQARUB"
+    override val companyName = "TAQARUB"
     override val navHome = "Home"
     override val navConverter = "Converter"
     override val navHistory = "History"

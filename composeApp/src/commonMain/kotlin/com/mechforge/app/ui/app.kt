@@ -142,18 +142,31 @@ fun MechForgeApp(deps: AppDependencies) {
                         modifier = Modifier.widthIn(max = 300.dp),
                     ) {
                         Column(modifier = Modifier.padding(vertical = 12.dp)) {
-                            Text(
-                                strings.appName,
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.primary,
+                            Row(
                                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 6.dp),
-                            )
-                            Text(
-                                strings.appTagline,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 24.dp),
-                            )
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.taqarub_logo_small),
+                                    contentDescription = strings.companyName,
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(RoundedCornerShape(9.dp)),
+                                )
+                                Column {
+                                    Text(
+                                        strings.appName,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                    Text(
+                                        strings.companyName,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
                                 Spacer(Modifier.height(6.dp))
                                 Text(
                                     "By Ahmed Ismail",
@@ -252,18 +265,31 @@ private fun Sidebar(current: Screen, onNavigate: (Screen) -> Unit) {
             .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            strings.appName,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(bottom = 4.dp),
-        )
-        Text(
-            strings.appTagline,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Row(
             modifier = Modifier.padding(bottom = 20.dp),
-        )
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Image(
+                painter = painterResource(Res.drawable.taqarub_logo_small),
+                contentDescription = strings.companyName,
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(RoundedCornerShape(9.dp)),
+            )
+            Column {
+                Text(
+                    strings.appName,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    strings.companyName,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         for (item in navItems(strings)) {
             val selected = isSelected(current, item.screen)
             Row(
@@ -328,13 +354,6 @@ private fun TaqarubCredit(strings: UiStrings, modifier: Modifier = Modifier) {
             strings.creditTaqarub,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Image(
-            painter = painterResource(Res.drawable.taqarub_logo_small),
-            contentDescription = strings.creditTaqarub,
-            modifier = Modifier
-                .size(30.dp)
-                .clip(RoundedCornerShape(7.dp)),
         )
     }
 }
