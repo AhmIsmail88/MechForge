@@ -195,6 +195,7 @@ Correctness is treated as a first-class feature, and is checked twice:
 ./gradlew :core:jvmTest :composeApp:desktopTest
 
 # independent cross-check
+![CI](https://github.com/AhmIsmail88/MechForge/actions/workflows/ci.yml/badge.svg)
 python tools/verification/extract_dump.py core/build/test-results/jvmTest/TEST-com.mechforge.core.EngineOutputDumpTest.xml engine_dump.jsonl
 python tools/verification/verify_calculations.py engine_dump.jsonl
 ```
@@ -280,6 +281,26 @@ bundled runtime - no Java installation is needed on the target machine. Two note
   the engine converts to SI internally, and there is no spreadsheet engine in this
   environment to evaluate the templates - so it is planned as its own change with tests
   rather than shipped unverified.
+
+## Verification and quality
+
+Every equation in this app is checked by two independent paths, and the checks run on every push
+(`.github/workflows/ci.yml`):
+
+| Layer | What it proves |
+|---|---|
+| Per-calculator tests (290 engine, 54 app) | A textbook case, a unit-conversion case and an edge case for each calculator, written from the equation rather than from the engine's output |
+| Golden suite (139 scenarios, 564 values, 63 calculators) | Every value is re-derived by an independent Python harness, so a changed equation shows up immediately |
+| Verification harness | Recomputes the engine's real output, including physical scaling laws |
+| Unit round-trips | Every unit converts back to itself and every factor is pinned to its numeric value |
+| Arabic parity | An Arabic line may not lose a number the English line carries - translation cannot change a result |
+| Reference self-check | The generated technical reference must cover every calculator and keep its Arabic sections |
+| Database migrations | A real migration test walks v1 to v7 on every build |
+
+**What this does not mean.** The checks prove the arithmetic reproduces standard published equations.
+They are not a third-party design review, they do not compare against copyrighted code tables -
+allowable stresses, flooding factors and design concentrations are entered by the engineer - and a
+result is never a statement of code compliance. Verification is engineering support, not approval.
 
 ## License and credits
 
