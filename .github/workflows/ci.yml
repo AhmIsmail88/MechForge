@@ -36,6 +36,26 @@ jobs:
       # Deterministic, SDK-light task set: JVM engine tests, the desktop database
       # migration test, and the Android debug APK. The Android SDK is preinstalled on
       # the GitHub runners; AGP downloads any missing platform if needed.
+      # Hypothesis, not a conclusion: the same task set passes on windows-latest and fails on
+      # ubuntu-latest, so the difference is the runner's environment rather than the code. This
+      # project compiles against a very new SDK platform, which the ubuntu image may not carry; the
+      # step records what the image has and accepts the licences so the build can fetch what it
+      # needs. It is scoped to Linux and cannot affect the Windows leg. If the failure is something
+      # else, the printed listing is the evidence for the next attempt.
+      - name: Prepare the Android SDK (Linux only)
+        if: runner.os == 'Linux'
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-unset}"
+          ls "${ANDROID_HOME}/platforms" 2>/dev/null || echo "no platforms directory"
+          ls "${ANDROID_HOME}/build-tools" 2>/dev/null || echo "no build-tools directory"
+          SDKM="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          if [ -x "$SDKM" ]; then
+            yes | "$SDKM" --licenses > /dev/null 2>&1 || true
+            "$SDKM" "platforms;android-36" > /dev/null 2>&1 || echo "platform install attempt finished with a nonzero status"
+          else
+            echo "sdkmanager not found at $SDKM"
+          fi
+
       # The technical reference is generated from the sources. This step fails the build if the
       # document stops covering a calculator or drops its Arabic sections, which happened silently
       # once before.
