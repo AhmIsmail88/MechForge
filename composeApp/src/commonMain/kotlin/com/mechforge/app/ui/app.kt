@@ -1,6 +1,7 @@
 package com.mechforge.app.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,11 +49,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.ui.i18n.UiStrings
+import com.mechforge.app.resources.Res
+import com.mechforge.app.resources.taqarub_logo_small
+import org.jetbrains.compose.resources.painterResource
 import com.mechforge.app.ui.theme.Glass
 import com.mechforge.app.ui.theme.GlassBackdrop
 import com.mechforge.app.ui.theme.glassChrome
@@ -154,6 +160,8 @@ fun MechForgeApp(deps: AppDependencies) {
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
+                                Spacer(Modifier.height(6.dp))
+                                TaqarubCredit(strings, Modifier.padding(horizontal = 24.dp))
                             Spacer(Modifier.height(12.dp))
                             for (item in navItems(strings)) {
                                 NavigationDrawerItem(
@@ -298,5 +306,35 @@ private fun Sidebar(current: Screen, onNavigate: (Screen) -> Unit) {
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
+            Spacer(Modifier.height(6.dp))
+            TaqarubCredit(strings)
+    }
+}
+
+/**
+ * Development credit at the foot of the app: the studio mark and its name.
+ *
+ * The text comes first in code, so in the RTL (Arabic) layout it sits on the right and the
+ * mark is leftmost, which is where the studio mark is wanted.
+ */
+@Composable
+private fun TaqarubCredit(strings: UiStrings, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            strings.creditTaqarub,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Image(
+            painter = painterResource(Res.drawable.taqarub_logo_small),
+            contentDescription = strings.creditTaqarub,
+            modifier = Modifier
+                .size(30.dp)
+                .clip(RoundedCornerShape(7.dp)),
+        )
     }
 }

@@ -43,6 +43,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material3)
                 implementation(compose.materialIconsExtended)
+                implementation(compose.components.resources)
                 implementation(compose.ui)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.kotlinx.serialization.json)
@@ -136,6 +137,11 @@ sqldelight {
     }
 }
 
+compose.resources {
+    // Fix the generated package so the logo import is stable and readable.
+    packageOfResClass = "com.mechforge.app.resources"
+}
+
 compose.desktop {
     application {
         mainClass = "com.mechforge.app.MainKt"
@@ -145,7 +151,7 @@ compose.desktop {
             packageName = "MechForge"
             packageVersion = "0.5.0"
             description = "MechForge — Mechanical Engineering Toolkit"
-            vendor = "MechForge"
+            vendor = "TAQARUB"
 
             // The app persists through SQLite over JDBC: the trimmed runtime jpackage
             // builds must carry java.sql (and jdk.unsupported, which the driver touches),
