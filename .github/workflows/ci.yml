@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     strategy:
+      # One runner failing should not hide what the other one saw: the pair of results is what
+      # separates an environment problem from a code problem.
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
