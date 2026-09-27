@@ -76,7 +76,10 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
             }
             if (results.isNotEmpty()) {
                 Card {
-                    Column(modifier = Modifier.padding(8.dp)) {
+                    // The padding has to be at least the card's corner radius (shapes.medium, 12dp),
+                    // otherwise the rounded corner clips the first row: the first result used to read
+                    // "ipe Flow Velocity" because the top-left curve cut the P away.
+                    Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
                         for (calc in results) {
                             Text(
                                 "${CalcText.name(calc.def, strings.isRtl)}  —  ${calc.def.category.displayName}",
