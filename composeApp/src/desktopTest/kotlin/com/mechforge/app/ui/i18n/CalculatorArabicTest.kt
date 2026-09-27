@@ -122,4 +122,24 @@ class CalculatorArabicTest {
         }
         assertTrue(problems.isEmpty(), problems.joinToString("; "))
     }
+
+    /**
+     * Coverage, not just consistency: every calculator in the registry must carry Arabic content,
+     * and every one of its inputs must have an Arabic label. Without this, a new calculator can ship
+     * with an English-only face and nothing complains - the other tests only check the entries that
+     * already exist.
+     */
+    @Test
+    fun everyCalculatorCarriesArabicContent() {
+        val calculators = CalculatorRegistry.all
+        val untranslated = calculators.filterNot { CalculatorArabic.isTranslated(it.def.id) }.map { it.def.id }
+        assertTrue(untranslated.isEmpty(), "calculators with no Arabic content: $untranslated")
+
+        val missingInputs = calculators.flatMap { c ->
+            c.def.inputs
+                .filter { CalculatorArabic.inputLabel(c.def.id, it.id, "") .isBlank() }
+                .map { "${c.def.id}.${it.id}" }
+        }
+        assertTrue(missingInputs.isEmpty(), "inputs with no Arabic label: $missingInputs")
+    }
 }
