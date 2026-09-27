@@ -155,6 +155,21 @@ fun CalculatorScreen(
         }
         Spacer(Modifier.height(6.dp))
         Text(CalcText.description(def, strings.isRtl), style = MaterialTheme.typography.bodyMedium)
+        Spacer(Modifier.height(12.dp))
+
+        // The equation and the code it comes from, shown before anything is calculated: an engineer
+        // should be able to read what a calculator does, and under which reference, without having to
+        // press Calculate first. The numeric working appears further down, once there is a result.
+        Text(strings.calculatorFormula, style = MaterialTheme.typography.labelMedium)
+        Text(def.formulaDisplay, style = MaterialTheme.typography.bodyLarge)
+        if (def.reference.isNotBlank()) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                strings.calculatorReference + ": " + def.reference,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
         Spacer(Modifier.height(16.dp))
 
         // ---- Inputs ----
@@ -359,8 +374,6 @@ fun CalculatorScreen(
                     Spacer(Modifier.height(8.dp))
                     HorizontalDivider()
                     Spacer(Modifier.height(8.dp))
-                    Text(strings.calculatorFormula, style = MaterialTheme.typography.labelMedium)
-                    Text(def.formulaDisplay, style = MaterialTheme.typography.bodyLarge)
                     val shownSteps = if (strings.isRtl && out.stepsAr.isNotEmpty()) out.stepsAr else out.steps
                     if (shownSteps.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
