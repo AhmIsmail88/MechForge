@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/cover.png" width="100%" alt="MechForge - 63 verified mechanical engineering calculators, offline-first, Arabic and English, PDF and Excel reports">
+<img src="docs/assets/cover.png" width="100%" alt="MechForge - 64 verified mechanical engineering calculators, offline-first, Arabic and English, PDF and Excel reports">
 
 <img src="docs/assets/cover-ar.png" width="100%" alt="MechForge - مجموعة أدوات الهندسة الميكانيكية، 63 حاسبة متحققة، عربي وإنجليزي">
 
@@ -36,7 +36,7 @@ It is built around one idea: an engineering number is only useful if you can che
 **every calculator shows its formula, its calculation steps and its engineering reference**
 next to the result — never just a bare number.
 
-- **63 calculators**, each with declared inputs, units, validation and references.
+- **64 calculators**, each with declared inputs, units, validation and references.
 - **Offline-first**: no account, no telemetry, no network. The Android app declares **no
   INTERNET permission** at all.
 - **Arabic and English interface**, with a **report language** that is chosen separately
@@ -96,7 +96,7 @@ next to the result — never just a bare number.
   record, a missing revision or status, a sheet that is not linked to a saved calculation and how
   many values were assumed. And a sheet states that the printed values are the calculation result,
   while design approval is a separate document action.
-- **Engineering foundations.** A golden test suite (139 scenarios, 564 comparisons, 63 calculators,
+- **Engineering foundations.** A golden test suite (141 scenarios, 610 comparisons, 64 calculators,
   re-derived independently of the engine), documented assumptions that the engine announces
   instead of applying silently, physical-range warnings, and a technical reference regenerated from
   the sources.
@@ -188,7 +188,7 @@ Correctness is treated as a first-class feature, and is checked twice:
    reference-library import and the report renderers.
 2. **An independent implementation**: `tools/verification/` re-derives the equations in
    Python from a dump of the engine's own output. The current run covers **129
-   scenarios**, **564 result comparisons** and **all 63 calculators**, with **0 value
+   scenarios**, **610 result comparisons** and **all 64 calculators**, with **0 value
    mismatches** and **0 scaling-law failures**.
 
 ```bash
@@ -203,7 +203,7 @@ python tools/verification/verify_calculations.py engine_dump.jsonl
 ## Architecture
 
 ```
-core/         Kotlin Multiplatform engine: units, validation, 63 calculators (no UI or DB dependencies)
+core/         Kotlin Multiplatform engine: units, validation, 64 calculators (no UI or DB dependencies)
 composeApp/   Compose Multiplatform app, shared by both platforms
               commonMain/   shared UI, data layer, report model
               androidMain/  Android entry point, manifest, icons, SQLite driver
@@ -290,7 +290,7 @@ Every equation in this app is checked by two independent paths, and the checks r
 | Layer | What it proves |
 |---|---|
 | Per-calculator tests (290 engine, 54 app) | A textbook case, a unit-conversion case and an edge case for each calculator, written from the equation rather than from the engine's output |
-| Golden suite (139 scenarios, 564 values, 63 calculators) | Every value is re-derived by an independent Python harness, so a changed equation shows up immediately |
+| Golden suite (141 scenarios, 610 values, 64 calculators) | Every value is re-derived by an independent Python harness, so a changed equation shows up immediately |
 | Verification harness | Recomputes the engine's real output, including physical scaling laws |
 | Unit round-trips | Every unit converts back to itself and every factor is pinned to its numeric value |
 | Arabic parity | An Arabic line may not lose a number the English line carries - translation cannot change a result |

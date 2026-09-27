@@ -21,7 +21,7 @@ private val Def = CalculatorDefinition(
     notes = "Excludes coatings, lining, insulation and fittings. Density defaults to 7850 kg/m3 (carbon steel). Enter a content density (e.g. 1000 kg/m3 for water) to get the operating weight used for supports and hydrotest.",
     keywords = listOf("pipe weight", "mass", "wall thickness", "od", "steel", "water filled", "operating weight"),
     inputs = listOf(
-        InputSpec("od", "Outside diameter", "OD", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
+        InputSpec("od", "Outside diameter", "OD", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm", libraryKey = "pipe-od"),
         InputSpec("t", "Wall thickness", "t", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("rho", "Material density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Material density assumed as 7850 kg/m3 (carbon steel) - use the value for the actual material."),
         InputSpec("rhoc", "Content density (for the operating weight)", "rho_c", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
