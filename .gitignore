@@ -38,3 +38,7 @@ dist/
 
 # Local project archive (not part of the sources)
 MechForge.rar
+
+# Python byte-code caches from the verification tooling
+__pycache__/
+*.pyc

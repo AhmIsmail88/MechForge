@@ -231,6 +231,36 @@ object DuckFootBendBaseDesignCalculator : Calculator(Def) {
                 "Checks: plate ${Fmt.n(tPlateSel * 1000.0, 1)} >= ${Fmt.n(tPlateReq * 1000.0, 2)} -> ${if (plateOk) "safe" else "NOT sufficient"}; ribs ${Fmt.n(tRibSel * 1000.0, 1)} >= ${Fmt.n(tRibReq * 1000.0, 2)} -> ${if (ribOk) "safe" else "NOT sufficient"}; bolts ${Fmt.n(interaction, 3)} <= 1.0 -> ${if (boltOk) "safe" else "NOT sufficient"}; plate diameter ${Fmt.n(dPlate * 1000.0, 1)} >= ${Fmt.n(dPlateMin * 1000.0, 1)} -> ${if (plateDiaOk) "safe" else "NOT sufficient"}",
                 "Elbow geometry recorded for the drawing: t_elbow = ${Fmt.n(tElbow * 1000.0, 1)} mm, D = ${Fmt.n(d * 1000.0, 1)} mm, L = ${Fmt.n(l, 3)} m, h_rib = ${Fmt.n(hRib * 1000.0, 1)} mm, n_ribs = ${Fmt.n(nRibs, 0)}, n_bolts = ${Fmt.n(nBolts, 0)}.",
             ),
+            stepsAr = listOf(
+                "الهندسة: A = π/4 × D^2 = π/4 × ${Fmt.n(d, 4)}^2 = ${Fmt.n(a, 6)} m2   |   V = Q/A = ${Fmt.n(q, 6)} / ${Fmt.n(a, 6)} = ${Fmt.n(v, 4)} m/s",
+                "قوة الدفع لحالة التشغيل لكل فرع: Fp_op = P_pump × A = ${Fmt.n(pPump, 1)} × ${Fmt.n(a, 6)} = ${Fmt.n(fpOp, 1)} N   |   Fm = ρ × Q × V = ${Fmt.n(rhoW, 1)} × ${Fmt.n(q, 6)} × ${Fmt.n(v, 4)} = ${Fmt.n(fm, 1)} N",
+                "F_op = ${Fmt.n(fpOp, 1)} + ${Fmt.n(fm, 1)} = ${Fmt.n(fOp, 1)} N   →   R_op = √2 × F_op = ${Fmt.n(rOp, 1)} N",
+                "قوة الدفع لحالة الضغط التصميمي (استاتيكي): Fp_des = ${Fmt.n(pDes, 1)} × ${Fmt.n(a, 6)} = ${Fmt.n(fpDes, 1)} N   →   R_des = √2 × Fp_des = ${Fmt.n(rDes, 1)} N",
+                "الحالة الحاكمة: R_gov = max(${Fmt.n(rOp / 1000.0, 1)}, ${Fmt.n(rDes / 1000.0, 1)}) = ${Fmt.n(rGov / 1000.0, 1)} kN   |   Rh = Rv = R_gov / √2 = ${Fmt.n(rh / 1000.0, 1)} kN",
+                "الأوزان: W_pipe = π × D × t_pipe × L × γ_s = ${Fmt.n(wPipe, 2)} kg   |   W_water = A × L × ρ_w = ${Fmt.n(wWater, 2)} kg   |   W_elbow = ${Fmt.n(wElbow, 1)} kg",
+                "N_total = Rv + (W_pipe + W_water + W_elbow) × 9.81 = ${Fmt.n(rv / 1000.0, 1)} kN + ${Fmt.n(dead, 2)} × 9.81 / 1000 = ${Fmt.n(nTotal / 1000.0, 1)} kN   |   M = H_total × H = ${Fmt.n(moment / 1000.0, 1)} kN.m",
+                "بالتة القاعدة: q = N_total / A_plate = ${Fmt.n(bearing / 1000.0, 2)} kPa   |   c = (D_plate - D)/2 = ${Fmt.n(cantilever * 1000.0, 1)} mm   |   M_plate = q × c^2 / 2 = ${Fmt.n(mPlate / 1000.0, 2)} kN.m/m",
+                "σ_allow = Fy / FOS = ${Fmt.n(fy / 1e6, 1)} / ${Fmt.n(fos, 3)} = ${Fmt.n(sigmaAllow / 1e6, 1)} MPa   →   t_plate_req = √(6 × M_plate / σ_allow) = ${Fmt.n(tPlateReq * 1000.0, 2)} mm",
+                "الأعصاب: F_rib = N_total / n_ribs = ${Fmt.n(fRib, 1)} N   |   M_rib = F_rib × c = ${Fmt.n(mRib / 1000.0, 2)} kN.m   →   t_rib_req = 6 × M_rib / (σ_allow × h_rib^2) = ${Fmt.n(tRibReq * 1000.0, 2)} mm",
+                "البراغي: T_max = 4 × M / (n_bolts × BCD) = ${Fmt.n(tMax, 1)} N   |   V_bolt = H_total / n_bolts = ${Fmt.n(vBolt, 1)} N   →   d_bolt_req = √(4 × T_max / (π × σ_bolt)) = ${Fmt.n(dBoltReq * 1000.0, 2)} mm",
+                "تفاعل البرغي = √((σ_t/σ_bolt)^2 + (τ/(0.6 × σ_bolt))^2) = √((${Fmt.n(sigmaTAct / 1e6, 1)}/${Fmt.n(sigmaBolt / 1e6, 1)})^2 + (${Fmt.n(tauAct / 1e6, 1)}/${Fmt.n(0.6 * sigmaBolt / 1e6, 1)})^2) = ${Fmt.n(interaction, 3)}",
+                "استيعاب البالتة: edge_min = 2 × d_bolt = ${Fmt.n(edgeMin * 1000.0, 1)} mm   |   D_plate_min = BCD + 2 × edge_sel = ${Fmt.n(dPlateMin * 1000.0, 1)} mm",
+                "الفحوصات: البالتة ${Fmt.n(tPlateSel * 1000.0, 1)} >= ${Fmt.n(tPlateReq * 1000.0, 2)} -> ${if (plateOk) "آمن" else "غير كافٍ"}; الأعصاب ${Fmt.n(tRibSel * 1000.0, 1)} >= ${Fmt.n(tRibReq * 1000.0, 2)} -> ${if (ribOk) "آمن" else "غير كافٍ"}; البراغي ${Fmt.n(interaction, 3)} <= 1.0 -> ${if (boltOk) "آمن" else "غير كافٍ"}; قطر البالتة ${Fmt.n(dPlate * 1000.0, 1)} >= ${Fmt.n(dPlateMin * 1000.0, 1)} -> ${if (plateDiaOk) "آمن" else "غير كافٍ"}",
+                "مقاسات الكوع للرسم: t_elbow = ${Fmt.n(tElbow * 1000.0, 1)} mm, D = ${Fmt.n(d * 1000.0, 1)} mm, L = ${Fmt.n(l, 3)} m, h_rib = ${Fmt.n(hRib * 1000.0, 1)} mm, n_ribs = ${Fmt.n(nRibs, 0)}, n_bolts = ${Fmt.n(nBolts, 0)}.",
+            ),
+            warningsAr = buildList {
+                if (!plateOk) add("سماكة بالتة القاعدة غير كافية: المختار ${Fmt.n(tPlateSel * 1000.0, 1)} mm أقل من المطلوب ${Fmt.n(tPlateReq * 1000.0, 2)} mm - زِد سماكة البالتة.")
+                if (!ribOk) add("سماكة العصب غير كافية: المختار ${Fmt.n(tRibSel * 1000.0, 1)} mm أقل من المطلوب ${Fmt.n(tRibReq * 1000.0, 2)} mm - زِد السماكة أو عدد الأعصاب.")
+                if (!boltOk) add("براغي التثبيت غير كافية: معامل التفاعل ${Fmt.n(interaction, 3)} أكبر من 1.0 - زِد قطر البرغي أو عددهم أو قطر دائرة التوزيع.")
+                if (!plateDiaOk) add("قطر البالتة غير كافٍ لدائرة البراغي: ${Fmt.n(dPlate * 1000.0, 1)} mm مقابل ${Fmt.n(dPlateMin * 1000.0, 1)} mm مطلوبة - زِد قطر البالتة أو قلل دائرة التوزيع.")
+                if (plateOk && ribOk && boltOk && plateDiaOk) add("الفحوصات الأربعة ناجحة بالمقاسات المُدخلة - سجّل الهوامش، فهي ما يوضّح المتبقي لو زادت الأحمال.")
+                if (kotlin.math.abs(nRibs - Math.round(nRibs).toDouble()) > 1e-9) add("عدد الأعصاب ليس عددًا صحيحًا (${Fmt.n(nRibs, 3)}) - توزيع الحمل على الأعصاب لا معنى له إلا بعدد صحيح.")
+                if (kotlin.math.abs(nBolts - Math.round(nBolts).toDouble()) > 1e-9) add("عدد البراغي ليس عددًا صحيحًا (${Fmt.n(nBolts, 3)}) - توزيع الحمل على البراغي لا معنى له إلا بعدد صحيح.")
+                if (tPlateSel < tPlateReq * 1.05) add("هامش سماكة البالتة أقل من 5% - زيادة صغيرة في الحمل ستُفشل هذا الفحص؛ أكّد المقاسات على السماكة التجارية التالية.")
+                add("الأقطار D = ${Fmt.n(d * 1000.0, 1)} mm مفترض تساويها، وهو ما يجعل المحصلة √2 من القوة لفرع واحد. و H = ${Fmt.n(h, 3)} m و W_elbow = ${Fmt.n(wElbow, 1)} kg تقديرية: أكّدها من الرسم التصنيعي والمورد قبل التنفيذ.")
+                add("الحالة الحاكمة كانت ${if (rOp >= rDes) "التشغيل (ضغط المضخة مع الدفع الديناميكي)" else "الضغط التصميمي (استاتيكي)"} عند ${Fmt.n(rGov / 1000.0, 1)} kN. الجاذبية مأخوذة 9.81 m/s2 ثابتة حسب المواصفة.")
+                add("مساعدة تصميم مبدئية: يجب مراجعة النتيجة واعتمادها من مهندس إنشائي/ميكانيكي مرخّص. تحمّل الخرسانة ولحام الأعصاب وتأثير الدفع على الماسورة غير مغطاة هنا.")
+            },
             warnings = warnings,
         )
     }
