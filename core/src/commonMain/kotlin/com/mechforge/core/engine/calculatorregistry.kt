@@ -27,6 +27,7 @@ import com.mechforge.core.calcs.DetentionTimeCalculator
 import com.mechforge.core.calcs.DuctPressureLossCalculator
 import com.mechforge.core.calcs.DuctSizingCalculator
 import com.mechforge.core.calcs.DuctVelocityCalculator
+import com.mechforge.core.calcs.DuckFootBendBaseDesignCalculator
 import com.mechforge.core.calcs.EquivalentLengthCalculator
 import com.mechforge.core.calcs.FanPowerCalculator
 import com.mechforge.core.calcs.FlowConverterCalculator
@@ -89,6 +90,7 @@ object CalculatorRegistry {
         PowerEfficiencyConverterCalculator,
         LatentHeatCalculator,
         DuctVelocityCalculator,
+        DuckFootBendBaseDesignCalculator,
         DuctSizingCalculator,
         DuctPressureLossCalculator,
         FanPowerCalculator,

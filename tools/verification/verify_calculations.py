@@ -39,6 +39,66 @@ def expectation(calc, scenario, raw):
     """raw maps input id -> SI base value."""
     x = lambda k: raw[k]
 
+    if calc == "duck-foot-bend-base":
+        # Re-derived from the design note independently of the Kotlin implementation.
+        d, tpipe, l = x("d"), x("tPipe"), x("l")
+        q = x("q")
+        a = math.pi / 4.0 * d * d
+        v = q / a
+        fp_op = x("pPump") * a
+        fm = x("rhoW") * q * v
+        r_op = math.sqrt(2.0) * (fp_op + fm)
+        r_des = math.sqrt(2.0) * x("pDes") * a
+        r_gov = max(r_op, r_des)
+        rh = r_gov / math.sqrt(2.0)
+        rv = rh
+        w_pipe = math.pi * d * tpipe * l * x("gammaS")
+        w_water = a * l * x("rhoW")
+        n_total = rv + (w_pipe + w_water + x("wElbow")) * 9.81
+        h_total = rh
+        m = h_total * x("h")
+        a_plate = math.pi / 4.0 * x("dPlate") ** 2
+        qb = n_total / a_plate
+        c = (x("dPlate") - d) / 2.0
+        m_plate = qb * c * c / 2.0
+        sigma_allow = x("fy") / x("fos")
+        t_plate_req = math.sqrt(6.0 * m_plate / sigma_allow)
+        t_rib_req = 6.0 * (n_total / x("nRibs")) * c / (sigma_allow * x("hRib") ** 2)
+        t_max = 4.0 * m / (x("nBolts") * x("bcd"))
+        v_bolt = h_total / x("nBolts")
+        a_s_req = t_max / x("sigmaBolt")
+        d_bolt_req = math.sqrt(4.0 * a_s_req / math.pi)
+        a_s_sel = math.pi / 4.0 * x("dBoltSel") ** 2
+        sigma_t = t_max / a_s_sel
+        tau = v_bolt / a_s_sel
+        interaction = math.sqrt((sigma_t / x("sigmaBolt")) ** 2 + (tau / (0.6 * x("sigmaBolt"))) ** 2)
+        d_plate_min = x("bcd") + 2.0 * x("edgeSel")
+        return {
+            "v": v,
+            "rGov": r_gov / 1000.0,
+            "nTotal": n_total / 1000.0,
+            "hTotal": h_total / 1000.0,
+            "moment": m,
+            "bearing": qb / 1000.0,
+            "cantilever": c * 1000.0,
+            "tPlateReq": t_plate_req * 1000.0,
+            "tPlateMargin": (x("tPlateSel") - t_plate_req) * 1000.0,
+            "tRibReq": t_rib_req * 1000.0,
+            "tRibMargin": (x("tRibSel") - t_rib_req) * 1000.0,
+            "tMax": t_max / 1000.0,
+            "vBolt": v_bolt / 1000.0,
+            "dBoltReq": d_bolt_req * 1000.0,
+            "sigmaTAct": sigma_t / 1e6,
+            "tauAct": tau / 1e6,
+            "interaction": interaction,
+            "edgeMin": 2.0 * x("dBoltSel") * 1000.0,
+            "dPlateMin": d_plate_min * 1000.0,
+            "checkPlate": 1.0 if x("tPlateSel") >= t_plate_req else 0.0,
+            "checkRib": 1.0 if x("tRibSel") >= t_rib_req else 0.0,
+            "checkBolt": 1.0 if interaction <= 1.0 else 0.0,
+            "checkPlateDia": 1.0 if x("dPlate") >= d_plate_min else 0.0,
+        }
+
     if calc == "pump-power":
         ph = x("rho") * G * x("q") * x("h") / 1000.0
         sh = ph / x("eta")

@@ -954,6 +954,20 @@ val GOLDEN_CASES: List<GoldenCase> = listOf(
         relativeTolerance = 1e-6,
     ),
     GoldenCase(
+        calculatorId = "duck-foot-bend-base",
+        scenario = "base",
+        inputs = listOf(GoldenInput("bcd", 1.6, "mm"), GoldenInput("d", 0.9, "mm"), GoldenInput("dBoltSel", 0.048, "mm"), GoldenInput("dPlate", 1.9000000000000001, "mm"), GoldenInput("edgeSel", 0.1, "mm"), GoldenInput("fos", 1.67, "dash"), GoldenInput("fy", 235000000.0, "mpa"), GoldenInput("gammaS", 7850.0, "kgm3"), GoldenInput("h", 0.9, "m"), GoldenInput("hRib", 0.3, "mm"), GoldenInput("l", 4.1, "m"), GoldenInput("nBolts", 12.0, "dash"), GoldenInput("nRibs", 8.0, "dash"), GoldenInput("pDes", 1600000.0, "bar"), GoldenInput("pPump", 900000.0, "bar"), GoldenInput("q", 1.32, "ls"), GoldenInput("rhoW", 1000.0, "kgm3"), GoldenInput("sigmaBolt", 140000000.0, "mpa"), GoldenInput("tElbow", 0.01, "mm"), GoldenInput("tPipe", 0.01, "mm"), GoldenInput("tPlateSel", 0.048, "mm"), GoldenInput("tRibSel", 0.032, "mm"), GoldenInput("wElbow", 300.0, "kg")),
+        expected = mapOf("bearing" to 372.214018997273, "cantilever" to 500.0, "checkBolt" to 1.0, "checkPlate" to 1.0, "checkPlateDia" to 1.0, "checkRib" to 1.0, "dBoltReq" to 41.661904489764815, "dPlateMin" to 1800.0, "edgeMin" to 96.0, "hTotal" to 1017.876019763093, "interaction" to 0.9375166080586743, "moment" to 916088.4177867838, "nTotal" to 1055.3337069495808, "rGov" to 1439.494071963311, "sigmaTAct" to 105.46875, "tMax" to 190.85175370557994, "tPlateMargin" to 3.4598885634158085, "tPlateReq" to 44.54011143658419, "tRibMargin" to 0.7516437835851097, "tRibReq" to 31.24835621641489, "tauAct" to 46.87500000000001, "v" to 2.0749088877165613, "vBolt" to 84.82300164692442),
+        relativeTolerance = 1e-6,
+    ),
+    GoldenCase(
+        calculatorId = "duck-foot-bend-base",
+        scenario = "pump-governs",
+        inputs = listOf(GoldenInput("bcd", 1.6, "mm"), GoldenInput("d", 0.9, "mm"), GoldenInput("dBoltSel", 0.064, "mm"), GoldenInput("dPlate", 1.9000000000000001, "mm"), GoldenInput("edgeSel", 0.1, "mm"), GoldenInput("fos", 1.67, "dash"), GoldenInput("fy", 235000000.0, "mpa"), GoldenInput("gammaS", 7850.0, "kgm3"), GoldenInput("h", 0.9, "m"), GoldenInput("hRib", 0.3, "mm"), GoldenInput("l", 4.1, "m"), GoldenInput("nBolts", 12.0, "dash"), GoldenInput("nRibs", 8.0, "dash"), GoldenInput("pDes", 400000.0, "bar"), GoldenInput("pPump", 900000.0, "bar"), GoldenInput("q", 1.32, "ls"), GoldenInput("rhoW", 1000.0, "kgm3"), GoldenInput("sigmaBolt", 140000000.0, "mpa"), GoldenInput("tElbow", 0.01, "mm"), GoldenInput("tPipe", 0.01, "mm"), GoldenInput("tPlateSel", 0.08, "mm"), GoldenInput("tRibSel", 0.04, "mm"), GoldenInput("wElbow", 300.0, "kg")),
+        expected = mapOf("bearing" to 216.1163043110634, "cantilever" to 500.0, "checkBolt" to 1.0, "checkPlate" to 1.0, "checkPlateDia" to 1.0, "checkRib" to 1.0, "dBoltReq" to 31.321074531349822, "dPlateMin" to 1800.0, "edgeMin" to 128.0, "hTotal" to 575.2941408485257, "interaction" to 0.29805510505646066, "moment" to 517764.7267636731, "nTotal" to 612.7518280350133, "rGov" to 813.5887763417626, "sigmaTAct" to 33.530605315374, "tMax" to 107.86765140909856, "tPlateMargin" to 46.06102653606681, "tPlateReq" to 33.93897346393319, "tRibMargin" to 21.856461829459715, "tRibReq" to 18.14353817054029, "tauAct" to 14.902491251277333, "v" to 2.0749088877165613, "vBolt" to 47.941178404043804),
+        relativeTolerance = 1e-6,
+    ),
+    GoldenCase(
         calculatorId = "pressure-converter",
         scenario = "1bar",
         inputs = listOf(GoldenInput("v", 100000.0, "bar")),

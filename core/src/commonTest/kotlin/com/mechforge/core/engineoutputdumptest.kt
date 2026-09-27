@@ -193,6 +193,24 @@ class EngineOutputDumpTest {
         dump("compression-ratio", "16bar", iv("p1", 1.0, "bar"), iv("p2", 16.0, "bar"), iv("crmax", 4.0, "dash"))
         dump("compression-ratio", "4bar", iv("p1", 1.0, "bar"), iv("p2", 4.0, "bar"), iv("crmax", 4.0, "dash"))
 
+        // --- Piping support ---
+        dump("duck-foot-bend-base", "base",
+            iv("d", 900.0, "mm"), iv("tElbow", 10.0, "mm"), iv("tPipe", 10.0, "mm"), iv("l", 4.10, "m"),
+            iv("q", 1320.0, "ls"), iv("pPump", 9.0, "bar"), iv("pDes", 16.0, "bar"), iv("fy", 235.0, "mpa"),
+            iv("fos", 1.67, "dash"), iv("rhoW", 1000.0, "kgm3"), iv("gammaS", 7850.0, "kgm3"),
+            iv("h", 0.90, "m"), iv("wElbow", 300.0, "kg"), iv("dPlate", 1900.0, "mm"), iv("nRibs", 8.0, "dash"),
+            iv("hRib", 300.0, "mm"), iv("nBolts", 12.0, "dash"), iv("bcd", 1600.0, "mm"),
+            iv("sigmaBolt", 140.0, "mpa"), iv("tPlateSel", 48.0, "mm"), iv("tRibSel", 32.0, "mm"),
+            iv("dBoltSel", 48.0, "mm"), iv("edgeSel", 100.0, "mm"))
+        dump("duck-foot-bend-base", "pump-governs",
+            iv("d", 900.0, "mm"), iv("tElbow", 10.0, "mm"), iv("tPipe", 10.0, "mm"), iv("l", 4.10, "m"),
+            iv("q", 1320.0, "ls"), iv("pPump", 9.0, "bar"), iv("pDes", 4.0, "bar"), iv("fy", 235.0, "mpa"),
+            iv("fos", 1.67, "dash"), iv("rhoW", 1000.0, "kgm3"), iv("gammaS", 7850.0, "kgm3"),
+            iv("h", 0.90, "m"), iv("wElbow", 300.0, "kg"), iv("dPlate", 1900.0, "mm"), iv("nRibs", 8.0, "dash"),
+            iv("hRib", 300.0, "mm"), iv("nBolts", 12.0, "dash"), iv("bcd", 1600.0, "mm"),
+            iv("sigmaBolt", 140.0, "mpa"), iv("tPlateSel", 80.0, "mm"), iv("tRibSel", 40.0, "mm"),
+            iv("dBoltSel", 64.0, "mm"), iv("edgeSel", 100.0, "mm"))
+
         // --- Unit converters ---
         dump("pressure-converter", "1bar", iv("v", 1.0, "bar"))
         dump("flow-converter", "1m3h", iv("v", 1.0, "m3h"))

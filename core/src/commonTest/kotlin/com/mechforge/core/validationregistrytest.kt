@@ -58,7 +58,7 @@ class RegistryTest {
 
     @Test
     fun calculatorCountMatchesMvpTarget() {
-        assertEquals(63, CalculatorRegistry.all.size)
+        assertEquals(64, CalculatorRegistry.all.size)
     }
 
     @Test
@@ -73,7 +73,7 @@ class RegistryTest {
         assertEquals(11, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.HVAC).size)
         assertEquals(6, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.THERMODYNAMICS).size)
         assertEquals(8, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.MECHANICAL_DESIGN).size)
-        assertEquals(6, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.PIPING).size)
+        assertEquals(7, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.PIPING).size)
         assertEquals(5, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.WATER_WASTEWATER).size)
         assertEquals(7, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.FIRE_PROTECTION).size)
         assertEquals(5, CalculatorRegistry.byCategory.getValue(com.mechforge.core.engine.CalculatorCategory.EQUIPMENT).size)
