@@ -9,10 +9,12 @@ object LibraryCatalog {
 
     const val ROUGHNESS = "roughness"
     const val DENSITY = "density"
+    const val PIPE_OD = "pipe-od"
 
     val datasetNames: Map<String, String> = mapOf(
         ROUGHNESS to "Pipe absolute roughness (typical)",
         DENSITY to "Material densities (typical)",
+        PIPE_OD to "Pipe outside diameter by nominal size (DN / NPS)",
     )
 
     /**

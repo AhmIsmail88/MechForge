@@ -31,7 +31,7 @@ private val Def = CalculatorDefinition(
     keywords = listOf("wall thickness", "b31.3", "b31.1", "pressure design", "pipe", "schedule", "hoop stress", "mill tolerance", "joint factor"),
     inputs = listOf(
         InputSpec("p", "Design pressure", "p", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
-        InputSpec("d", "Outside diameter", "D", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
+        InputSpec("d", "Outside diameter", "D", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm", libraryKey = "pipe-od"),
         InputSpec("sigma", "Allowable stress S (at design temperature)", "S", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa"),
         InputSpec(
             "e", "Weld joint quality factor E", "E", UnitFamily.DIMENSIONLESS,
