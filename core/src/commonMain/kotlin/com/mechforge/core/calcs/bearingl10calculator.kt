@@ -53,8 +53,9 @@ private val Def = CalculatorDefinition(
         ),
         InputSpec(
             "aiso", "Life modification factor a_ISO", "a_ISO", UnitFamily.DIMENSIONLESS,
-            required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", defaultValue = 1.0,, maxValue = 50.0
-        assumedWhenOmitted = "a_ISO assumed as 1.0 (normal lubrication and contamination) - use the ISO 281 life modification factor where the application demands it."),
+            required = false, minValue = 0.0, exclusiveMin = true, maxValue = 50.0,
+            defaultUnitId = "dash", defaultValue = 1.0,
+            assumedWhenOmitted = "a_ISO assumed as 1.0 (normal lubrication and contamination) - use the ISO 281 life modification factor where the application demands it."),
     ),
 )
 
