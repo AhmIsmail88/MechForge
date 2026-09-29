@@ -730,7 +730,10 @@ def main() -> int:
     doc = re.sub(r"\b\d+ calculator definitions\b", str(n_calcs) + " calculator definitions", doc)
     # 2. Kotlin template expressions copied verbatim by the extraction ("${Fmt.n(x, 3)}"). They are
     #    the expression, not a value, so the wrapper is stripped and the expression shown as code.
-    doc = re.sub(r"\$\{([^{}]*)\}", lambda m: "<code>" + escape(m.group(1)) + "</code>", doc)
+    # One level of nested braces is allowed: an expression such as
+    # ${if (a) { "x" } else { "y" }} is still one expression.
+    doc = re.sub(r"\$\{(?:[^{}]|\{[^{}]*\})*\}",
+                 lambda m: "<code>" + escape(m.group(0)[2:-1]) + "</code>", doc)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with io.open(OUT, "w", encoding="utf-8", newline="") as fh:
         fh.write(doc)
