@@ -21,29 +21,29 @@ import com.mechforge.app.ui.i18n.resolveStrings
 // The four brand colours below are the app's colour identity and are unchanged by
 // the design pass; everything else about the theme (typography, shapes, semantic
 // state colours, spacing) is layered on top in the files next to this one.
-internal val EngineeringBlue = Color(0xFF1B4F8A)
-internal val EngineeringBlueContainer = Color(0xFFD5E4F7)
-internal val Graphite = Color(0xFF3C4043)
-internal val Cyan = Color(0xFF00A5C4)
+internal val EngineeringBlue = Color(0xFF1A73E8)
+internal val EngineeringBlueContainer = Color(0xFFD2E3FC)
+internal val Graphite = Color(0xFF137333)
+internal val Cyan = Color(0xFFF29900)
 
 internal val LightColors = lightColorScheme(
     primary = EngineeringBlue,
     onPrimary = Color.White,
     primaryContainer = EngineeringBlueContainer,
-    onPrimaryContainer = Color(0xFF0B2C4F),
+    onPrimaryContainer = Color(0xFF174EA6),
     secondary = Graphite,
     onSecondary = Color.White,
     tertiary = Cyan,
-    onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFD2F2F8),
+    onTertiary = Color(0xFF202124),
+    tertiaryContainer = Color(0xFFFEEFC3),
     // Glass pass: the shell paints the backdrop, so every surface is translucent and
     // Material components (cards, fields, dialogs, menus) become glass for free.
-    background = Color(0xFFEDF2FB),
-    onBackground = Color(0xFF141A24),
+    background = Color(0xFFF8F9FA),
+    onBackground = Color(0xFF202124),
     surface = Color(0xD9FFFFFF),
-    onSurface = Color(0xFF141A24),
+    onSurface = Color(0xFF202124),
     surfaceVariant = Color(0xC7FFFFFF),
-    onSurfaceVariant = Color(0xFF3A4453),
+    onSurfaceVariant = Color(0xFF5F6368),
     surfaceContainerLowest = Color(0xCCFFFFFF),
     surfaceContainerLow = Color(0xD9FFFFFF),
     surfaceContainer = Color(0xE0FFFFFF),
@@ -54,7 +54,7 @@ internal val LightColors = lightColorScheme(
 )
 
 internal val DarkColors = darkColorScheme(
-    primary = Color(0xFF9CC5F5),
+    primary = Color(0xFF8AB4F8),
     onPrimary = Color(0xFF10283F),
     primaryContainer = Color(0xFF2A5480),
     onPrimaryContainer = Color(0xFFD5E4F7),

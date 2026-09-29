@@ -39,12 +39,12 @@ import androidx.compose.ui.unit.dp
 internal object Glass {
 
     /** Identity colours reused as the light sources behind the glass. */
-    val Blue = Color(0xFF1B4F8A)
-    val Cyan = Color(0xFF00A5C4)
+    val Blue = Color(0xFF1A73E8)
+    val Amber = Color(0xFFFBBC04)
 
     // Backdrop base, dark and light.
     private val DarkBase = listOf(Color(0xFF05070D), Color(0xFF0A1220), Color(0xFF04060B))
-    private val LightBase = listOf(Color(0xFFE8EEFA), Color(0xFFF7F9FD), Color(0xFFEDF1F9))
+    private val LightBase = listOf(Color(0xFFF1F3F4), Color(0xFFF8F9FA), Color(0xFFEDF1F9))
 
     /** True when the active colour scheme is the dark one. */
     @Composable
@@ -112,7 +112,7 @@ fun GlassBackdrop(modifier: Modifier = Modifier) {
                 .background(
                     Brush.radialGradient(
                         listOf(
-                            Glass.Cyan.copy(alpha = if (dark) 0.20f else 0.10f),
+                            Glass.Amber.copy(alpha = if (dark) 0.20f else 0.10f),
                             Color.Transparent,
                         ),
                     ),

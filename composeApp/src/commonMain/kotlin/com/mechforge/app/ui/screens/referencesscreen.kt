@@ -85,7 +85,9 @@ fun ReferencesScreen(deps: AppDependencies) {
 
         for (dataset in datasets) {
             Card(modifier = Modifier.fillMaxWidth().glassBorder(MaterialTheme.shapes.large).padding(vertical = 4.dp)) {
-                Column(modifier = Modifier.padding(14.dp)) {
+                // The content padding has to clear the card's corner radius
+                // (shapes.large = 16dp), otherwise the rounded corner clips the first line.
+                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth(),
