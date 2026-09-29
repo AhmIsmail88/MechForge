@@ -62,11 +62,11 @@ class DuckFootBendBaseTest {
 
         // Hand calculation from the design note's equations.
         assertTrue(rel(value(defaults(), "v"), 2.074909) < 1e-5, "velocity")
-        assertTrue(rel(value(defaults(), "rGov"), 1439.494) < 1e-5, "governing resultant, kN")
-        assertTrue(rel(value(defaults(), "nTotal"), 1055.334) < 1e-5, "total vertical load, kN")
+        assertTrue(rel(value(defaults(), "rGov"), 1439.4941) < 1e-5, "governing resultant, kN")
+        assertTrue(rel(value(defaults(), "nTotal"), 1055.4201) < 1e-5, "total vertical load, kN")
         assertTrue(rel(value(defaults(), "hTotal"), 1017.876) < 1e-5, "horizontal load, kN")
-        assertTrue(rel(value(defaults(), "moment"), 916088.418) < 1e-5, "overturning moment, N.m")
-        assertTrue(rel(value(defaults(), "bearing"), 372.214) < 1e-5, "bearing stress, kPa")
+        assertTrue(rel(value(defaults(), "moment"), 916088.4178) < 1e-5, "overturning moment, N.m")
+        assertTrue(rel(value(defaults(), "bearing"), 372.2445) < 1e-5, "bearing stress, kPa")
         assertTrue(rel(value(defaults(), "cantilever"), 500.0) < 1e-9, "plate cantilever, mm")
         assertTrue(rel(value(defaults(), "tPlateReq"), 44.5401) < 1e-4, "required plate thickness, mm")
         assertTrue(rel(value(defaults(), "tRibReq"), 31.2484) < 1e-4, "required rib thickness, mm")

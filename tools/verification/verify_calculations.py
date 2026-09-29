@@ -49,12 +49,13 @@ def expectation(calc, scenario, raw):
         fm = x("rhoW") * q * v
         r_op = math.sqrt(2.0) * (fp_op + fm)
         r_des = math.sqrt(2.0) * x("pDes") * a
-        r_gov = max(r_op, r_des)
+        r_test = math.sqrt(2.0) * x("pTest") * a if "pTest" in raw else None
+        r_gov = max(r_op, r_des, r_test if r_test is not None else 0.0)
         rh = r_gov / math.sqrt(2.0)
         rv = rh
-        w_pipe = math.pi * d * tpipe * l * x("gammaS")
+        w_pipe = math.pi * (d + tpipe) * tpipe * l * x("gammaS")
         w_water = a * l * x("rhoW")
-        n_total = rv + (w_pipe + w_water + x("wElbow")) * 9.81
+        n_total = rv + (w_pipe + w_water + x("wElbow")) * 9.80665
         h_total = rh
         m = h_total * x("h")
         a_plate = math.pi / 4.0 * x("dPlate") ** 2

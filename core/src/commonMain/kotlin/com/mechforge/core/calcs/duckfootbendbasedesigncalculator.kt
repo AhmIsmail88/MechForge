@@ -37,7 +37,7 @@ private val Def = CalculatorDefinition(
     category = CalculatorCategory.PIPING,
     description = "Sizes the anchor base of a 90 degree duck foot bend: the thrust on both load cases, the base plate thickness, the stiffener ribs and the anchor bolts on their bolt circle, with a pass/fail check for each.",
     formulaDisplay = "R = sqrt(2)*max(P_pump*A + rho*Q*V, P_des*A)  |  t_plate = sqrt(6*q*c^2/2 / sigma_allow)  |  T_max = 4*M / (n*BCD)",
-    reference = "Initial design assistance following the vector thrust of a 90 degree bend and the cantilever-plate, rib-bending and elastic bolt-group methods; to be verified against ASME B31.3 and AISC (or the governing project code).",
+    reference = "Initial design assistance following the vector thrust of a 90 degree bend and the cantilever-plate, rib-bending and elastic bolt-group methods. The pressure side cites B31.3; the base plate, the bolts and the ribs are foundation items whose methods come from AISC 360 / AISC Design Guide 1 and whose loads from AWWA M11 practice. The concrete anchorage is governed by ACI 318-19 chapter 17 and is not checked here.",
     notes = "The two legs are assumed equal in diameter, which is what makes the resultant sqrt(2) times the leg thrust. H is the height of the bend centre above the plate and W_elbow is the bend weight: both are estimates and must be confirmed against the fabrication drawing and the supplier. The rib is designed on a conservative lever arm equal to the plate cantilever, and the plate as a cantilever strip under uniform bearing. Structural checks such as concrete bearing, weld design, plate flexibility limits and the effect of the thrust on the pipe itself are outside this calculator. This is initial design assistance: the result must be reviewed and approved by a licensed structural or mechanical engineer before construction.",
     keywords = listOf("duck foot bend", "thrust block", "base plate", "anchor bolt", "stiffener", "rib", "gusset", "bolt circle", "pump base", "momentum thrust", "bend", "support"),
     inputs = listOf(
@@ -48,6 +48,11 @@ private val Def = CalculatorDefinition(
         InputSpec("q", "Water flow", "Q", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "ls"),
         InputSpec("pPump", "Pump operating pressure", "P_pump", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
         InputSpec("pDes", "Design pressure (static case)", "P_des", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
+        InputSpec(
+            "pTest", "Hydrostatic test pressure (1.5 x design per B31.3 345)", "P_test", UnitFamily.PRESSURE,
+            required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar",
+            assumedWhenOmitted = "No hydrostatic test case computed: enter the test pressure (commonly 1.5 x design pressure per B31.3 345) - for a bend carrying a dead end the test case often governs the thrust.",
+        ),
         InputSpec("fy", "Steel yield stress", "Fy", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mpa"),
         InputSpec("fos", "Design factor of safety", "FOS", UnitFamily.DIMENSIONLESS, minValue = 1.0, defaultUnitId = "dash"),
         InputSpec("rhoW", "Water density", "rho_w", UnitFamily.DENSITY, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3"),
@@ -69,8 +74,8 @@ private val Def = CalculatorDefinition(
 
 object DuckFootBendBaseDesignCalculator : Calculator(Def) {
 
-    /** Gravity, fixed by the specification (m/s2). */
-    private const val G = 9.81
+    /** Gravity, m/s2 - one value across the whole engine. */
+    private const val G = 9.80665
 
     override fun calculate(inputs: Map<String, InputValue>): CalcOutput {
         val d = value(inputs, "d")                 // m
@@ -111,12 +116,19 @@ object DuckFootBendBaseDesignCalculator : Calculator(Def) {
         val fpDes = pDes * a
         val rDes = sqrt(2.0) * fpDes
 
-        val rGov = max(rOp, rDes)
+        // Hydrostatic test: static, no flow, at the test pressure. For a bend with a dead end this
+        // case is frequently the governing one and leaving it out understates the thrust.
+        val fpTest = if (has(inputs, "pTest")) value(inputs, "pTest") * a else null
+        val rTest = fpTest?.let { sqrt(2.0) * it }
+
+        val rGov = max(rOp, max(rDes, rTest ?: 0.0))
         val rh = rGov / sqrt(2.0)
         val rv = rGov / sqrt(2.0)
 
         // Loads on the base
-        val wPipe = Math.PI * d * tPipe * l * gammaS
+        // Mean-diameter wall: the metal ring carries the mid-surface, and the inner-diameter
+        // form understated the weight slightly.
+        val wPipe = Math.PI * (d + tPipe) * tPipe * l * gammaS
         val wWater = a * l * rhoW
         val dead = wPipe + wWater + wElbow
         val nTotal = rv + dead * G
@@ -184,8 +196,14 @@ object DuckFootBendBaseDesignCalculator : Calculator(Def) {
                 add("The plate thickness margin is under 5% - a small load increase will fail this check; confirm the sizes against the next commercial plate thickness.")
             }
             add("D = ${Fmt.n(d * 1000.0, 1)} mm legs are assumed equal in diameter, which is what makes the resultant sqrt(2) times one leg. H = ${Fmt.n(h, 3)} m and W_elbow = ${Fmt.n(wElbow, 1)} kg are estimates: confirm them against the fabrication drawing and the supplier before construction.")
-            add("The governing case was ${if (rOp >= rDes) "operating (pump pressure plus momentum)" else "design pressure (static)"} at ${Fmt.n(rGov / 1000.0, 1)} kN. Gravity is taken as 9.81 m/s2, fixed by the specification.")
-            add("Initial design assistance: the result must be reviewed and approved by a licensed structural or mechanical engineer. Concrete bearing, welding of the ribs and the effect on the pipe are not covered here.")
+            val gov = when (rGov) {
+                rTest ?: -1.0 -> if (rTest != null) "hydrostatic test pressure" else ""
+                rDes -> "design pressure (static)"
+                else -> "operating (pump pressure plus momentum)"
+            }
+            add("The governing case was " + gov + " at ${Fmt.n(rGov / 1000.0, 1)} kN. Gravity is taken as 9.80665 m/s2, the same constant as the rest of the engine.")
+            add("Initial design assistance: the result must be reviewed and approved by a licensed structural or mechanical engineer. NOT covered here: concrete anchorage (ACI 318-19 ch. 17 breakout, pullout, pryout, side-blowout), plate bending at the bolt group (AISC Design Guide 1, frequently the governing plate check), rib shear and bearing, wind and seismic loads, and friction as a shear path - all of which can govern.")
+            add("Pump operating pressure should be entered as the maximum the pump can develop (shut-off or relief setting, gauge), not the rated duty pressure.")
         }
 
         return CalcOutput(
@@ -258,8 +276,9 @@ object DuckFootBendBaseDesignCalculator : Calculator(Def) {
                 if (kotlin.math.abs(nBolts - Math.round(nBolts).toDouble()) > 1e-9) add("عدد البراغي ليس عددًا صحيحًا (${Fmt.n(nBolts, 3)}) - توزيع الحمل على البراغي لا معنى له إلا بعدد صحيح.")
                 if (tPlateSel < tPlateReq * 1.05) add("هامش سماكة البالتة أقل من 5% - زيادة صغيرة في الحمل ستُفشل هذا الفحص؛ أكّد المقاسات على السماكة التجارية التالية.")
                 add("الأقطار D = ${Fmt.n(d * 1000.0, 1)} mm مفترض تساويها، وهو ما يجعل المحصلة √2 من القوة لفرع واحد. و H = ${Fmt.n(h, 3)} m و W_elbow = ${Fmt.n(wElbow, 1)} kg تقديرية: أكّدها من الرسم التصنيعي والمورد قبل التنفيذ.")
-                add("الحالة الحاكمة كانت ${if (rOp >= rDes) "التشغيل (ضغط المضخة مع الدفع الديناميكي)" else "الضغط التصميمي (استاتيكي)"} عند ${Fmt.n(rGov / 1000.0, 1)} kN. الجاذبية مأخوذة 9.81 m/s2 ثابتة حسب المواصفة.")
-                add("مساعدة تصميم مبدئية: يجب مراجعة النتيجة واعتمادها من مهندس إنشائي/ميكانيكي مرخّص. تحمّل الخرسانة ولحام الأعصاب وتأثير الدفع على الماسورة غير مغطاة هنا.")
+                add("الحالة الحاكمة كانت " + (if (rTest != null && rGov == rTest) "ضغط الاختبار الهيدروستاتيكي" else if (rGov == rDes) "الضغط التصميمي (استاتيكي)" else "التشغيل (ضغط المضخة مع الدفع الديناميكي)") + "عند ${Fmt.n(rGov / 1000.0, 1)} kN. الجاذبية مأخوذة 9.80665 m/s2، نفس الثابت في باقي المحرك.")
+                add("مساعدة تصميم مبدئية: يجب مراجعة النتيجة واعتمادها من مهندس إنشائي/ميكانيكي مرخّص. غير مغطى هنا: تثبيت الخرسانة (ACI 318-19 الفصل 17 - الانفصال والقشط والانحشار والقص الجانبي)، وانحناء اللوحة عند مجموعة البراغي (AISC Design Guide 1 وهو غالبًا الفحص الحاكم للوحة)، وقص وانحشار الأعصاب، وأحمال الرياح والزلازل، والاحتكاك كمسار قص - وكلها قد تحكم.")
+                add("يُفضَّل إدخال ضغط تشغيل المضخة كأقصى ضغط يمكن أن تنتجه (ضغط الغلق أو ضبط صمام الأمان، gauge) لا ضغط نقطة التشغيل المقننة.")
             },
             warnings = warnings,
         )
