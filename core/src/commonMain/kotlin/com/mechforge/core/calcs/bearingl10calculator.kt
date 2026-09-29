@@ -23,11 +23,13 @@ import kotlin.math.pow
  */
 private val ReliabilityLevels: List<Pair<InputOption, Double>> = listOf(
     InputOption("90", "90 % - basic rating life (L10)") to 1.0,
-    InputOption("95", "95 % (L5)") to 0.62,
-    InputOption("96", "96 % (L4)") to 0.53,
-    InputOption("97", "97 % (L3)") to 0.44,
-    InputOption("98", "98 % (L2)") to 0.33,
-    InputOption("99", "99 % (L1)") to 0.21,
+    InputOption("95", "95 % (L5)") to 0.64,
+    InputOption("96", "96 % (L4)") to 0.55,
+    InputOption("97", "97 % (L3)") to 0.47,
+    InputOption("98", "98 % (L2)") to 0.37,
+    InputOption("99", "99 % (L1)") to 0.25,
+    InputOption("992", "99.2 % (L0.8)") to 0.22,
+    InputOption("999", "99.9 % (L0.1)") to 0.06,
 )
 
 private val Def = CalculatorDefinition(
@@ -37,7 +39,7 @@ private val Def = CalculatorDefinition(
     description = "Basic rating life of a rolling bearing (ISO 281 L10) and the reliability- and lubrication-adjusted modified life Lnm.",
     formulaDisplay = "L10 = (C/P)^p * 10^6 rev ;  L10h = 10^6/(60*n)*(C/P)^p ;  L_nm = a1 * a_ISO * L10",
     reference = "ISO 281 basic rating life L10 = (C/P)^p*10^6 with a1 reliability factors and the a_ISO life modification factor (ISO 281:2007).",
-    notes = "p = 3 for ball bearings and 10/3 for roller bearings. The reliability factor a1 comes from ISO 281 (1.0 at 90 %, 0.62 at 95 %, 0.53 at 96 %, 0.44 at 97 %, 0.33 at 98 %, 0.21 at 99 %). a_ISO (a_SKF for SKF bearings) is taken from the lubrication and contamination of the application - the viscosity ratio and the contamination factor - and is entered here from the lubricant data or the manufacturer's tool. Verify the actual life with the bearing manufacturer for the application.",
+    notes = "p = 3 for ball bearings and 10/3 for roller bearings. The reliability factor a1 comes from ISO 281:2007 (1.00 at 90 %, 0.64 at 95 %, 0.55 at 96 %, 0.47 at 97 %, 0.37 at 98 %, 0.25 at 99 %, and lower for the extended levels). a_ISO is limited to 50 by the standard and is capped here. a_ISO = 1.0 assumes normal lubrication and clean conditions; a proper value comes from the lubrication condition, the contamination level and the fatigue load limit. The life is in revolutions, and in hours when a speed is given, at the stated reliability.",
     keywords = listOf("bearing", "l10", "lnm", "life", "iso 281", "dynamic load", "ball", "roller", "reliability", "lubrication"),
     inputs = listOf(
         InputSpec("c", "Dynamic load rating", "C", UnitFamily.FORCE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kn"),
@@ -51,7 +53,7 @@ private val Def = CalculatorDefinition(
         ),
         InputSpec(
             "aiso", "Life modification factor a_ISO", "a_ISO", UnitFamily.DIMENSIONLESS,
-            required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", defaultValue = 1.0,
+            required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", defaultValue = 1.0,, maxValue = 50.0
         assumedWhenOmitted = "a_ISO assumed as 1.0 (normal lubrication and contamination) - use the ISO 281 life modification factor where the application demands it."),
     ),
 )

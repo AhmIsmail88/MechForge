@@ -502,7 +502,7 @@ val GOLDEN_CASES: List<GoldenCase> = listOf(
         calculatorId = "bearing-l10",
         scenario = "rel95",
         inputs = listOf(GoldenInput("c", 30000.0, "kn"), GoldenInput("exp", 3.0, "dash"), GoldenInput("n", 1500.0, "rpm"), GoldenInput("p", 5000.0, "kn"), GoldenInput("rel", 1.0, "dash")),
-        expected = mapOf("a1" to 0.62, "aisoUsed" to 1.0, "l10" to 216000000.0, "l10h" to 2400.0, "lnm" to 133920000.0, "lnmh" to 1488.0),
+        expected = mapOf("a1" to 0.64, "aisoUsed" to 1.0, "l10" to 216000000.0, "l10h" to 2400.0, "lnm" to 138240000.0, "lnmh" to 1536.0),
         relativeTolerance = 1e-6,
     ),
     GoldenCase(

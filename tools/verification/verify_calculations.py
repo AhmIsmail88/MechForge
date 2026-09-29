@@ -299,7 +299,7 @@ def expectation(calc, scenario, raw):
         if "n" in raw:
             out["l10h"] = l10 / (60.0 * x("n"))
         # ISO 281 reliability factors a1 and the life modification factor a_ISO
-        a1 = {0: 1.0, 1: 0.62, 2: 0.53, 3: 0.44, 4: 0.33, 5: 0.21}[int(x("rel"))] if "rel" in raw else 1.0
+        a1 = {0: 1.0, 1: 0.64, 2: 0.55, 3: 0.47, 4: 0.37, 5: 0.25, 6: 0.22, 7: 0.06}[int(x("rel"))] if "rel" in raw else 1.0
         a_iso = x("aiso") if "aiso" in raw else 1.0
         if a1 != 1.0 or a_iso != 1.0:
             lnm = a1 * a_iso * l10

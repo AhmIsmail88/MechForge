@@ -299,9 +299,9 @@ class BearingModifiedLifeTest {
             T.iv("c", 30.0, "kn"), T.iv("p", 5.0, "kn"), T.iv("exp", 3.0, "dash"),
             T.iv("n", 1500.0, "rpm"), T.iv("rel", 1.0, "dash"),
         )
-        assertEquals(0.62, out.results.first { it.id == "a1" }.value, 1e-9)
-        assertEquals(133.92e6, out.results.first { it.id == "lnm" }.value, 1.0)
-        assertEquals(1488.0, out.results.first { it.id == "lnmh" }.value, 1.0)
+        assertEquals(0.64, out.results.first { it.id == "a1" }.value, 1e-9)
+        assertEquals(138.24e6, out.results.first { it.id == "lnm" }.value, 1.0)
+        assertEquals(1536.0, out.results.first { it.id == "lnmh" }.value, 1.0)
     }
 
     @Test
@@ -322,8 +322,8 @@ class BearingModifiedLifeTest {
             T.iv("c", 30.0, "kn"), T.iv("p", 5.0, "kn"), T.iv("exp", 3.0, "dash"),
             T.iv("n", 1500.0, "rpm"), T.iv("rel", 4.0, "dash"), T.iv("aiso", 0.8, "dash"),
         )
-        assertEquals(0.33, out.results.first { it.id == "a1" }.value, 1e-9)
-        assertEquals(57.024e6, out.results.first { it.id == "lnm" }.value, 1.0)
-        assertEquals(633.6, out.results.first { it.id == "lnmh" }.value, 1.0)
+        assertEquals(0.37, out.results.first { it.id == "a1" }.value, 1e-9)
+        assertEquals(63.936e6, out.results.first { it.id == "lnm" }.value, 1.0)
+        assertEquals(710.4, out.results.first { it.id == "lnmh" }.value, 1.0)
     }
 }
