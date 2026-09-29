@@ -37,20 +37,24 @@ private val Def = CalculatorDefinition(
             "e", "Weld joint quality factor E", "E", UnitFamily.DIMENSIONLESS,
             required = false, minValue = 0.0, exclusiveMin = true, maxValue = 1.0,
             defaultUnitId = "dash", defaultValue = 1.0,
+            assumedWhenOmitted = "Weld joint quality factor E assumed as 1.00 (seamless pipe). Welded pipe is 0.85-0.95 depending on the examination level - confirm it for the joint actually specified.",
         ),
         InputSpec(
             "y", "Coefficient Y (B31.3 Table 304.1.1)", "Y", UnitFamily.DIMENSIONLESS,
             required = false, minValue = 0.0, exclusiveMin = false, maxValue = 1.0,
             defaultUnitId = "dash", defaultValue = 0.4,
+            assumedWhenOmitted = "Coefficient Y assumed as 0.4, the B31.3 Table 304.1.1 value for ferritic steels up to 482 C - other materials and temperatures differ.",
         ),
         InputSpec(
             "ca", "Corrosion / erosion allowance", "CA", UnitFamily.LENGTH,
             required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "mm", defaultValue = 0.0,
+            assumedWhenOmitted = "No corrosion or erosion allowance assumed (0 mm) - codes require an allowance for the service; a clean, non-corrosive service may justify zero.",
         ),
         InputSpec(
             "mill", "Mill tolerance", "mill", UnitFamily.DIMENSIONLESS,
             required = false, minValue = 0.0, exclusiveMin = false, maxValue = 1.0, exclusiveMax = true,
             allowedUnitIds = listOf("pct"), defaultUnitId = "pct", defaultValue = 12.5,
+            assumedWhenOmitted = "Mill tolerance assumed as 12.5 %, the standard allowance for seamless and welded pipe under the ASTM A106/A53 specifications - it is a pipe specification figure, not a B31.3 one. Confirm the tolerance for the pipe actually ordered.",
         ),
     ),
 )
@@ -71,6 +75,11 @@ object PipeWallThicknessCalculator : Calculator(Def) {
         val tNominal = tMin / (1.0 - mill)
 
         val warnings = buildList {
+            // B31.3 304.1.2(a): the pressure-design equation holds while t < D/6. Beyond that the
+            // geometry is no longer thin-walled and the hoop-stress form stops being valid.
+            if (d / tNominal < 6.0) {
+                add("The required nominal thickness is not small compared with the diameter (D/t = ${Fmt.n(d / tNominal, 2)}): B31.3 limits this equation to t < D/6, so the wall needs the thick-wall treatment or a heavier pipe.")
+            }
             add("S must be the code allowable stress at the design temperature, and E/Y must match the pipe and material - confirm against ASME B31.3 (or the governing code) before ordering.")
             if (e < 1.0) add("E = ${Fmt.n(e, 3)}: the allowable is reduced for a welded joint - confirm the joint factor for the examination level specified.")
             if (ca <= 0.0) add("No corrosion/erosion allowance entered - codes require an allowance for the service (0 for clean non-corrosive service).")

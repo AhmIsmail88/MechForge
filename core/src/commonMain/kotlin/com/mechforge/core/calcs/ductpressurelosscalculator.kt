@@ -88,7 +88,7 @@ object DuctPressureLossCalculator : Calculator(Def) {
         val warnings = buildList {
             rhoSiteWarning?.let { add(it) }
             FrictionFactor.regimeWarning(re)?.let { add(it) }
-            add("Uses the straight-duct fiction only — add fitting/terminal losses for a full system total.")
+            add("Uses the straight-duct friction only — add fitting/terminal losses for a full system total.")
             if (dp / l > 1.5) add("Friction loss above 1.5 Pa/m - above the usual design band; check the fan energy against the project criterion.")
             if (dp / l < 0.5) add("Friction loss below 0.5 Pa/m - the duct may be oversized for the stated criterion.")
         }
