@@ -17,7 +17,7 @@ private val Def = CalculatorDefinition(
     description = "Predicted flow, head and power at a new pump speed, and for an impeller diameter change (trim).",
     formulaDisplay = "Q2 = Q1*(N2/N1) ;  H2 = H1*(N2/N1)^2 ;  P2 = P1*(N2/N1)^3",
     reference = "Pump affinity (similarity) laws; HI/ANSI pump standards practice.",
-    notes = "Speed change: exact for a geometrically similar pump. Impeller trim: an approximation valid for trims up to about 10-15% - always verify on the actual curve. Efficiency is assumed unchanged.",
+    notes = "Speed change: exact for a geometrically similar pump. Impeller trim: an approximation valid for trims up to about 10-15% - always verify on the actual curve. Efficiency is assumed unchanged. The affinity laws move a point along the pump curve; it is the new operating point only when the system curve passes through the origin (friction only, no static head). With a static component the flow shifts less than the speed ratio suggests, and efficiency changes with speed and trimming are not modelled.",
     keywords = listOf("affinity", "pump", "speed", "trim", "impeller", "equipment", "laws"),
     inputs = listOf(
         InputSpec("q1", "Flow at N1", "Q1", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),

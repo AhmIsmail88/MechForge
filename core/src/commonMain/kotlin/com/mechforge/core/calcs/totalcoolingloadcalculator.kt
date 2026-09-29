@@ -22,7 +22,7 @@ private val Def = CalculatorDefinition(
     description = "Sensible, latent and total cooling load for an air stream from temperature and humidity difference.",
     formulaDisplay = "Q_t = ρ·V̇·(c_p·ΔT + h_fg·Δw)",
     reference = "Standard psychrometric load relations (formula form; ASHRAE Handbook—Fundamentals).",
-    notes = "h_fg = 2501 kJ/kg. Humidity ratio w in kg/kg dry air (optional — omit for sensible-only).",
+    notes = "h_fg = 2501 kJ/kg. Humidity ratio w in kg/kg dry air (optional — omit for sensible-only). The dry-air specific heat and the enthalpy of vaporisation are the standard 1.005 kJ/(kg K) and 2501 kJ/kg; a moist-air correction is not applied. A negative total means the temperature difference was taken as outlet minus inlet - check the sign convention of the two temperatures.",
     keywords = listOf("cooling", "load", "sensible", "latent", "coil", "hvac"),
     inputs = listOf(
         InputSpec("q", "Airflow", "V̇", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),

@@ -18,7 +18,7 @@ private val Def = CalculatorDefinition(
     description = "Latent heat from moisture change in an air stream (humidification or dehumidification).",
     formulaDisplay = "Q_l = ρ·V̇·h_fg·Δw",
     reference = "Standard air-side psychrometric relation; h_fg = 2501 kJ/kg at 0 °C (approximation).",
-    notes = "Δw = w_leaving − w_entering in kg/kg dry air. Positive = moisture added (humidification).",
+    notes = "Δw = w_leaving − w_entering in kg/kg dry air. Positive = moisture added (humidification). The latent heat h_fg = 2501 kJ/kg is the value at 0 C; it falls with temperature. Moist air carries its own correction to the specific heat that is not applied here.",
     keywords = listOf("latent", "moisture", "humidity", "humidification", "hvac"),
     inputs = listOf(
         InputSpec("q", "Airflow", "V̇", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),

@@ -23,7 +23,7 @@ private val Def = CalculatorDefinition(
     description = "Sensible heat added to or removed from an air stream, in SI and imperial forms.",
     formulaDisplay = "Q_s = ρ·V̇·c_p·ΔT   (imperial: Q_s = 1.08·CFM·ΔT)",
     reference = "Standard air-side HVAC relations (formula form; ASHRAE Handbook—Fundamentals).",
-    notes = "c_p = 1.005 kJ/(kg·K). Imperial 1.08-form assumes standard air density; shown as equivalent of the computed kW.",
+    notes = "c_p = 1.005 kJ/(kg·K). Imperial 1.08-form assumes standard air density; shown as equivalent of the computed kW. The specific heat 1.005 kJ/(kg K) is dry air; moist air is about 1.006 + 1.86 w, roughly 3.5 percent higher at w = 0.018, so a humid design is slightly understated. A negative result means the temperature difference was taken as outlet minus inlet.",
     keywords = listOf("sensible", "heat", "cooling", "heating", "hvac", "air"),
     inputs = listOf(
         InputSpec("q", "Airflow", "V̇", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
