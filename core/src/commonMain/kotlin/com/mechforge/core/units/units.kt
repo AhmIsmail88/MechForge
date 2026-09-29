@@ -28,6 +28,9 @@ object Units {
         add(factorUnit("mpa", "MPa", UnitFamily.PRESSURE, 1e6))
         add(factorUnit("bar", "bar", UnitFamily.PRESSURE, 1e5))
         add(factorUnit("psi", "psi", UnitFamily.PRESSURE, 6894.757293168361))
+        add(factorUnit("kgfcm2", "kgf/cm²", UnitFamily.PRESSURE, 98066.5))
+        add(factorUnit("mmhg", "mmHg", UnitFamily.PRESSURE, 133.322387415))
+        add(factorUnit("inhg", "inHg", UnitFamily.PRESSURE, 3386.388640341))
         add(factorUnit("atm", "atm", UnitFamily.PRESSURE, 101325.0))
         add(factorUnit("mh2o", "mH₂O", UnitFamily.PRESSURE, 9806.65))
         add(factorUnit("fth2o", "ftH₂O", UnitFamily.PRESSURE, 2989.0669))
@@ -51,6 +54,9 @@ object Units {
         add(factorUnit("w", "W", UnitFamily.POWER, 1.0))
         add(factorUnit("kw", "kW", UnitFamily.POWER, 1e3))
         add(factorUnit("hp", "HP", UnitFamily.POWER, 745.69987158227))
+        // Metric horsepower (PS): 75 kgf m/s, used on European motor and fan nameplates. It is
+        // 1.4 % smaller than the mechanical HP above, which is why both are listed.
+        add(factorUnit("hpm", "HP (metric)", UnitFamily.POWER, 735.49875))
         add(factorUnit("tr", "TR", UnitFamily.POWER, 3516.8528))
         add(factorUnit("btuh", "BTU/h", UnitFamily.POWER, 0.29307107017))
 
