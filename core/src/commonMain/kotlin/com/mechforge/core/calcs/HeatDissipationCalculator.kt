@@ -38,6 +38,8 @@ private val Def = CalculatorDefinition(
         InputSpec("p", "Heat dissipation (sensible heat load)", "P", UnitFamily.POWER, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kw"),
         InputSpec("dt", "Allowable air temperature rise", "dT", UnitFamily.TEMPERATURE_DIFFERENCE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "delk"),
         InputSpec("rho", "Air density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Air density assumed as 1.2 kg/m3 (20 C, sea level) - correct it for the actual temperature and altitude."),
+                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
+                InputSpec("alt", "Site altitude (for the density)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
         InputSpec("cp", "Specific heat of air", "c_p", UnitFamily.SPECIFIC_HEAT, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "jkgk", assumedWhenOmitted = "Specific heat assumed as 1005 J/(kg.K) (air at 20 C) - use the value for the gas actually handled."),
         InputSpec("fancap", "Fan capacity (per fan)", "Q_fan", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
         InputSpec("nfans", "Number of fans selected", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),

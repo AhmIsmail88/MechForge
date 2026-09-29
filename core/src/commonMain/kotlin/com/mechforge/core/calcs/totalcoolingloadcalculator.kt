@@ -31,6 +31,8 @@ private val Def = CalculatorDefinition(
         InputSpec("win", "Entering humidity ratio", "w_in", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 0.2, defaultUnitId = "dash"),
         InputSpec("wout", "Leaving humidity ratio", "w_out", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 0.2, defaultUnitId = "dash"),
         InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
+                InputSpec("alt", "Site altitude (for the density)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
+                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
     ),
 )
 

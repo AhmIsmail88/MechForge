@@ -51,8 +51,8 @@ class AirDensityTest {
                 "alt" to com.mechforge.core.engine.InputValue("alt", 500.0, "m"),
             ),
         )
-        val baseQ = base.results.first { it.id == "q" }.value
-        val hotQ = hot.results.first { it.id == "q" }.value
+        val baseQ = base.results.first { it.id == "qs" }.value
+        val hotQ = hot.results.first { it.id == "qs" }.value
         assertTrue(hotQ < baseQ, "thinner air carries less heat for the same volume flow")
         assertTrue(abs(hotQ - baseQ) / baseQ > 0.1, "the difference should be material")
         assertTrue(hot.warnings.any { it.contains("Air density from") }, hot.warnings.toString())

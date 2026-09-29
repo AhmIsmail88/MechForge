@@ -30,6 +30,8 @@ private val Def = CalculatorDefinition(
         InputSpec("tin", "Entering dry-bulb", "T_in", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("tout", "Leaving dry-bulb", "T_out", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
+                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
+                InputSpec("alt", "Site altitude (for the density)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
     ),
 )
 
