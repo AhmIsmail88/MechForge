@@ -21,7 +21,7 @@ private val Def = CalculatorDefinition(
     description = "Hydraulic (water) power, shaft power and recommended standard IEC motor for a pump duty point.",
     formulaDisplay = "P_h = ρ·g·Q·H ;  P = P_h / η",
     reference = "Pump hydraulics (Karassik et al., Pump Handbook); IEC 60034 standard motor ratings.",
-    notes = "g = 9.80665 m/s². Density defaults to 1000 kg/m³ (water). Efficiency is the pump (hydraulic-to-shaft) efficiency as a fraction.",
+    notes = "g = 9.80665 m/s². Density defaults to 1000 kg/m³, the round value for water - water at 20 °C is 998.2 kg/m³, a difference of under 0.2 %, and the fire-pump and NPSH calculators use that accurate figure. Enter the density for anything else. Efficiency is the pump (hydraulic-to-shaft) efficiency as a fraction.",
     keywords = listOf("pump", "power", "shaft", "hydraulic", "motor", "efficiency", "duty"),
     inputs = listOf(
         InputSpec("q", "Flow rate", "Q", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
@@ -42,6 +42,7 @@ object PumpPowerCalculator : Calculator(Def) {
         val q = value(inputs, "q") // m³/s
         val h = value(inputs, "h") // m
         val eta = value(inputs, "eta") // fraction
+        // The round 1000 kg/m³ rather than 998.2: the difference is under 0.2 % here, and this calculator is used for liquids in general, not only water at 20 C.
         val rho = optionalValue(inputs, "rho", 1000.0) // kg/m³
 
         val hydraulicW = rho * G * q * h
