@@ -48,7 +48,7 @@ private const val M_HFC_227EA = 0.17003 // kg/mol
  */
 private val HazardClasses: List<Pair<InputOption, Double>> = listOf(
     InputOption("a", "Class A - surface fire, solid combustibles (7.0 %)") to 7.0,
-    InputOption("b", "Class B - flammable liquids (8.7 %)") to 8.7,
+    InputOption("b", "Class B - flammable liquids (8.7 % is a starting point; the design concentration is fuel-specific)") to 8.7,
     InputOption("c", "Class C - energized electrical / electronic (7.0 %)") to 7.0,
 )
 
@@ -220,6 +220,12 @@ object Fm200AgentQuantityCalculator : Calculator(Def) {
             }
             add("No leakage, piping or reserve allowance is added automatically. Any additional quantity must come from the actual NFPA 2001 provisions and the actual enclosure conditions, entered separately - piping/nozzle content and the network design are a separate engineered-system calculation.")
             add("Confirm the minimum design concentration for the hazard with the NFPA 2001 edition in force and the agent manufacturer's listed design manual.")
+            if (hazard.first.id == "b") {
+                add("Class B: flammable-liquid design concentrations are fuel-specific. The 8.7 % figure is a starting point - the manufacturer's listed design manual gives the minimum per fuel, heptane commonly being the benchmark.")
+            }
+            if (concentrationPct > 9.0) {
+                add("The design concentration (${Fmt.n(concentrationPct, 1)} %) exceeds the NOAEL of 9.0 % for HFC-227ea (LOAEL 10.5 %): occupied-space protection at this concentration needs the exposure limits and the evacuation reviewed against the manufacturer's data.")
+            }
             if (hazard.first.id == "c") {
                 add("Class C: for energized electrical hazards - in particular above 480 V that remain energized during and after discharge - do not assume the standard design concentration is sufficient; perform the applicable hazard analysis/testing.")
             }
@@ -229,6 +235,12 @@ object Fm200AgentQuantityCalculator : Calculator(Def) {
         }
 
         val warningsAr = buildList {
+            if (hazard.first.id == "b") {
+                add("الفئة B: تركيزات السوائل القابلة للاشتعال تعتمد على الوقود. نسبة 8.7 % نقطة بداية - دليل التصميم يذكر الحد الأدنى لكل وقود، والهبتان هو المرجع الشائع.")
+            }
+            if (concentrationPct > 9.0) {
+                add("تركيز التصميم (${Fmt.n(concentrationPct, 1)} %) يتجاوز NOAEL وهو 9.0 % لـ HFC-227ea (LOAEL 10.5 %): حماية أماكن مأهولة بهذا التركيز تستلزم مراجعة حدود التعرض والإخلاء ببيانات الشركة المصنعة.")
+            }
             if (netFromGross != null && kotlin.math.abs(netFromGross - volume) > 0.02 * volume) {
                 add("فحص الحجم: الإجمالي − المستثنى = ${Fmt.n(netFromGross, 3)} m3 لا يطابق الحجم الصافي المُدخل ${Fmt.n(volume, 3)} m3. صحّح الحجم الصافي قبل استخدام النتيجة.")
             }
