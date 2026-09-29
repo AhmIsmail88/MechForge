@@ -26,6 +26,11 @@ private val Def = CalculatorDefinition(
         InputSpec("p1", "Inlet pressure", "P1", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
         InputSpec("p2", "Discharge pressure", "P2", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
         InputSpec("crmax", "Maximum per-stage ratio", "CR_max", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = false, defaultUnitId = "dash", assumedWhenOmitted = "Maximum per-stage ratio assumed as 4.0 - enter a value from the compressor manufacturer data."),
+        InputSpec("t1", "Inlet temperature (for the temperature limit)", "T1", UnitFamily.TEMPERATURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c"),
+        InputSpec("t2max", "Maximum allowable discharge temperature", "T2max", UnitFamily.TEMPERATURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c",
+            assumedWhenOmitted = "No discharge-temperature limit given: the per-stage ratio falls back to the entered CR_max. The limit is what actually caps a stage, since CR_max = (T2max/T1)^(n/(n-1))."),
+        InputSpec("n", "Compression exponent n (for the limit)", "n", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = true, defaultUnitId = "dash",
+            assumedWhenOmitted = "Exponent n assumed as 1.3, typical of a polytropic air compression; n = 1.4 is the isentropic value. It changes the ratio the temperature limit allows."),
     ),
 )
 
@@ -34,7 +39,14 @@ object CompressionRatioCalculator : Calculator(Def) {
     override fun calculate(inputs: Map<String, InputValue>): CalcOutput {
         val p1 = value(inputs, "p1")
         val p2 = value(inputs, "p2")
-        val crMax = optionalValue(inputs, "crmax", 4.0)
+        // The per-stage limit is the discharge temperature, not an arbitrary ratio:
+        // CR_max = (T2max/T1)^(n/(n-1)). When those three are given the ratio is derived from them;
+        // otherwise the entered CR_max stands, and 4.0 if nothing is entered at all.
+        val nExp = if (has(inputs, "n")) value(inputs, "n") else 1.3
+        val crFromLimit = if (has(inputs, "t1") && has(inputs, "t2max")) {
+            (value(inputs, "t2max") / value(inputs, "t1")).pow(nExp / (nExp - 1.0))
+        } else null
+        val crMax = crFromLimit ?: optionalValue(inputs, "crmax", 4.0)
 
         if (p2 < p1) {
             throw com.mechforge.core.engine.ValidationException(
@@ -57,6 +69,7 @@ object CompressionRatioCalculator : Calculator(Def) {
             steps = listOf(
                 "Overall ratio: CR = P2/P1 = ${Fmt.n(p2 / 1e5, 3)} / ${Fmt.n(p1 / 1e5, 3)} = ${Fmt.n(ratio, 3)}",
                 "Maximum per-stage ratio: ${Fmt.n(crMax, 2)}",
+                "Per-stage ratio from the temperature limit: CR_max = (T2max/T1)^(n/(n-1)) = ${Fmt.n(crFromLimit ?: crMax, 2)}${if (crFromLimit != null) " (derived from the discharge limit)" else " (ratio entered or assumed)"}",
                 if (stages == 1) {
                     "CR <= CR_max - a single stage is sufficient."
                 } else {
@@ -73,6 +86,7 @@ object CompressionRatioCalculator : Calculator(Def) {
             stepsAr = listOf(
                 "النسبة الكلية: CR = P2/P1 = ${Fmt.n(p2 / 1e5, 3)} / ${Fmt.n(p1 / 1e5, 3)} = ${Fmt.n(ratio, 3)}",
                 "أقصى نسبة لكل مرحلة: ${Fmt.n(crMax, 2)}",
+                "أقصى نسبة من حد الحرارة: CR_max = (T2max/T1)^(n/(n-1)) = ${Fmt.n(crFromLimit ?: crMax, 2)}${if (crFromLimit != null) " (مشتقة من حد التصريف)" else " (نسبة مُدخلة أو مفترضة)"}",
                 if (stages == 1) {
                     "CR ≤ CR_max - مرحلة واحدة كافية."
                 } else {
