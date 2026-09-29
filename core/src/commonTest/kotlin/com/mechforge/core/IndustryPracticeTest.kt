@@ -223,11 +223,12 @@ class BoltPreloadDesignTest {
         val out = T.run(
             BoltTorqueCalculator,
             T.iv("d", 12.0, "mm"), T.iv("pitch", 1.75, "mm"),
-            T.iv("class", 1.0, "dash"), T.iv("preloadpct", 65.0, "pct"),
+            T.iv("class", 3.0, "dash"), T.iv("preloadpct", 65.0, "pct"),
         )
         assertEquals(84.266, out.results.first { it.id == "at" }.value, 0.01)
-        assertEquals(35.0547, out.results.first { it.id == "fRec" }.value, 0.01)
-        assertEquals(84.13, out.results.first { it.id == "tRec" }.value, 0.05)
+        // 0.65 x 580 MPa x 84.266 mm2 = 31.768 kN; T = 0.20 x F x d = 76.244 N.m
+        assertEquals(31.7683, out.results.first { it.id == "fRec" }.value, 0.01)
+        assertEquals(76.244, out.results.first { it.id == "tRec" }.value, 0.05)
     }
 
     @Test
@@ -235,11 +236,12 @@ class BoltPreloadDesignTest {
         val out = T.run(
             BoltTorqueCalculator,
             T.iv("d", 16.0, "mm"), T.iv("pitch", 2.0, "mm"),
-            T.iv("class", 2.0, "dash"), T.iv("preloadpct", 65.0, "pct"),
+            T.iv("class", 5.0, "dash"), T.iv("preloadpct", 65.0, "pct"),
         )
         assertEquals(156.668, out.results.first { it.id == "at" }.value, 0.01)
-        assertEquals(95.7238, out.results.first { it.id == "fRec" }.value, 0.01)
-        assertEquals(306.32, out.results.first { it.id == "tRec" }.value, 0.1)
+        // 0.65 x 830 MPa x 156.668 mm2 = 84.523 kN; T = 0.20 x F x d = 270.47 N.m
+        assertEquals(84.5226, out.results.first { it.id == "fRec" }.value, 0.01)
+        assertEquals(270.47, out.results.first { it.id == "tRec" }.value, 0.1)
     }
 
     @Test
@@ -247,9 +249,10 @@ class BoltPreloadDesignTest {
         val out = T.run(
             BoltTorqueCalculator,
             T.iv("d", 12.0, "mm"), T.iv("pitch", 1.75, "mm"),
-            T.iv("class", 1.0, "dash"), T.iv("f", 35.0, "kn"),
+            T.iv("class", 3.0, "dash"), T.iv("f", 35.0, "kn"),
         )
-        assertEquals(64.9, out.results.first { it.id == "util" }.value, 0.05)
+        // 35 kN against a proof load of 580 MPa x 84.266 mm2 = 48.874 kN -> 71.6 %
+        assertEquals(71.6, out.results.first { it.id == "util" }.value, 0.05)
         assertEquals(84.0, out.results.first { it.id == "t" }.value, 0.05)
         assertEquals(415.3, out.results.first { it.id == "sigma" }.value, 1.0)
     }

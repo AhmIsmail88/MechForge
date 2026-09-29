@@ -466,22 +466,22 @@ val GOLDEN_CASES: List<GoldenCase> = listOf(
     GoldenCase(
         calculatorId = "bolt-torque",
         scenario = "m12-88-65pct",
-        inputs = listOf(GoldenInput("class", 1.0, "dash"), GoldenInput("d", 0.012, "mm"), GoldenInput("pitch", 0.00175, "mm"), GoldenInput("preloadpct", 0.65, "pct")),
-        expected = mapOf("at" to 84.26636752380864, "fRec" to 35.05480888990439, "tRec" to 84.13154133577055),
+        inputs = listOf(GoldenInput("class", 3.0, "dash"), GoldenInput("d", 0.012, "mm"), GoldenInput("pitch", 0.00175, "mm"), GoldenInput("preloadpct", 0.65, "pct")),
+        expected = mapOf("at" to 84.26636752380864, "fRec" to 31.768420556475856, "tRec" to 76.24420933554207),
         relativeTolerance = 1e-6,
     ),
     GoldenCase(
         calculatorId = "bolt-torque",
         scenario = "m16-109-65pct",
-        inputs = listOf(GoldenInput("class", 2.0, "dash"), GoldenInput("d", 0.016, "mm"), GoldenInput("pitch", 0.002, "mm"), GoldenInput("preloadpct", 0.65, "pct")),
-        expected = mapOf("at" to 156.66814448611203, "fRec" to 95.72423628101446, "tRec" to 306.31755609924625),
+        inputs = listOf(GoldenInput("class", 5.0, "dash"), GoldenInput("d", 0.016, "mm"), GoldenInput("pitch", 0.002, "mm"), GoldenInput("preloadpct", 0.65, "pct")),
+        expected = mapOf("at" to 156.66814448611203, "fRec" to 84.52246395025745, "tRec" to 270.4718846408238),
         relativeTolerance = 1e-6,
     ),
     GoldenCase(
         calculatorId = "bolt-torque",
         scenario = "util-35kn-88",
-        inputs = listOf(GoldenInput("class", 1.0, "dash"), GoldenInput("d", 0.012, "mm"), GoldenInput("f", 35000.0, "kn"), GoldenInput("pitch", 0.00175, "mm")),
-        expected = mapOf("at" to 84.26636752380864, "f" to 35.0, "fRec" to 35.05480888990439, "sigma" to 415.3495757380439, "t" to 84.0, "tRec" to 84.13154133577055, "util" to 64.89837120906937),
+        inputs = listOf(GoldenInput("class", 3.0, "dash"), GoldenInput("d", 0.012, "mm"), GoldenInput("f", 35000.0, "kn"), GoldenInput("pitch", 0.00175, "mm")),
+        expected = mapOf("at" to 84.26636752380864, "f" to 35.0, "fRec" to 31.768420556475856, "sigma" to 415.3495757380439, "t" to 84.0, "tRec" to 76.24420933554207, "util" to 71.61199581690411),
         relativeTolerance = 1e-6,
     ),
     GoldenCase(
@@ -866,7 +866,7 @@ val GOLDEN_CASES: List<GoldenCase> = listOf(
         calculatorId = "fire-pump-power",
         scenario = "base",
         inputs = listOf(GoldenInput("eta", 0.75, "pct"), GoldenInput("h", 93.2935, "m"), GoldenInput("q", 0.04166666666666667, "lmin"), GoldenInput("rho", 998.2, "kgm3")),
-        expected = mapOf("hydraulic" to 38.052078654658544, "motor" to 55.0, "shaft" to 50.73610487287806),
+        expected = mapOf("driver" to 50.73610487287806, "hydraulic" to 38.052078654658544, "motor" to 55.0, "shaft" to 50.73610487287806),
         relativeTolerance = 1e-6,
     ),
     GoldenCase(

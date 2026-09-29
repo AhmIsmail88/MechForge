@@ -24,12 +24,24 @@ import kotlin.math.PI
  * published values; the preload percentage and the nut factor stay user inputs because
  * they depend on the joint and the lubrication.
  */
+/**
+ * Proof strength S_p in MPa, per ISO 898-1 (and ISO 3506 for the stainless grades).
+ *
+ * These are the PROOF strengths, which is the quantity the preload rule uses. They were
+ * previously taken from the 0.2 % yield stresses of the same classes, which are 10 to 13 %
+ * higher and therefore not conservative - the targeted tension, and with it the 90 % and
+ * 40 % limits, moved with them. Class 8.8 depends on the diameter: 580 MPa up to M16 and
+ * 600 MPa from M16 upward, applied in the calculation below.
+ */
 private val PropertyClasses: List<Pair<InputOption, Double>> = listOf(
     InputOption("4.6", "4.6 - low carbon steel") to 225.0,
-    InputOption("8.8", "8.8 - quenched and tempered steel") to 640.0,
-    InputOption("10.9", "10.9 - alloy steel") to 940.0,
-    InputOption("12.9", "12.9 - alloy steel, higher strength") to 1100.0,
-    InputOption("a2a4", "A2 / A4-70 - austenitic stainless") to 450.0,
+    InputOption("5.8", "5.8 - low carbon steel, higher strength") to 380.0,
+    InputOption("6.8", "6.8 - low carbon steel, quenched and tempered") to 440.0,
+    InputOption("8.8", "8.8 - quenched and tempered steel (580 up to M16, 600 above)") to 580.0,
+    InputOption("9.8", "9.8 - quenched and tempered steel, lower proof") to 650.0,
+    InputOption("10.9", "10.9 - alloy steel") to 830.0,
+    InputOption("12.9", "12.9 - alloy steel, higher strength") to 970.0,
+    InputOption("a2a4", "A2 / A4-70 - austenitic stainless (ISO 3506)") to 450.0,
 )
 
 private val Def = CalculatorDefinition(
@@ -39,7 +51,7 @@ private val Def = CalculatorDefinition(
     description = "Tightening torque from the preload (or preload from torque), and the design preload for a bolt property class from its tensile stress area and proof strength.",
     formulaDisplay = "T = K*F*d ;  A_t = PI/4*(d - 0.9382*p)^2 ;  F_rec = preload% * S_p * A_t",
     reference = "Torque-preload relation T = K*F*d (Shigley; VDI 2230) with the metric tensile stress area formula; proof strengths of ISO 898-1 / ISO 3506 property classes.",
-    notes = "K = 0.20 is typical for as-received steel bolts, lightly oiled; lubrication, coatings and washers change K a lot, so verify it for critical joints. A_t is the tensile stress area (use the pitch field and it is calculated, or enter the tabulated value). The design preload is normally 65-75% of the proof load (up to 90% for permanent, well-controlled joints). Torque scatter is typically +/-25-35%, so safety-critical joints are verified by torque plus angle, or by bolt elongation.",
+    notes = "Proof strengths follow ISO 898-1 (and ISO 3506 for stainless). K = 0.20 is typical for as-received steel bolts, lightly oiled; zinc-plated or otherwise coated fasteners commonly run 0.25-0.35, lubrication, coatings and washers change K a lot, so verify it for critical joints. A_t is the tensile stress area (use the pitch field and it is calculated, or enter the tabulated value). The design preload is normally 65-75% of the proof load (up to 90% for permanent, well-controlled joints). Torque scatter is typically +/-25-35%, so safety-critical joints are verified by torque plus angle, or by bolt elongation.",
     keywords = listOf("bolt", "torque", "preload", "tension", "fastener", "stress area", "proof load", "property class", "iso 898", "vdi 2230"),
     inputs = listOf(
         InputSpec("k", "Nut factor K", "K", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", defaultValue = 0.20, assumedWhenOmitted = "Nut factor K assumed as 0.20 (dry, as-received steel) - plated or lubricated fasteners need a different K."),
@@ -99,7 +111,9 @@ object BoltTorqueCalculator : Calculator(Def) {
         }
         val propertyClass = if (hasClass) PropertyClasses[value(inputs, "class").toInt()] else null
         val preloadPct = optionalValue(inputs, "preloadpct", 0.65)
-        val proofStress = propertyClass?.second // MPa
+        // ISO 898-1: the proof strength of class 8.8 is 580 MPa up to M16 and 600 MPa above it.
+        var proofStress = propertyClass?.second // MPa
+        if (propertyClass?.first?.id == "8.8" && d * 1000.0 >= 16.0) proofStress = 600.0
 
         val results = mutableListOf<com.mechforge.core.engine.ResultValue>()
         val steps = mutableListOf<String>()

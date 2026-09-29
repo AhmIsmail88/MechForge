@@ -20,7 +20,7 @@ private val Def = CalculatorDefinition(
     description = "Theoretical internal diameter from flow rate and a chosen design velocity.",
     formulaDisplay = "D = √(4·Q / (π·v))",
     reference = "Continuity equation; velocity limits are engineering practice, not code.",
-    notes = "Choose velocity per line role: pump suction 1.2–3.0 m/s (lower preferred), discharge 0.9–2.1 m/s commonly used as a starting point.",
+    notes = "Choose the velocity by line role, and keep suction lower than discharge: pump suction is commonly 0.6-1.8 m/s (the lower the better for NPSH margin), discharge 1.5-3.0 m/s as a starting point. Fire-pump piping has its own velocity limits under NFPA 20, and slurries or abrasive services need their own limits.",
     keywords = listOf("pipe", "sizing", "diameter", "velocity", "design"),
     inputs = listOf(
         InputSpec("q", "Flow rate", "Q", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
@@ -38,7 +38,7 @@ object PipeSizingCalculator : Calculator(Def) {
         val dMm = d * 1000.0
 
         val warnings = buildList {
-            if (v > 3.0) add("Selected velocity above 3 m/s — typical water practice is 0.6–3.0 m/s depending on line role.")
+            if (v > 3.0) add("Selected velocity is above 3 m/s: typical water practice keeps the suction at 0.6-1.8 m/s and the discharge at 1.5-3.0 m/s, and abrasive or slurry services are lower still.")
             if (v < 0.6) add("Selected velocity below 0.6 m/s — sedimentation and undersizing risk in water lines.")
             add("Result is the theoretical internal diameter; select the next standard pipe size (schedule/series) above it.")
         }

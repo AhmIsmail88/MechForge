@@ -103,8 +103,12 @@ def expectation(calc, scenario, raw):
         ph = x("rho") * G * x("q") * x("h") / 1000.0
         sh = ph / x("eta")
         motor = next((r for r in [0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5, 11.0, 15.0, 18.5,
-                                  22.0, 30.0, 37.0, 45.0, 55.0, 75.0, 90.0] if r * 1000 >= sh * 1000), 90.0)
-        return {"hydraulic": ph, "shaft": sh, "motor": motor}
+                                  22.0, 30.0, 37.0, 45.0, 55.0, 75.0, 90.0, 110.0, 132.0, 160.0, 200.0,
+                                  250.0, 315.0, 355.0] if r >= ph / x("eta")), None)
+        out = {"hydraulic": ph, "shaft": sh}
+        if motor is not None:
+            out["motor"] = motor
+        return out
 
     if calc == "heat-dissipation":
         cp = x("cp") if "cp" in raw else 1005.0
@@ -268,7 +272,12 @@ def expectation(calc, scenario, raw):
         if at is None and "pitch" in raw:
             minor = d - 0.9382 * x("pitch")
             at = math.pi / 4.0 * minor * minor
-        sp = {0: 225.0, 1: 640.0, 2: 940.0, 3: 1100.0, 4: 450.0}[int(x("class"))] if "class" in raw else None
+        sp = None
+        if "class" in raw:
+            # option order: 4.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9, A2/A4-70 (proof strength Sp, ISO 898-1)
+            sp = {0: 225.0, 1: 380.0, 2: 440.0, 3: 580.0, 4: 650.0, 5: 830.0, 6: 970.0, 7: 450.0}[int(x("class"))]
+            if int(x("class")) == 3 and d * 1000.0 >= 16.0:
+                sp = 600.0
         if at is not None and force is not None:
             out["sigma"] = force / at / 1e6
         if sp is not None and at is not None:
@@ -456,9 +465,13 @@ def expectation(calc, scenario, raw):
         hyd = rho * G * x("q") * x("h") / 1000.0
         shaft = hyd / x("eta")
         motors = [0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5, 11.0, 15.0, 18.5, 22.0, 30.0,
-                  37.0, 45.0, 55.0, 75.0, 90.0, 110.0, 132.0, 160.0, 200.0]
-        motor = next((m for m in motors if m >= shaft), 200.0)
-        return {"hydraulic": hyd, "shaft": shaft, "motor": motor}
+                  37.0, 45.0, 55.0, 75.0, 90.0, 110.0, 132.0, 160.0, 200.0, 250.0, 315.0, 355.0]
+        driver = max(shaft, x("bhp150") / 1000.0) if "bhp150" in raw else shaft
+        motor = next((m for m in motors if m >= driver), None)
+        out = {"hydraulic": hyd, "shaft": shaft, "driver": driver}
+        if motor is not None:
+            out["motor"] = motor
+        return out
 
     if calc == "water-hammer":
         rho = x("rho") if "rho" in raw else 1000.0

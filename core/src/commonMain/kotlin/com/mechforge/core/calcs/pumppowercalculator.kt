@@ -55,38 +55,37 @@ object PumpPowerCalculator : Calculator(Def) {
                 add("Efficiency above 85% is optimistic for most pump types; verify against the pump curve.")
             }
             if (motor == null) {
-                add("Shaft power exceeds the largest standard IEC rating (90 kW); select a larger or custom motor.")
+                add("Shaft power is above the largest rating in the standard list (355 kW): no standard motor can be recommended here - select a larger or custom driver, and state the selection basis in the report.")
             }
         }
 
         return CalcOutput(
-            results = listOf(
-                result("hydraulic", "Hydraulic Power", hydraulicKw, "kw", isPrimary = true),
-                result("shaft", "Shaft Power", shaftKw, "kw", isPrimary = true),
-                result(
-                    "motor", "Recommended Standard Motor",
-                    motor ?: 90.0, "kw", isRecommended = true,
-                ),
-            ),
+            results = buildList {
+                add(result("hydraulic", "Hydraulic Power", hydraulicKw, "kw", isPrimary = true))
+                add(result("shaft", "Shaft Power", shaftKw, "kw", isPrimary = true))
+                motor?.let { r ->
+                    add(result("motor", "Recommended Standard Motor", r, "kw", isRecommended = true))
+                }
+            },
             steps = listOf(
                 "Hydraulic power: P_h = ρ·g·Q·H = ${Fmt.n(rho, 1)} × 9.80665 × ${Fmt.n(q, 6)} × ${Fmt.n(h, 3)} = ${Fmt.n(hydraulicKw)} kW",
                 "Shaft power: P = P_h / η = ${Fmt.n(hydraulicKw)} / ${Fmt.n(eta, 4)} = ${Fmt.n(shaftKw)} kW",
                 "Select the smallest standard IEC motor rating ≥ shaft power → " +
-                    (motor?.let { "${Fmt.n(it, 2)} kW" } ?: "above 90 kW (custom selection)"),
+                    (motor?.let { "${Fmt.n(it, 2)} kW" } ?: "beyond the standard list (355 kW) - custom driver selection"),
             ),
             warnings = warnings,
             stepsAr = listOf(
                 "القدرة الهيدروليكية: P_h = ρ·g·Q·H = ${Fmt.n(rho, 1)} × 9.80665 × ${Fmt.n(q, 6)} × ${Fmt.n(h, 3)} = ${Fmt.n(hydraulicKw)} kW",
                 "قدرة العمود: P = P_h / η = ${Fmt.n(hydraulicKw)} / ${Fmt.n(eta, 4)} = ${Fmt.n(shaftKw)} kW",
                 "اختر أصغر قدرة محرك قياسية IEC أكبر من أو تساوي قدرة العمود → " +
-                    (motor?.let { "${Fmt.n(it, 2)} kW" } ?: "أعلى من 90 kW (اختيار خاص)"),
+                    (motor?.let { "${Fmt.n(it, 2)} kW" } ?: "أعلى من قائمة القدرات القياسية (355 kW) - اختيار محرك خاص"),
             ),
             warningsAr = buildList {
                 if (eta > 0.85) {
                     add("كفاءة أعلى من 85 % تفاؤلية لمعظم أنواع المضخات؛ تحقق منها على منحنى المضخة.")
                 }
                 if (motor == null) {
-                    add("قدرة العمود تتجاوز أكبر قدرة قياسية IEC (90 kW)؛ اختر محركًا أكبر أو خاصًا.")
+                    add("قدرة العمود أعلى من أكبر قدرة في القائمة القياسية (355 kW): لا يمكن ترشيح محرك قياسي - اختر محركًا أكبر أو خاصًا، واذكر أساس الاختيار في التقرير.")
                 }
             },
         )

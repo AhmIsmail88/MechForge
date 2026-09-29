@@ -81,7 +81,9 @@ class PumpPowerTest {
             PumpPowerCalculator,
             T.iv("q", 2000.0, "m3h"), T.iv("h", 150.0, "m"), T.iv("eta", 75.0, "pct"),
         )
-        assertTrue(out.warnings.any { it.contains("90 kW") })
+        assertTrue(out.warnings.any { it.contains("355 kW") }, out.warnings.toString())
+        // Above the standard list the calculator must say so, not invent a rating.
+        assertTrue(out.results.none { it.id == "motor" }, "no standard motor may be recommended beyond the list")
     }
 }
 
