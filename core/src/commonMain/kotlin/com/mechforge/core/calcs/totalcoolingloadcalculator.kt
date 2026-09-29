@@ -1,6 +1,7 @@
 package com.mechforge.core.calcs
 
 import com.mechforge.core.engine.Calculator
+import kotlin.math.abs
 import com.mechforge.core.engine.CalculatorCategory
 import com.mechforge.core.engine.CalculatorDefinition
 import com.mechforge.core.engine.CalcOutput
@@ -43,7 +44,21 @@ object TotalCoolingLoadCalculator : Calculator(Def) {
         val tIn = value(inputs, "tin")
         val tOut = value(inputs, "tout")
         val hasHumidity = has(inputs, "win") && has(inputs, "wout")
-        val rho = optionalValue(inputs, "rho", 1.2)
+        // Air density: an explicit input wins; otherwise, when the site conditions are given,
+        // the density is computed from them. Without either, the 1.2 kg/m3 shorthand stays.
+        val rhoFromSite = if (has(inputs, "tair") && has(inputs, "alt")) {
+            airDensity(value(inputs, "tair"), value(inputs, "alt"))
+        } else null
+        val rho = if (has(inputs, "rho")) value(inputs, "rho") else (rhoFromSite ?: 1.2)
+        val rhoSiteWarning = rhoFromSite?.let { r ->
+            "Air density from " + Fmt.n(value(inputs, "tair"), 1) + " C at " + Fmt.n(value(inputs, "alt"), 0) +
+                " m = " + Fmt.n(r, 4) + " kg/m3" +
+                (if (abs(r - 1.2) / 1.2 > 0.05) {
+                    " - differs from the 1.2 shorthand by more than 5 percent: the airflow scales with it."
+                } else {
+                    ""
+                })
+        }
 
         val massFlow = rho * q
         val deltaT = tOut - tIn
@@ -61,6 +76,7 @@ object TotalCoolingLoadCalculator : Calculator(Def) {
         val total = qs + ql
 
         val warnings = buildList {
+            rhoSiteWarning?.let { add(it) }
             if (!hasHumidity) {
                 add("Humidity ratios not provided — latent load computed as 0. Enter humidity ratio (kg/kg dry air) for a full load split.")
             }

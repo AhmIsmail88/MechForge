@@ -1,6 +1,7 @@
 package com.mechforge.core.calcs
 
 import com.mechforge.core.engine.Calculator
+import kotlin.math.abs
 import com.mechforge.core.engine.CalculatorCategory
 import com.mechforge.core.engine.CalculatorDefinition
 import com.mechforge.core.engine.CalcOutput
@@ -41,7 +42,21 @@ object SensibleHeatCalculator : Calculator(Def) {
         val q = value(inputs, "q") // m³/s
         val tIn = value(inputs, "tin") // K
         val tOut = value(inputs, "tout") // K
-        val rho = optionalValue(inputs, "rho", 1.2) // kg/m³
+        // Air density: an explicit input wins; otherwise, when the site conditions are given,
+        // the density is computed from them. Without either, the 1.2 kg/m3 shorthand stays.
+        val rhoFromSite = if (has(inputs, "tair") && has(inputs, "alt")) {
+            airDensity(value(inputs, "tair"), value(inputs, "alt"))
+        } else null
+        val rho = if (has(inputs, "rho")) value(inputs, "rho") else (rhoFromSite ?: 1.2) // kg/m3
+        val rhoSiteWarning = rhoFromSite?.let { r ->
+            "Air density from " + Fmt.n(value(inputs, "tair"), 1) + " C at " + Fmt.n(value(inputs, "alt"), 0) +
+                " m = " + Fmt.n(r, 4) + " kg/m3" +
+                (if (abs(r - 1.2) / 1.2 > 0.05) {
+                    " - differs from the 1.2 shorthand by more than 5 percent: the airflow scales with it."
+                } else {
+                    ""
+                })
+        }
 
         val deltaT = tOut - tIn
         val massFlow = rho * q // kg/s
@@ -49,6 +64,7 @@ object SensibleHeatCalculator : Calculator(Def) {
         val qsBtuh = qsKw * BTUH_PER_KW
 
         val warnings = buildList {
+            rhoSiteWarning?.let { add(it) }
             if (abs(deltaT) < 1e-9) add("Supply and return temperatures are equal — load is zero.")
             if (deltaT > 0) add("ΔT > 0 — this is a heating duty (air gains heat).")
             if (!has(inputs, "rho")) add("Air density not provided — assumed 1.2 kg/m³ (standard air ~20°C).")

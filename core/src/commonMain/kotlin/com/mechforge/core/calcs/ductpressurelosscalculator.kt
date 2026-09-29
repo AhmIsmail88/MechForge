@@ -1,6 +1,7 @@
 package com.mechforge.core.calcs
 
 import com.mechforge.core.engine.Calculator
+import kotlin.math.abs
 import com.mechforge.core.engine.CalculatorCategory
 import com.mechforge.core.engine.CalculatorDefinition
 import com.mechforge.core.engine.CalcOutput
@@ -27,6 +28,8 @@ private val Def = CalculatorDefinition(
         InputSpec("w", "Rectangular width", "W", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("h", "Rectangular height", "H", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Air density assumed as 1.2 kg/m3 (20 C, sea level) - correct it for the actual temperature and altitude."),
+                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
+        InputSpec("alt", "Site altitude (for the density)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
         InputSpec("nu", "Kinematic viscosity", "ν", UnitFamily.KINEMATIC_VISCOSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "cst", assumedWhenOmitted = "Kinematic viscosity assumed as 1.5e-5 m2/s (air at 20 C) - correct it for the actual temperature."),
         InputSpec("eps", "Absolute roughness", "ε", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "mm", libraryKey = "roughness", assumedWhenOmitted = "Absolute roughness assumed as 9e-5 m (galvanised steel) - use the value for the actual duct material."),
     ),
@@ -37,7 +40,22 @@ object DuctPressureLossCalculator : Calculator(Def) {
     override fun calculate(inputs: Map<String, InputValue>): CalcOutput {
         val v = value(inputs, "v")
         val l = value(inputs, "l")
-        val rho = optionalValue(inputs, "rho", 1.2)
+
+        // Air density: an explicit input wins; otherwise, when the site conditions are given,
+        // the density is computed from them. Without either, the 1.2 kg/m3 shorthand stays.
+        val rhoFromSite = if (has(inputs, "tair") && has(inputs, "alt")) {
+            airDensity(value(inputs, "tair"), value(inputs, "alt"))
+        } else null
+        val rho = if (has(inputs, "rho")) value(inputs, "rho") else (rhoFromSite ?: 1.2)
+        val rhoSiteWarning = rhoFromSite?.let { r ->
+            "Air density from " + Fmt.n(value(inputs, "tair"), 1) + " C at " + Fmt.n(value(inputs, "alt"), 0) +
+                " m = " + Fmt.n(r, 4) + " kg/m3" +
+                (if (abs(r - 1.2) / 1.2 > 0.05) {
+                    " - differs from the 1.2 shorthand by more than 5 percent: the airflow scales with it."
+                } else {
+                    ""
+                })
+        }
         val nu = optionalValue(inputs, "nu", 1.5e-5)
         val eps = optionalValue(inputs, "eps", 9e-5)
 
@@ -68,6 +86,7 @@ object DuctPressureLossCalculator : Calculator(Def) {
         val dp = f * (l / dh) * velocityPressure
 
         val warnings = buildList {
+            rhoSiteWarning?.let { add(it) }
             FrictionFactor.regimeWarning(re)?.let { add(it) }
             add("Uses the straight-duct fiction only — add fitting/terminal losses for a full system total.")
             if (dp / l > 1.5) add("Friction loss above 1.5 Pa/m - above the usual design band; check the fan energy against the project criterion.")
