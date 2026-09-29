@@ -97,4 +97,60 @@ class ThemeContrastTest {
             "the light theme's default text colour is light: it would vanish on the light backdrop",
         )
     }
+
+    /**
+     * F38 from the review: the panes are translucent over a gradient and two light orbs, so the text
+     * sitting on them has to be checked against the worst point of that backdrop rather than an
+     * average. The pane fills and the gradient stops come from Glass.kt, and every pane is checked
+     * over every backdrop sample in both themes.
+     */
+    @Test
+    fun glassPanesAreLegibleOverTheWholeBackdrop() {
+        fun orb(base: Long, orbColor: Long, alpha: Float) =
+            over(Color(orbColor).copy(alpha = alpha), Color(base))
+
+        data class Pane(val name: String, val fill: Color, val text: Color)
+
+        val darkPanes = listOf(
+            Pane("fill", Color(0xFF0E1626).copy(alpha = 0.90f), DarkColors.onSurface),
+            Pane("fill/onSurfaceVariant", Color(0xFF0E1626).copy(alpha = 0.90f), DarkColors.onSurfaceVariant),
+            Pane("fill/onBackground", Color(0xFF0E1626).copy(alpha = 0.90f), DarkColors.onBackground),
+            Pane("fillStrong", Color(0xFF131D31).copy(alpha = 0.95f), DarkColors.onSurface),
+            Pane("fillChrome", Color(0xFF0B1220).copy(alpha = 0.94f), DarkColors.onSurfaceVariant),
+        )
+        val lightPanes = listOf(
+            Pane("fill", Color.White.copy(alpha = 0.82f), LightColors.onSurface),
+            Pane("fill/onSurfaceVariant", Color.White.copy(alpha = 0.82f), LightColors.onSurfaceVariant),
+            Pane("fill/onBackground", Color.White.copy(alpha = 0.82f), LightColors.onBackground),
+            Pane("fillStrong", Color.White.copy(alpha = 0.92f), LightColors.onSurface),
+            Pane("fillChrome", Color.White.copy(alpha = 0.88f), LightColors.onSurfaceVariant),
+        )
+
+        val darkBackdrops = listOf(
+            Color(0xFF05070D), Color(0xFF0A1220), Color(0xFF04060B),
+            orb(0xFF0A1220, 0xFF1B4F8A, 0.34f), orb(0xFF0A1220, 0xFF00A5C4, 0.20f),
+        )
+        val lightBackdrops = listOf(
+            Color(0xFFE8EEFA), Color(0xFFF7F9FD), Color(0xFFEDF1F9),
+            orb(0xFFF7F9FD, 0xFF1B4F8A, 0.16f), orb(0xFFF7F9FD, 0xFF00A5C4, 0.10f),
+        )
+
+        for ((theme, panes, backdrops) in listOf(
+            Triple("dark", darkPanes, darkBackdrops),
+            Triple("light", lightPanes, lightBackdrops),
+        )) {
+            for (pane in panes) {
+                for (backdrop in backdrops) {
+                    val surface = over(pane.fill, backdrop)
+                    val r = ratio(pane.text, surface)
+                    assertTrue(
+                        r >= 4.5,
+                        "%s / %s over %s contrast is %.2f:1, below the 4.5:1 minimum".format(
+                            theme, pane.name, backdrop.toString(), r,
+                        ),
+                    )
+                }
+            }
+        }
+    }
 }
