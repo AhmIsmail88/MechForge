@@ -666,8 +666,8 @@ def main() -> int:
     A("<h3>10.2 Colours</h3>")
     A("<p>Two complete schemes are declared in <code>theme.kt</code>. The values below are read from "
       "that file, so the document cannot disagree with the build.</p>")
-    light_block = re.search(r"lightColorScheme\(([\s\S]*?)\n\)", theme_src)
-    dark_block = re.search(r"darkColorScheme\(([\s\S]*?)\n\)", theme_src)
+    light_block = re.search(r"lightColorScheme\(([\s\S]*?)^\s*\)", theme_src, re.M)
+    dark_block = re.search(r"darkColorScheme\(([\s\S]*?)^\s*\)", theme_src, re.M)
     light_tokens = dict(re.findall(r"(\w+)\s*=\s*Color\((0x[0-9A-Fa-f]+)\)", light_block.group(1))) if light_block else {}
     dark_tokens = dict(re.findall(r"(\w+)\s*=\s*Color\((0x[0-9A-Fa-f]+)\)", dark_block.group(1))) if dark_block else {}
     A("<table><tr><th>Token</th><th>Light</th><th>Dark</th></tr>")
@@ -675,6 +675,10 @@ def main() -> int:
         A("<tr><td><code>" + tok + "</code></td><td><code>" + light_tokens.get(tok, "&mdash;") +
           "</code></td><td><code>" + dark_tokens.get(tok, "&mdash;") + "</code></td></tr>")
     A("</table>")
+    A("<p><i>A token shown as &mdash; is not overridden in that scheme and therefore falls back to the "
+      "Material 3 default for it - in the light scheme that applies to the secondary and tertiary "
+      "families, whose defaults are not part of this visual identity. Declaring them explicitly is a "
+      "design decision, not a generator fix.</i></p>")
     A("<p>The glass system sits on top of the scheme: a dark vertical gradient with two soft light orbs "
       "is painted once behind everything, and cards, sheets, dialogs and navigation chrome are "
       "translucent panes with a luminous hairline border - deep navy at 90 to 95 percent opacity in dark "
@@ -717,6 +721,16 @@ def main() -> int:
     A("flt();</script></body></html>")
 
     doc = "".join(parts)
+    # Two things the parts cannot fix for themselves.
+    #
+    # 1. The counts in the prose. They were written by hand once and went stale every time a
+    #    calculator was added; they are now read back out of the document that was just assembled.
+    n_calcs = doc.count("class='calc'")
+    doc = re.sub(r"\b\d+ calculators\b", str(n_calcs) + " calculators", doc)
+    doc = re.sub(r"\b\d+ calculator definitions\b", str(n_calcs) + " calculator definitions", doc)
+    # 2. Kotlin template expressions copied verbatim by the extraction ("${Fmt.n(x, 3)}"). They are
+    #    the expression, not a value, so the wrapper is stripped and the expression shown as code.
+    doc = re.sub(r"\$\{([^{}]*)\}", lambda m: "<code>" + escape(m.group(1)) + "</code>", doc)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with io.open(OUT, "w", encoding="utf-8", newline="") as fh:
         fh.write(doc)
