@@ -158,10 +158,11 @@ def expectation(calc, scenario, raw):
         return {"v": v, "q": x("a") * v * 3600.0, "qSi": x("a") * v}
 
     if calc == "hazen-williams":
-        q = 0.278 * x("c") * x("d") ** 2.63 * x("s") ** 0.54
+        q = x("q") if "q" in raw else 0.2785 * x("c") * x("d") ** 2.63 * x("s") ** 0.54
+        l = x("l") if "l" in raw else 1000.0
         v = q / (math.pi * x("d") ** 2 / 4.0)
-        hf = 10.67 * 1000.0 * q ** 1.852 / (x("c") ** 1.852 * x("d") ** 4.87)
-        return {"q": q * 3600.0, "v": v, "hf": hf, "gradient": hf / 1000.0}
+        hf = 10.67 * l * q ** 1.852 / (x("c") ** 1.852 * x("d") ** 4.87)
+        return {"q": q * 3600.0, "v": v, "hf": hf, "gradient": hf / l}
 
     if calc == "npsh-available":
         patm = x("patm") if "patm" in raw else 101325.0

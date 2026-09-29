@@ -138,14 +138,14 @@ val GOLDEN_CASES: List<GoldenCase> = listOf(
         calculatorId = "hazen-williams",
         scenario = "d-300",
         inputs = listOf(GoldenInput("c", 130.0, "dash"), GoldenInput("d", 0.3, "mm"), GoldenInput("s", 0.001, "dash")),
-        expected = mapOf("gradient" to 0.0009951716456008523, "hf" to 0.9951716456008523, "q" to 131.55869259740376, "v" to 0.5169929934218258),
+        expected = mapOf("gradient" to 0.0009984890374884555, "hf" to 0.9984890374884555, "q" to 131.79530895099623, "v" to 0.5179228369351745),
         relativeTolerance = 1e-6,
     ),
     GoldenCase(
         calculatorId = "hazen-williams",
         scenario = "d-600",
         inputs = listOf(GoldenInput("c", 130.0, "dash"), GoldenInput("d", 0.6, "mm"), GoldenInput("s", 0.001, "dash")),
-        expected = mapOf("gradient" to 0.00099569603202942, "hf" to 0.99569603202942, "q" to 814.3825090397855, "v" to 0.8000802585263087),
+        expected = mapOf("gradient" to 0.0009990151719524417, "hf" to 0.9990151719524417, "q" to 815.8472257826629, "v" to 0.8015192517970395),
         relativeTolerance = 1e-6,
     ),
     GoldenCase(
