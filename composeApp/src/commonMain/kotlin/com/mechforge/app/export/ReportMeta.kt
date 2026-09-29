@@ -1,5 +1,7 @@
 package com.mechforge.app.export
 
+import com.mechforge.core.engine.EngineFingerprint
+
 import com.mechforge.app.data.ProjectInfo
 
 /**
@@ -59,6 +61,7 @@ object ReportMeta {
             project.preparedBy.takeIf { it.isNotBlank() }?.let { labels.engineer to it },
             project.documentNumber.takeIf { it.isNotBlank() }?.let { labels.documentNo to it },
             labels.date to date,
+            labels.engineFingerprint to EngineFingerprint.text,
         )
     }
 

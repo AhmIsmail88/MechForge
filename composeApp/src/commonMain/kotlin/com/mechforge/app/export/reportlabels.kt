@@ -1,5 +1,7 @@
 package com.mechforge.app.export
 
+import com.mechforge.core.engine.EngineFingerprint
+
 /**
  * Labels printed on an exported calculation sheet. Engineering reports are commonly
  * issued in Arabic or English depending on the office, so the report has its own small
@@ -15,6 +17,7 @@ data class ReportLabels(
     val engineer: String,
     val location: String,
     val date: String,
+    val engineFingerprint: String,
     val reportNo: String,
     val revision: String,
     /** The code/edition the calculation is based on, e.g. "NFPA 12 (2018)". */
@@ -63,6 +66,7 @@ data class ReportLabels(
             engineer = "Engineer",
             location = "Location",
             date = "Date",
+            engineFingerprint = "Engine: " + EngineFingerprint.text,
             reportNo = "Report no.",
             revision = "Rev.",
             code = "Code / edition",
@@ -106,6 +110,7 @@ data class ReportLabels(
             engineer = "المهندس",
             location = "الموقع",
             date = "التاريخ",
+            engineFingerprint = "بصمة المحرك: " + EngineFingerprint.text,
             reportNo = "رقم التقرير",
             revision = "المراجعة",
             code = "الكود / الإصدار",
