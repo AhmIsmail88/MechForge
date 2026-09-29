@@ -84,7 +84,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 5
-        versionName = "0.5.0"
+        versionName = "01"
     }
 
     signingConfigs {
@@ -149,7 +149,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi, TargetFormat.Exe)
             packageName = "MechForge"
-            packageVersion = "0.5.0"
+            packageVersion = "01.0.0"
             description = "MechForge — Mechanical Engineering Toolkit"
             vendor = "TAQARUB"
 

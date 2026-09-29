@@ -76,7 +76,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
             }
             if (results.isNotEmpty()) {
                 Card {
-                    // The padding has to be at least the card's corner radius (shapes.medium, 12dp),
+                    // The padding has to be at least the card's corner radius (shapes.medium = 14dp),
                     // otherwise the rounded corner clips the first row: the first result used to read
                     // "ipe Flow Velocity" because the top-left curve cut the P away.
                     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {

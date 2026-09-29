@@ -7,6 +7,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 
 /**
  * MechForge type scale (README v2 §29). The stock Material 3 scale is anonymous:
@@ -156,11 +157,14 @@ val ResultNumberStyleSmall = TextStyle(
 /**
  * MechForge shape scale. Cards and dialogs are slightly rounder than the Material
  * default so surfaces read as distinct blocks; buttons keep a moderate radius.
+ * IMPORTANT: values are dp. Never write the bare-Int RoundedCornerShape(Int)
+ * overload here: that overload means PERCENT of the box size, so a big card drew
+ * a giant corner arc that clipped its first text line (reported 2026-09-29).
  */
 val MechForgeShapes = Shapes(
-    extraSmall = RoundedCornerShape(6),
-    small = RoundedCornerShape(10),
-    medium = RoundedCornerShape(14),
-    large = RoundedCornerShape(18),
-    extraLarge = RoundedCornerShape(26),
+    extraSmall = RoundedCornerShape(6.dp),
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(14.dp),
+    large = RoundedCornerShape(18.dp),
+    extraLarge = RoundedCornerShape(26.dp),
 )
