@@ -301,6 +301,8 @@ object CalculatorArabic {
                 "h" to "ارتفاع الدكت المستطيل",
             ),
             results = mapOf(
+                "de" to "قطر الاحتكاك المكافئ (وفق ASHRAE)",
+                "aspect" to "نسبة الأبعاد W/H",
                 "v" to "سرعة الهواء",
                 "vFpm" to "سرعة الهواء (إمبريال)",
                 "a" to "مساحة الدكت",
