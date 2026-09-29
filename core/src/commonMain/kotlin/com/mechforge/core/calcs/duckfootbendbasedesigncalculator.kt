@@ -26,7 +26,7 @@ import kotlin.math.sqrt
  *   ribs   : simple bending with a conservative lever arm equal to the plate cantilever c;
  *   bolts  : elastic method for a bolt group on a circle, T_max = 4*M/(n*BCD).
  *
- * Gravity is taken as 9.81 m/s2 (a constant, not an input: the engine has no acceleration family,
+ * Gravity is taken as 9.80665 m/s2 (a constant, not an input: the engine has no acceleration family,
  * and the value is fixed by the specification). Every allowable stress, the density values and the
  * estimated elbow weight and centre height remain editable inputs, because they come from the
  * project's governing code and from the supplier rather than from this formula.
@@ -239,7 +239,7 @@ object DuckFootBendBaseDesignCalculator : Calculator(Def) {
                 "Design thrust (static): Fp_des = ${Fmt.n(pDes, 1)} x ${Fmt.n(a, 6)} = ${Fmt.n(fpDes, 1)} N   ->   R_des = sqrt(2) x Fp_des = ${Fmt.n(rDes, 1)} N",
                 "Governing: R_gov = max(${Fmt.n(rOp / 1000.0, 1)}, ${Fmt.n(rDes / 1000.0, 1)}) = ${Fmt.n(rGov / 1000.0, 1)} kN   |   Rh = Rv = R_gov / sqrt(2) = ${Fmt.n(rh / 1000.0, 1)} kN",
                 "Weights: W_pipe = pi x D x t_pipe x L x gamma_s = ${Fmt.n(wPipe, 2)} kg   |   W_water = A x L x rho_w = ${Fmt.n(wWater, 2)} kg   |   W_elbow = ${Fmt.n(wElbow, 1)} kg",
-                "N_total = Rv + (W_pipe + W_water + W_elbow) x 9.81 = ${Fmt.n(rv / 1000.0, 1)} kN + ${Fmt.n(dead, 2)} x 9.81 / 1000 = ${Fmt.n(nTotal / 1000.0, 1)} kN   |   M = H_total x H = ${Fmt.n(moment / 1000.0, 1)} kN.m",
+                "N_total = Rv + (W_pipe + W_water + W_elbow) x 9.81 = ${Fmt.n(rv / 1000.0, 1)} kN + ${Fmt.n(dead, 2)} x 9.80665 / 1000 = ${Fmt.n(nTotal / 1000.0, 1)} kN   |   M = H_total x H = ${Fmt.n(moment / 1000.0, 1)} kN.m",
                 "Base plate: q = N_total / A_plate = ${Fmt.n(bearing / 1000.0, 2)} kPa   |   c = (D_plate - D)/2 = ${Fmt.n(cantilever * 1000.0, 1)} mm   |   M_plate = q x c^2 / 2 = ${Fmt.n(mPlate / 1000.0, 2)} kN.m/m",
                 "sigma_allow = Fy / FOS = ${Fmt.n(fy / 1e6, 1)} / ${Fmt.n(fos, 3)} = ${Fmt.n(sigmaAllow / 1e6, 1)} MPa   ->   t_plate_req = sqrt(6 x M_plate / sigma_allow) = ${Fmt.n(tPlateReq * 1000.0, 2)} mm",
                 "Ribs: F_rib = N_total / n_ribs = ${Fmt.n(fRib, 1)} N   |   M_rib = F_rib x c = ${Fmt.n(mRib / 1000.0, 2)} kN.m   ->   t_rib_req = 6 x M_rib / (sigma_allow x h_rib^2) = ${Fmt.n(tRibReq * 1000.0, 2)} mm",
@@ -256,7 +256,7 @@ object DuckFootBendBaseDesignCalculator : Calculator(Def) {
                 "قوة الدفع لحالة الضغط التصميمي (استاتيكي): Fp_des = ${Fmt.n(pDes, 1)} × ${Fmt.n(a, 6)} = ${Fmt.n(fpDes, 1)} N   →   R_des = √2 × Fp_des = ${Fmt.n(rDes, 1)} N",
                 "الحالة الحاكمة: R_gov = max(${Fmt.n(rOp / 1000.0, 1)}, ${Fmt.n(rDes / 1000.0, 1)}) = ${Fmt.n(rGov / 1000.0, 1)} kN   |   Rh = Rv = R_gov / √2 = ${Fmt.n(rh / 1000.0, 1)} kN",
                 "الأوزان: W_pipe = π × D × t_pipe × L × γ_s = ${Fmt.n(wPipe, 2)} kg   |   W_water = A × L × ρ_w = ${Fmt.n(wWater, 2)} kg   |   W_elbow = ${Fmt.n(wElbow, 1)} kg",
-                "N_total = Rv + (W_pipe + W_water + W_elbow) × 9.81 = ${Fmt.n(rv / 1000.0, 1)} kN + ${Fmt.n(dead, 2)} × 9.81 / 1000 = ${Fmt.n(nTotal / 1000.0, 1)} kN   |   M = H_total × H = ${Fmt.n(moment / 1000.0, 1)} kN.m",
+                "N_total = Rv + (W_pipe + W_water + W_elbow) × 9.81 = ${Fmt.n(rv / 1000.0, 1)} kN + ${Fmt.n(dead, 2)} × 9.80665 / 1000 = ${Fmt.n(nTotal / 1000.0, 1)} kN   |   M = H_total × H = ${Fmt.n(moment / 1000.0, 1)} kN.m",
                 "بالتة القاعدة: q = N_total / A_plate = ${Fmt.n(bearing / 1000.0, 2)} kPa   |   c = (D_plate - D)/2 = ${Fmt.n(cantilever * 1000.0, 1)} mm   |   M_plate = q × c^2 / 2 = ${Fmt.n(mPlate / 1000.0, 2)} kN.m/m",
                 "σ_allow = Fy / FOS = ${Fmt.n(fy / 1e6, 1)} / ${Fmt.n(fos, 3)} = ${Fmt.n(sigmaAllow / 1e6, 1)} MPa   →   t_plate_req = √(6 × M_plate / σ_allow) = ${Fmt.n(tPlateReq * 1000.0, 2)} mm",
                 "الأعصاب: F_rib = N_total / n_ribs = ${Fmt.n(fRib, 1)} N   |   M_rib = F_rib × c = ${Fmt.n(mRib / 1000.0, 2)} kN.m   →   t_rib_req = 6 × M_rib / (σ_allow × h_rib^2) = ${Fmt.n(tRibReq * 1000.0, 2)} mm",
