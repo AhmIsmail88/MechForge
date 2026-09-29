@@ -44,7 +44,7 @@ private const val STANDARD_CYLINDER_CHARGE = 45.0 // kg
 /** Hazard -> design concentration (% by volume) for CO2 total flooding. */
 private val HazardClasses: List<Pair<InputOption, Double>> = listOf(
     InputOption("a", "Class A - surface fire, solid combustibles (34 %)") to 34.0,
-    InputOption("b", "Class B - flammable liquids (34 %)") to 34.0,
+    InputOption("b", "Class B - flammable liquids (34 % is a starting point; the design concentration is fuel-specific)") to 34.0,
     InputOption("c", "Class C - energized electrical, surface fire (34 %)") to 34.0,
     InputOption("ds", "Class A - deep-seated (smouldering) fire (50 %)") to 50.0,
     InputOption("dse", "Deep-seated dry electrical hazard (50 %)") to 50.0,
@@ -236,6 +236,12 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
             add("No additional allowance is added automatically: no leakage %, no piping %, no reserve. Any additional CO2 must come from the actual NFPA 12 provisions and the actual enclosure conditions (for example unclosable openings), entered separately - 0 kg when none apply.")
             add("The cylinder count comes from W_final and the cylinder charge; it is not inflated by an allowance. Piping/network design, discharge time, pressure relief and venting are separate engineered-system items.")
             add("Confirm the design concentration and the applicable flooding factor for the hazard with the NFPA 12 edition in force.")
+            if (hazard.first.id == "b") {
+                add("Class B: flammable-liquid design concentrations are fuel-specific. The 34 % figure is a starting point from the surface-fire value - the NFPA 12 table lists the minimum design concentration per fuel, and it is frequently much higher.")
+            }
+            if (concentrationPct > 5.0) {
+                add("The design concentration (${Fmt.n(concentrationPct, 1)} %) is above the NOAEL of about 5 % for CO2: a CO2 total flooding system is lethal - the space must be evacuated, and alarms, discharge delay, pre-discharge warning and lock-out are life-safety requirements, not options.")
+            }
         }
 
         val warningsAr = buildList {
@@ -253,6 +259,12 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
             add("لا تُضاف أي بدلات تلقائيًا: لا نسبة تسريب ولا نسبة مواسير ولا احتياطي. أي كمية CO2 إضافية يجب أن تأتي من أحكام NFPA 12 الفعلية وظروف الحيز الفعلية (مثل الفتحات غير القابلة للغلق) وتُدخل منفصلة - 0 kg عند عدم وجودها.")
             add("عدد الأسطوانات ينتج من W_final وشحنة الأسطوانة؛ ولا يُضخَّم بأي بدل. تصميم المواسير والشبكة وزمن التصريف وتنفيس الضغط والتهوية بنود نظام هندسي منفصلة.")
             add("أكّد تركيز التصميم ومعامل الغمر المطبق للخطر من إصدار NFPA 12 الساري.")
+            if (hazard.first.id == "b") {
+                add("الفئة B: تركيزات السوائل القابلة للاشتعال تعتمد على الوقود. نسبة 34 % نقطة بداية من قيمة حرائق السطح - جدول NFPA 12 يذكر الحد الأدنى لكل وقود، وغالبًا أعلى بكثير.")
+            }
+            if (concentrationPct > 5.0) {
+                add("تركيز التصميم (${Fmt.n(concentrationPct, 1)} %) أعلى من NOAEL لنحو 5 % لثاني أكسيد الكربون: نظام الإغراق بـ CO2 قاتل - يجب إخلاء المكان، وإنذارات ومهلة تصريف وتحذير مسبق وقفل التشغيل ليست خيارات بل متطلبات سلامة أرواح.")
+            }
         }
 
         return CalcOutput(results = results, steps = steps, stepsAr = stepsAr, warnings = warnings, warningsAr = warningsAr)
