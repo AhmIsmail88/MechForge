@@ -141,9 +141,10 @@ class FireSuppressionReviewTest {
             T.iv("hazard", 4.0, "dash"),
             T.iv("t", 21.0, "c"),
         )
-        assertEquals(1.823329, out.results.first { it.id == "f" }.value, 1e-5)
-        assertTrue(out.warnings.any { it.contains("ideal-gas") && it.contains("NFPA 12") })
-        assertTrue(out.steps.any { it.contains("ideal-gas estimate") })
+        assertEquals(1.263835, out.results.first { it.id == "f" }.value, 1e-5)
+        assertTrue(out.warnings.any { it.contains("comparison") && it.contains("NFPA 12") })
+        assertTrue(out.warnings.any { it.contains("clean-agent form") })
+        assertTrue(out.steps.any { it.contains("Theoretical flooding factor") })
     }
 
     @Test

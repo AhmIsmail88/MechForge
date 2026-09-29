@@ -557,13 +557,15 @@ def expectation(calc, scenario, raw):
         return out
 
     if calc == "co2-agent-quantity":
-        # f = rho_vapour(T) * C/(100-C); rho_vapour = P*M/(R*T), M = 44.01 g/mol
+        # Theoretical value from the closed-vessel dilution relation, f = rho * ln(100/(100-C)).
+        # The C/(100-C) form belongs to the clean agents of NFPA 2001: at 65 % it is about 77 %
+        # higher, so using it for CO2 is not conservative. It is reported for comparison only.
         rho = 101325.0 * 0.04401 / (R_UNIVERSAL * x("t"))
         # hazard index -> design concentration (NFPA 12: 34 % surface, 50 % deep-seated)
         c = x("c") * 100.0 if "c" in raw else {0: 34.0, 1: 34.0, 2: 34.0, 3: 50.0, 4: 50.0}[int(x("hazard"))]
-        ratio = c / (100.0 - c)
-        f_ideal = rho * ratio
-        f = x("ftable") if "ftable" in raw else f_ideal
+        f_theory = rho * math.log(100.0 / (100.0 - c))
+        f_clean_agent_form = rho * (c / (100.0 - c))
+        f = x("ftable") if "ftable" in raw else f_theory
         v = x("v")
         w_basic = v * f
         extra = x("addkg") if "addkg" in raw else 0.0
@@ -571,7 +573,7 @@ def expectation(calc, scenario, raw):
         charge = x("mcyl") if "mcyl" in raw else 45.0
         n = math.ceil(w / charge)
         return {"w": w, "wLb": w / 0.45359237, "wbasic": w_basic, "wadd": extra,
-                "f": f, "fIdeal": f_ideal, "fLb": f / 16.0184634, "rhoVapour": rho,
+                "f": f, "fIdeal": f_clean_agent_form, "fLb": f / 16.0184634, "rhoVapour": rho,
                 "cylinders": float(n), "installed": n * charge, "margin": n * charge - w,
                 "marginPct": (n * charge - w) / w * 100.0, "cUsed": c, "vnet": v}
 
