@@ -626,6 +626,80 @@ def main() -> int:
       "The only declared permission is POST_NOTIFICATIONS for the &quot;report exported&quot; notification.</li>")
     A("</ul></section>")
 
+    # ---- screens and interface (10) ----
+    base = os.path.join(REPO, "composeApp", "src", "commonMain", "kotlin", "com", "mechforge", "app")
+    app_src = read(os.path.join(base, "ui", "app.kt"))
+    theme_src = read(os.path.join(base, "ui", "theme", "theme.kt"))
+    screens = re.findall(r"data (?:object|class)\s+(\w+)\s*(?:\([^)]*\))?\s*:\s*Screen", app_src)
+    SCREENS = {
+        "Home": "Entry screen: a searchable catalogue of every calculator, grouped by category, with the user's favourites and the most recently used calculations above it. The search filters by name, keywords and category.",
+        "Converter": "A unit-converter surface: choose a quantity type, enter one value and read it in every unit of that family at once. It uses the same unit engine as the calculators, so a conversion can never disagree with a calculator's answer.",
+        "Calculator": "The calculation screen: the name, description, equation and reference of the calculator are shown before anything is calculated; then the declared inputs, each with its own unit picker, validation message and - where the input declares a library key - a pick-list from the reference library; then Calculate and Reset; then the primary and secondary results with per-result unit switching; then the numeric step-by-step working, the warnings, the save-to-history dialog, and the PDF and Excel exports.",
+        "History": "Every saved calculation with its calculator, inputs and results, the calculation number, revision and status, the project it belongs to and the frozen project snapshot it was calculated under. Entries can be renamed, duplicated, deleted and reopened, which restores the inputs, the title, the revision metadata and the project context into the calculator screen.",
+        "Favorites": "The calculators the user starred, for quick access. Starring is done from the calculator screen.",
+        "Projects": "The project register: create, rename and delete projects, set the active project, and edit the project record - number, client, consultant, contractor, location, revision, status, prepared and checked by, codes, code edition, department, document package, drawing and specification references and the design standard. Each project also opens a dashboard of its disciplines, its recent calculations and its status percentages, and can print a project register and a full calculation package to PDF or Excel.",
+        "References": "The engineering reference library: built-in datasets (pipe outside diameters, pipe wall thickness by schedule, motor ratings, material densities, water properties, pipe roughness) plus CSV and JSON datasets the user imports and names. Datasets can be browsed, expanded row by row and deleted, and inputs whose spec declares a library key offer their values as pick-lists.",
+        "Settings": "Appearance (system, light, dark), the application language - Arabic mirrors the whole interface to RTL - the report language independently of it, the report identification fields printed in every exported header (project, client, engineer, location, document number and revision, code, checked by) and the company logo used on the PDF letterhead.",
+        "About": "What the app is and is not: the mission, the local-first and offline stance, how the reference data is treated, the version, and the disclaimer that a result is engineering support and not an approval.",
+    }
+    missing = [s for s in screens if s not in SCREENS]
+    if missing:
+        print("FAIL: screens declared in the code but not described here:", missing)
+        return 1
+    nav = re.findall(r"NavItem\(Screen\.(\w+),", app_src)
+    width = re.search(r"private val CompactWidth = ([0-9.]+)\.dp", app_src)
+
+    A("<section><h2>10. Screens and the interface</h2>")
+    A("<p>The app is one window whose navigation shell switches between the screens below. The shell "
+      "has two layouts: below " + (width.group(1) if width else "600") + "dp of width (phones) the "
+      "navigation becomes a drawer behind a top bar, and from that width up (desktop, tablets) a fixed "
+      "230dp sidebar replaces it. The application language drives the whole layout - Arabic mirrors "
+      "everything to RTL, which moves the sidebar to the other side and reverses every row.</p>")
+    A("<h3>10.1 The screens, in navigation order</h3>")
+    A("<table><tr><th>Screen</th><th>What it does</th></tr>")
+    for name in (nav or []) + ["Calculator"]:
+        A("<tr><td><b>" + escape(name) + "</b></td><td>" + SCREENS[name] + "</td></tr>")
+    A("</table>")
+    A("<p><i>The generator reads the screen list from the code and fails if a screen exists without a "
+      "written description here, so this table cannot fall behind the app.</i></p>")
+
+    A("<h3>10.2 Colours</h3>")
+    A("<p>Two complete schemes are declared in <code>theme.kt</code>. The values below are read from "
+      "that file, so the document cannot disagree with the build.</p>")
+    light_block = re.search(r"lightColorScheme\(([\s\S]*?)\n\)", theme_src)
+    dark_block = re.search(r"darkColorScheme\(([\s\S]*?)\n\)", theme_src)
+    light_tokens = dict(re.findall(r"(\w+)\s*=\s*Color\((0x[0-9A-Fa-f]+)\)", light_block.group(1))) if light_block else {}
+    dark_tokens = dict(re.findall(r"(\w+)\s*=\s*Color\((0x[0-9A-Fa-f]+)\)", dark_block.group(1))) if dark_block else {}
+    A("<table><tr><th>Token</th><th>Light</th><th>Dark</th></tr>")
+    for tok in light_tokens.keys() | dark_tokens.keys():
+        A("<tr><td><code>" + tok + "</code></td><td><code>" + light_tokens.get(tok, "&mdash;") +
+          "</code></td><td><code>" + dark_tokens.get(tok, "&mdash;") + "</code></td></tr>")
+    A("</table>")
+    A("<p>The glass system sits on top of the scheme: a dark vertical gradient with two soft light orbs "
+      "is painted once behind everything, and cards, sheets, dialogs and navigation chrome are "
+      "translucent panes with a luminous hairline border - deep navy at 90 to 95 percent opacity in dark "
+      "mode, white at 82 to 92 percent in light mode. No blur filter is used, so text never sits behind "
+      "a blurred layer.</p>")
+
+    A("<h3>10.3 Reading order, type and states</h3>")
+    A("<ul>")
+    A("<li><b>Reading order.</b> Arabic is the primary language and mirrors the layout to RTL. Every row "
+      "uses start/end padding and AutoMirrored icons, so nothing breaks when the direction flips, and "
+      "each calculator screen shows its equation before its inputs.</li>")
+    A("<li><b>Type scale.</b> Material 3: headline for screen titles, title for section headings, body "
+      "for content, label for captions, and the equation set in body-large directly under the "
+      "calculator's description.</li>")
+    A("<li><b>Shapes.</b> Material 3 shapes - 12dp for cards, 16dp for large panes - with content "
+      "padding kept at or above the corner radius so a rounded corner can never clip text.</li>")
+    A("<li><b>States.</b> Validation errors in the scheme's error colour, warnings prefixed with a "
+      "warning sign, the selected navigation item and the primary action in the primary colour, and the "
+      "favourite star in amber.</li>")
+    A("<li><b>Branding.</b> The TAQARUB mark sits beside the product name in the navigation header with "
+      "the company name under it, the development credit is printed at the foot of the navigation, and "
+      "the signature of the author appears on the About screen and on every exported report.</li>")
+    A("</ul>")
+    A("</section>")
+
     A("<section><h2>9. Regenerating and editing this document</h2>")
     A("<p>Everything above section 5 is generated from the sources listed under <i>source</i> in each "
       "calculator block. Change a calculator (or add one), run "
