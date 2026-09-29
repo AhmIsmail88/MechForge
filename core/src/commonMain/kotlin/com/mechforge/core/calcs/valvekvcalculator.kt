@@ -50,6 +50,7 @@ object ValveKvCalculator : Calculator(Def) {
                 "Equivalent Cv = 1.156 × Kv = ${Fmt.n(cv, 3)}",
             ),
             warnings = buildList {
+                add("Choked flow is not checked: compare the pressure drop against FL^2 x (P1 - FF x Pv) from the valve data before trusting the Kv, and note that piping geometry factors are not included.")
                 if (!has(inputs, "sg")) add("Specific gravity not provided — assumed 1.0 (water).")
                 add("Liquid sizing only — no cavitation, flashing, laminar-flow or gas/steam correction applied.")
             },
@@ -59,6 +60,7 @@ object ValveKvCalculator : Calculator(Def) {
                 "المكافئ Cv = 1.156 × Kv = ${Fmt.n(cv, 3)}",
             ),
             warningsAr = buildList {
+                add("الانحشار غير مفحوص: قارن فرق الضغط مقابل FL^2 × (P1 - FF × Pv) من بيانات الصمام قبل الاعتماد على Kv، ولاحظ أن معاملات هندسة المواسير غير مضمّنة.")
                 if (!has(inputs, "sg")) {
                     add("لم تُدخل الكثافة النوعية - افتُرضت 1.0 (مياه).")
                 }

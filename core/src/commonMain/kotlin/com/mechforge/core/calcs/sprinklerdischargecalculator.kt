@@ -37,6 +37,8 @@ object SprinklerDischargeCalculator : Calculator(Def) {
         val qM3h = qLmin * 60.0 / 1000.0
 
         val warnings = buildList {
+
+            add("NFPA 13 requires a minimum operating pressure at the sprinkler (about 0.5 bar / 7 psi, higher for some K-factors and hazards) - verify the computed pressure against it, and check the sprinkler's maximum listed working pressure as well.")
             add("K-factor tables and minimum sprinkler pressures are code data - take them from the sprinkler listing and the applicable NFPA 13 design criteria.")
         }
 
@@ -58,6 +60,7 @@ object SprinklerDischargeCalculator : Calculator(Def) {
                 "Q = K × √(P) = ${Fmt.n(k, 4)} × ${Fmt.n(sqrt(pBar), 5)} = ${Fmt.n(qLmin, 2)} L/min = ${Fmt.n(qGpm, 2)} gpm",
             ),
             warningsAr = buildList {
+                add("NFPA 13 يشترط حدًا أدنى لضغط التشغيل عند الرشاش (نحو 0.5 بار / 7 psi وأعلى لبعض معاملات K والخطر) - تحقق من الضغط المحسوب مقابلها ومن أقصى ضغط تشغيل مُدرج للرشاش.")
                 add("جداول معامل K وأقل ضغوط الرشاشات بيانات كودية - خُذها من قوائم اعتماد الرشاش ومعايير تصميم NFPA 13 المطبقة.")
             },
         )

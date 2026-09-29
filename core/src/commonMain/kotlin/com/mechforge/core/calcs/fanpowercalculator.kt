@@ -41,6 +41,8 @@ object FanPowerCalculator : Calculator(Def) {
         val motorRating = nextIecMotorRating(pMotor / 1000.0)
 
         val warnings = buildList {
+
+            add("The drive efficiency defaults to 1.0 (direct drive): belt drives are lower. The reported motor power is the shaft power, not the electrical input, and IEC 60034-1 derating above 40 C or 1000 m is not applied.")
             if (etaFan > 0.8) add("Fan efficiency above 80% is optimistic for small fans; verify at the duty point on the fan curve.")
             add("Motor rating is the next standard IEC rating; check the ambient/altitude derating, the starting method and the fan inertia before ordering.")
             if (motorRating == null) add("Motor power exceeds the largest rating in the standard list - verify the driver selection.")
@@ -78,6 +80,7 @@ object FanPowerCalculator : Calculator(Def) {
                 },
             ),
             warningsAr = buildList {
+                add("كفاءة التوصيل افتراضيًا 1.0 (توصيل مباشر) وأحزمة التوصيل أقل. قدرة المحرك المعلنة هي قدرة العمود لا القدرة الكهربائية، ولا يُطبق تخفيض IEC 60034-1 فوق 40 °م أو 1000 م.")
                 if (etaFan > 0.8) {
                     add("كفاءة مروحة أعلى من 80 % تفاؤلية للمراوح الصغيرة؛ تحقق عند نقطة التشغيل على منحنى المروحة.")
                 }

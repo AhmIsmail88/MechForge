@@ -47,6 +47,7 @@ object ThermalExpansionCalculator : Calculator(Def) {
                 "Per metre: ${Fmt.n(expansionPerMetre * 1000.0, 3)} mm/m",
             ),
             warnings = buildList {
+                add("The expansion coefficient is a single value while the real expansion depends on the temperature range (B31.3 Appendix C tabulates total expansion from 21 C); stainless steel is about 16-17e-6, and a negative temperature difference means contraction.")
                 if (!has(inputs, "alpha")) add("Expansion coefficient not provided — assumed 12 µm/(m·K) (carbon steel).")
                 if (dl > 0.025) {
                     add("Total expansion exceeds 25 mm — expansion loops, anchors or expansion joints are likely required. Check the applicable design basis.")
@@ -58,6 +59,7 @@ object ThermalExpansionCalculator : Calculator(Def) {
                 "لكل متر من الماسورة: ${Fmt.n(expansionPerMetre * 1000.0, 3)} mm/m",
             ),
             warningsAr = buildList {
+                add("معامل التمدد قيمة واحدة والتمدد الفعلي يعتمد على المدى الحراري (ملحق B31.3 C يدرج التمدد الكلي من 21 °م)، والفولاذ المقاوم للصدأ نحو 16-17e-6، والفرق السالب يعني انكماشًا.")
                 if (!has(inputs, "alpha")) {
                     add("لم يُدخل معامل التمدد - افتُرض 12 µm/(m·K) (صلب كربوني).")
                 }

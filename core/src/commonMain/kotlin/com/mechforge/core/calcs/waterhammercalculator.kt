@@ -103,11 +103,14 @@ object WaterHammerCalculator : Calculator(Def) {
         }
 
         val warnings = buildList {
+
+            add("The wave speed uses the thin-wall form without a support factor psi (about 1 - nu/2); its accuracy drops when D/t falls below 25. The result is the pressure rise added to the static pressure - the negative wave (vapour, column separation) is not checked.")
             if (!cEntered && !has(inputs, "epipe")) add("Pipe elastic modulus not provided - assumed 200 GPa (steel). Use the value for the actual pipe material (plastic pipes give much lower wave speeds).")
             add("This is the maximum (instantaneous closure) surge. For slower closures use the standard wave-speed characteristics or a surge-analysis package.")
             if (dv > 3.0) add("Velocity change above 3 m/s produces a very large surge - review the valve closure time and the pipe pressure class.")
         }
         val warningsAr = buildList {
+            add("سرعة الموجة بصيغة الجدار الرقيق بدون معامل التثبيت psi (نحو 1 - ν/2) وتقل دقتها عند D/t أقل من 25. الناتج ارتفاع ضغط يُضاف للضغط الثابت - الموجة السالبة (تبخر/انفصال العمود) غير مفحوصة.")
             if (!cEntered && !has(inputs, "epipe")) {
                 add("لم يُدخل معامل مرونة الماسورة - افتُرض 200 GPa (صلب). استخدم قيمة مادة الماسورة الفعلية (المواسير البلاستيكية تعطي سرعات موجة أقل بكثير).")
             }

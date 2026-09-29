@@ -19,7 +19,7 @@ private val Def = CalculatorDefinition(
     description = "Volumetric discharge through a submerged/free orifice from head and orifice size.",
     formulaDisplay = "Q = Cd·A·√(2gH)",
     reference = "Standard orifice (Torricelli) relation; Cd values from hydraulic handbooks.",
-    notes = "Cd default 0.62 (sharp-edged orifice, typical). g = 9.80665 m/s². Head H is the piezometric head across the orifice.",
+    notes = "Cd default 0.62 (sharp-edged orifice, typical). g = 9.80665 m/s². Head H is the piezometric head across the orifice. This is Torricelli for an orifice under a liquid head H, not an ISO 5167 orifice plate in a line - do not use it for flow-measuring plates, which need a separate ISO 5167 calculation.",
     keywords = listOf("orifice", "discharge", "flow", "torricelli", "cd"),
     inputs = listOf(
         InputSpec("cd", "Discharge coefficient", "Cd", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, maxValue = 1.0, defaultUnitId = "dash"),

@@ -55,6 +55,7 @@ object FirePumpHeadCalculator : Calculator(Def) {
                 "Total head: H = ${Fmt.n(pressureHead, 3)} + ${Fmt.n(hStatic, 2)} + ${Fmt.n(hFriction, 2)} = ${Fmt.n(total, 2)} m",
             ),
             warnings = buildList {
+                add("The available suction pressure defaults to zero and is not flagged as an assumption: a suction lift (tank below the pump) is a negative head - enter it explicitly. The NFPA 20 acceptance criteria (churn at or below 140 % of rated pressure, and at least 65 % of rated pressure at 150 % of rated flow) are not checked here.")
                 if (!has(inputs, "rho")) add("Density not provided - assumed 998.2 kg/m3 (water at 20 C).")
                 if (total <= 0.0) add("Total head is not positive - the supply pressure already exceeds the requirement.")
                 add("Select the pump from its certified curve (NFPA 20 churn/rated/overload points).")
@@ -66,6 +67,7 @@ object FirePumpHeadCalculator : Calculator(Def) {
                 "الرفع الكلي: H = ${Fmt.n(pressureHead, 3)} + ${Fmt.n(hStatic, 2)} + ${Fmt.n(hFriction, 2)} = ${Fmt.n(total, 2)} m",
             ),
             warningsAr = buildList {
+                add("الضغط المتاح عند السحب افتراضيًا صفر وبدون إعلانه كافتراض: رفع بالسحب (خزان تحت المضخة) رأس سالب - أدخله صراحة. معايير قبول NFPA 20 (churn حتى 140% من الضغط المقنن و65% على الأقل عند 150% من التصرف) غير مفحوصة هنا.")
                 if (!has(inputs, "rho")) {
                     add("لم تُدخل الكثافة - افتُرضت 998.2 kg/m3 (مياه عند 20 °C).")
                 }

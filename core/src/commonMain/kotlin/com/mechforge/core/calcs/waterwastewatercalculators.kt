@@ -172,6 +172,7 @@ object PeakFlowCalculator : Calculator(PeakFlowDef) {
                 "Daily equivalent: ${Fmt.n(peak * 86400.0, 0)} m³/d",
             ),
             warnings = buildList {
+                add("The dose units are a mass concentration, not a volume one: commercial hypochlorite is usually percent w/v (grams of available chlorine per litre) - enter the dose in the units the supplier actually uses, and confirm the available-chlorine basis.")
                 add("Peaking factor is a design input — confirm it against the applicable design criteria or a population-based formula.")
                 if (pf > 4.0) add("Peaking factor above 4.0 is unusually high; verify the source of the value.")
             },
@@ -180,6 +181,7 @@ object PeakFlowCalculator : Calculator(PeakFlowDef) {
                 "المكافئ اليومي: ${Fmt.n(peak * 86400.0, 0)} m³/d",
             ),
             warningsAr = buildList {
+                add("وحدات الجرعة كتلة وليست حجمية: هيبوكلوريت التجاري غالبًا % w/v (جرام كلور فعال لكل لتر) - أدخل الجرعة بوحدات المورد الفعلية وتأكد من أساس الكلور الفعال.")
                 add("معامل الذروة مُدخل تصميمي - أكّده مقابل معايير التصميم المطبقة أو معادلة مبنية على عدد السكان.")
                 if (pf > 4.0) {
                     add("معامل ذروة أعلى من 4.0 مرتفع بشكل غير معتاد؛ تحقق من مصدر القيمة.")

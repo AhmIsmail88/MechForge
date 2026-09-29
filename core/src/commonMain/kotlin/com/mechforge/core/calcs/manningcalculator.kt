@@ -18,7 +18,7 @@ private val Def = CalculatorDefinition(
     description = "Mean velocity and discharge in an open channel or gravity pipe from Manning roughness, hydraulic radius and slope.",
     formulaDisplay = "v = (1/n)·R^(2/3)·S^(1/2) ;  Q = A·v",
     reference = "Robert Manning (1891); standard open-channel hydraulics (e.g. Chow, Open-Channel Hydraulics).",
-    notes = "SI form. R = A/P (hydraulic radius), S = energy slope (m/m). Typical n: 0.013 concrete, 0.015–0.025 earth channels (reference values — verify for your lining).",
+    notes = "SI form. R = A/P (hydraulic radius), S = energy slope (m/m). Typical n: 0.013 concrete, 0.015–0.025 earth channels (reference values — verify for your lining). No maximum-velocity (erosion) check is made, and a pipe running partially full needs its own geometry; local codes differ on both limits.",
     keywords = listOf("manning", "open channel", "gravity", "sewer", "roughness", "slope"),
     inputs = listOf(
         InputSpec("n", "Manning roughness", "n", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
