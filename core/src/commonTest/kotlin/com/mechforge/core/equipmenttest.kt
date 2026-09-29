@@ -68,7 +68,7 @@ class HxEffectivenessTest {
         // NTU = 2, Cr = 1, counter -> NTU/(1+NTU) = 66.67 %
         val out = T.run(
             HxEffectivenessNtuCalculator,
-            T.iv("ntu", 2.0, "dash"), T.iv("cr", 1.0, "dash"), T.iv("arr", 1.0, "dash"),
+            T.iv("ntu", 2.0, "dash"), T.iv("cr", 1.0, "dash"), T.iv("arr", 0.0, "dash"),
         )
         assertEquals(66.67, out.results.first { it.id == "eps" }.value, 0.05)
     }
@@ -78,7 +78,7 @@ class HxEffectivenessTest {
         // NTU = 2, Cr = 1, parallel -> (1-exp(-4))/2 = 49.08 %
         val out = T.run(
             HxEffectivenessNtuCalculator,
-            T.iv("ntu", 2.0, "dash"), T.iv("cr", 1.0, "dash"), T.iv("arr", 0.0, "dash"),
+            T.iv("ntu", 2.0, "dash"), T.iv("cr", 1.0, "dash"), T.iv("arr", 1.0, "dash"),
         )
         assertEquals(49.08, out.results.first { it.id == "eps" }.value, 0.05)
     }

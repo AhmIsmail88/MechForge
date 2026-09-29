@@ -4,6 +4,7 @@ import com.mechforge.core.engine.Calculator
 import com.mechforge.core.engine.CalculatorCategory
 import com.mechforge.core.engine.CalculatorDefinition
 import com.mechforge.core.engine.CalcOutput
+import com.mechforge.core.engine.InputOption
 import com.mechforge.core.engine.InputSpec
 import com.mechforge.core.engine.InputValue
 import com.mechforge.core.units.UnitFamily
@@ -25,6 +26,15 @@ private val Def = CalculatorDefinition(
         InputSpec("ntu", "Number of transfer units", "NTU", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
         InputSpec("cr", "Capacity ratio", "Cr", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 1.0, defaultUnitId = "dash", assumedWhenOmitted = "Capacity ratio assumed as 0 - this models one stream condensing or evaporating at constant temperature."),
         InputSpec("arr", "Arrangement (1 = counter, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash", assumedWhenOmitted = "Flow arrangement assumed as counter-flow - check it against the exchanger actually specified."),
+        InputSpec(
+            "arr", "Flow arrangement", "Arrangement", UnitFamily.DIMENSIONLESS,
+            required = false, allowedUnitIds = listOf("dash"), defaultUnitId = "dash", defaultValue = 0.0,
+            options = listOf(
+                InputOption("counter", "Counter-current (pure)"),
+                InputOption("parallel", "Parallel-flow (pure)"),
+            ),
+            assumedWhenOmitted = "Counter-current assumed when the arrangement is not chosen - it gives the higher effectiveness, so confirm the pass arrangement.",
+        ),
     ),
 )
 
@@ -33,7 +43,7 @@ object HxEffectivenessNtuCalculator : Calculator(Def) {
     override fun calculate(inputs: Map<String, InputValue>): CalcOutput {
         val ntu = value(inputs, "ntu")
         val cr = optionalValue(inputs, "cr", 0.0)
-        val counter = optionalValue(inputs, "arr", 1.0) >= 0.5
+        val counter = optionalValue(inputs, "arr", 0.0) < 0.5
 
         val eps = if (abs(cr) < 1e-9) {
             1.0 - exp(-ntu)
@@ -68,6 +78,7 @@ object HxEffectivenessNtuCalculator : Calculator(Def) {
             warnings = buildList {
                 if (counter && cr > 0.95 && cr < 1.0) add("Cr close to 1: the counter-flow result uses a near-singular form - check the limit value.")
                 if (eps > 0.95) add("Effectiveness above 95 % needs a very large surface - check the area and the approach temperatures.")
+                add("These closed forms are for a pure counter-current or pure parallel-flow exchanger. A multi-pass shell-and-tube or a cross-flow exchanger needs its own effectiveness relation, or the LMTD correction factor F applied to the counter-flow value - the pure forms overstate it.")
             },
             stepsAr = listOf(
                 "NTU = ${Fmt.n(ntu, 3)}   Cr = ${Fmt.n(cr, 3)}   الترتيب: ${if (counter) "متعاكس" else "متوازي"}",
@@ -89,6 +100,7 @@ object HxEffectivenessNtuCalculator : Calculator(Def) {
                 if (eps > 0.95) {
                     add("فعالية أعلى من 95 % تحتاج مساحة كبيرة جدًا - راجع المساحة وفروق الحرارة الطرفية.")
                 }
+                add("هذه الصيغ المغلقة لمبادل متعاكس بحت أو متوازٍ بحت. المبادل متعدد الممرات (shell & tube) أو المتقاطع يحتاج علاقته الخاصة، أو معامل التصحيح F مطبقًا على قيمة التعاكس - والصيغ البحتة تبالغ في النتيجة.")
             },
         )
     }

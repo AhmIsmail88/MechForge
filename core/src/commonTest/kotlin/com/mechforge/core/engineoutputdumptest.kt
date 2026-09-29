@@ -185,7 +185,7 @@ class EngineOutputDumpTest {
         dump("heat-exchanger-duty", "m-1kgs", iv("m", 1.0, "kgs"), iv("cp", 4.186, "kjkgk"), iv("tin", 30.0, "c"), iv("tout", 50.0, "c"), iv("u", 500.0, "wm2k"), iv("a", 10.0, "m2"), iv("thin", 90.0, "c"), iv("thout", 60.0, "c"), iv("tcin", 20.0, "c"), iv("tcout", 45.0, "c"), iv("arr", 1.0, "dash"))
         dump("heat-exchanger-duty", "m-2kgs", iv("m", 2.0, "kgs"), iv("cp", 4.186, "kjkgk"), iv("tin", 60.0, "c"), iv("tout", 80.0, "c"))
         dump("hx-effectiveness-ntu", "ntu2-cr0", iv("ntu", 2.0, "dash"), iv("cr", 0.0, "dash"))
-        dump("hx-effectiveness-ntu", "ntu2-cr1-counter", iv("ntu", 2.0, "dash"), iv("cr", 1.0, "dash"), iv("arr", 1.0, "dash"))
+        dump("hx-effectiveness-ntu", "ntu2-cr1-counter", iv("ntu", 2.0, "dash"), iv("cr", 1.0, "dash"), iv("arr", 0.0, "dash"))
         dump("pump-affinity-laws", "n2-1800", iv("q1", 100.0, "m3h"), iv("h1", 50.0, "m"), iv("p1", 10.0, "kw"), iv("n1", 1500.0, "rpm"), iv("n2", 1800.0, "rpm"))
         dump("pump-affinity-laws", "n2-1200", iv("q1", 100.0, "m3h"), iv("h1", 50.0, "m"), iv("p1", 10.0, "kw"), iv("n1", 1500.0, "rpm"), iv("n2", 1200.0, "rpm"))
         dump("fan-laws", "n2-1200", iv("q1", 10000.0, "m3h"), iv("dp1", 500.0, "pa"), iv("p1", 5.0, "kw"), iv("n1", 1000.0, "rpm"), iv("n2", 1200.0, "rpm"), iv("rho1", 1.2, "kgm3"), iv("rho2", 1.2, "kgm3"))

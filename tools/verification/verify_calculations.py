@@ -506,7 +506,7 @@ def expectation(calc, scenario, raw):
     if calc == "hx-effectiveness-ntu":
         ntu = x("ntu")
         cr = x("cr") if "cr" in raw else 0.0
-        counter = (x("arr") >= 0.5) if "arr" in raw else True
+        counter = (x("arr") < 0.5) if "arr" in raw else True  # pick-list: index 0 is counter-current
         if abs(cr) < 1e-9:
             eps = 1.0 - math.exp(-ntu)
         elif counter and abs(1.0 - cr) < 1e-9:

@@ -907,7 +907,7 @@ val GOLDEN_CASES: List<GoldenCase> = listOf(
     GoldenCase(
         calculatorId = "hx-effectiveness-ntu",
         scenario = "ntu2-cr1-counter",
-        inputs = listOf(GoldenInput("arr", 1.0, "dash"), GoldenInput("cr", 1.0, "dash"), GoldenInput("ntu", 2.0, "dash")),
+        inputs = listOf(GoldenInput("arr", 0.0, "dash"), GoldenInput("cr", 1.0, "dash"), GoldenInput("ntu", 2.0, "dash")),
         expected = mapOf("crUsed" to 1.0, "eps" to 66.66666666666666, "epsFrac" to 0.6666666666666666, "ntuUsed" to 2.0),
         relativeTolerance = 1e-6,
     ),
