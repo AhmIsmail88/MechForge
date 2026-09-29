@@ -13,7 +13,10 @@ import kotlin.math.pow
  * volume flow, so ventilation airflow must scale with it. This helper is shared by the
  * airflow and load calculators so they cannot disagree with each other.
  */
+internal fun atmosphericPressure(altitudeM: Double): Double =
+    101325.0 * (1.0 - 2.25577e-5 * altitudeM).pow(5.25588)
+
 internal fun airDensity(temperatureC: Double, altitudeM: Double): Double {
-    val pressure = 101325.0 * (1.0 - 2.25577e-5 * altitudeM).pow(5.25588)
+    val pressure = atmosphericPressure(altitudeM)
     return pressure / (287.05 * (273.15 + temperatureC))
 }

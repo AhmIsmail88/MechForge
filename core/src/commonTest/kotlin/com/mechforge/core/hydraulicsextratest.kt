@@ -196,7 +196,7 @@ class NpshAvailableTest {
             T.iv("hs", -6.0, "m"), T.iv("hf", 2.5, "m"),
         )
         assertEquals(1.61, out.results.first { it.id == "npsha" }.value, 0.03)
-        assertTrue(out.warnings.any { it.contains("low margin") })
+        assertTrue(out.warnings.any { it.contains("rule of thumb") })
     }
 
     @Test

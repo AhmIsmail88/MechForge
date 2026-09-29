@@ -223,6 +223,8 @@ object CalculatorArabic {
             name = "NPSH المتاح",
             description = "صافي رفع الشفط الموجب المتاح من الضغط الجوي وضغط البخار وكثافة السائل وفقد خط الشفط.",
             inputs = mapOf(
+                "alt" to "ارتفاع الموقع (يحسب الضغط الجوي)",
+                "npshr" to "NPSH المطلوب للمضخة (عند تصريف التشغيل)",
                 "patm" to "الضغط المطلق على السطح",
                 "pv" to "ضغط تبخر السائل",
                 "rho" to "كثافة السائل",
@@ -230,6 +232,9 @@ object CalculatorArabic {
                 "hf" to "فقد خط الشفط",
             ),
             results = mapOf(
+                "npshr" to "NPSH المطلوب (من منحنى المضخة)",
+                "margin" to "هامش NPSHa − NPSHr",
+                "marginRatio" to "نسبة NPSHa / NPSHr",
                 "npsha" to "NPSH المتاح",
                 "phead" to "مساهمة ضغط الرأس",
             ),
