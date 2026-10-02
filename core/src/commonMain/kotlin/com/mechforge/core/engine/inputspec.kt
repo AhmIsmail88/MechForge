@@ -40,6 +40,7 @@ data class InputSpec(
      * then reports it as a warning instead of assuming silently (engineering review P1-6).
      */
     val assumedWhenOmitted: String? = null,
+    val integerOnly: Boolean = false,
 )
 
 /** One choice of an option-based input. */

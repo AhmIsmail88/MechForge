@@ -116,24 +116,26 @@ object Fm200AgentQuantityCalculator : Calculator(Def) {
         val excludedFromGross = if (gross != null) gross - volume else null
         val netFromGross = if (gross != null && excluded != null) gross - excluded else null
         val side = volume.pow(1.0 / 3.0)
+        val consistentVolumes = (gross == null || volume <= gross) &&
+            (netFromGross == null || kotlin.math.abs(netFromGross - volume) <= 0.02 * volume)
 
         val results = buildList {
             add(result("vnet", "Net protected volume used", volume, "m3"))
             if (gross != null) add(result("vexcl", "Excluded volume (gross - net)", (excludedFromGross ?: 0.0).coerceAtLeast(0.0), "m3"))
             add(result("cUsed", "Design concentration used", concentrationPct, "pct"))
             add(result("sUsed", "Specific vapour volume used", s, "m3perkg"))
-            add(result("wbasic", "Basic agent quantity W_basic", basic, "kg"))
+            add(result("wbasic", if (sDerived) "Theoretical basic agent quantity" else "Preliminary basic agent quantity W_basic", basic, "kg"))
             add(result("wadd", "Additional quantity W_add", additional, "kg"))
-            add(result("w", "Final required quantity W_final", final, "kg", isPrimary = true))
-            add(result("wLb", "Final quantity (imperial)", finalLb, "lb", isPrimary = true))
+            add(result("w", if (sDerived) "Theoretical final quantity (not for equipment selection)" else "Preliminary final quantity W_final", final, "kg", isPrimary = !sDerived))
+            add(result("wLb", if (sDerived) "Theoretical final quantity (imperial)" else "Preliminary final quantity (imperial)", finalLb, "lb", isPrimary = !sDerived))
             add(result("f", "Equivalent flooding factor (W_basic / V)", equivalentFactor, "kgm3"))
             add(result("fLb", "Equivalent flooding factor (imperial)", equivalentFactor / 16.0184634, "lbft3"))
             add(result("vapourVolume", "Agent vapour volume at design T", vapourVolume, "m3"))
-            if (has(inputs, "mcyl")) {
+            if (!sDerived && has(inputs, "c") && has(inputs, "mcyl") && consistentVolumes) {
                 val charge = value(inputs, "mcyl")
                 val count = ceil(final / charge)
                 val installed = count * charge
-                add(result("cylinders", "Cylinders required (${Fmt.n(charge, 3)} kg each)", count, "dash"))
+                add(result("cylinders", "Preliminary cylinders (${Fmt.n(charge, 3)} kg each)", count, "dash"))
                 add(result("installed", "Installed agent capacity", installed, "kg"))
                 add(result("margin", "Capacity margin", installed - final, "kg"))
                 add(result("marginPct", "Capacity margin", (installed - final) / final * 100.0, "pct"))
@@ -164,12 +166,12 @@ object Fm200AgentQuantityCalculator : Calculator(Def) {
                 },
             )
             add("Step 7  W_final = W_basic + W_add = ${Fmt.n(basic, 2)} + ${Fmt.n(additional, 2)} = ${Fmt.n(final, 2)} kg")
-            if (has(inputs, "mcyl")) {
+            if (!sDerived && has(inputs, "c") && has(inputs, "mcyl") && consistentVolumes) {
                 val charge = value(inputs, "mcyl")
                 val count = ceil(final / charge)
                 add("Step 8  Cylinders = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(charge, 3)} kg) = ${Fmt.n(count, 0)} x ${Fmt.n(charge, 3)} kg = ${Fmt.n(count * charge, 2)} kg installed")
             } else {
-                add("Step 8  Enter the listed cylinder charge to get the cylinder selection and the capacity margin.")
+                add("Step 8  Cylinder count requires entered listed S, verified design concentration C and listed cylinder charge; ideal-gas estimates cannot select equipment.")
             }
             add("Step 9  Assumptions: NFPA 2001 methodology; state the edition in force for the project (Settings > Report details > Code / edition) and confirm the concentration, S and the listed system with the manufacturer.")
         }
@@ -198,12 +200,12 @@ object Fm200AgentQuantityCalculator : Calculator(Def) {
                 },
             )
             add("خطوة 7  W_final = W_basic + W_add = ${Fmt.n(basic, 2)} + ${Fmt.n(additional, 2)} = ${Fmt.n(final, 2)} kg")
-            if (has(inputs, "mcyl")) {
+            if (!sDerived && has(inputs, "c") && has(inputs, "mcyl") && consistentVolumes) {
                 val chargeAr = value(inputs, "mcyl")
                 val countAr = ceil(final / chargeAr)
                 add("خطوة 8  الأسطوانات = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(chargeAr, 3)} kg) = ${Fmt.n(countAr, 0)} × ${Fmt.n(chargeAr, 3)} kg = ${Fmt.n(countAr * chargeAr, 2)} kg مُركّبة")
             } else {
-                add("خطوة 8  أدخل شحنة الأسطوانة المُدرجة للحصول على اختيار الأسطوانات وهامش السعة.")
+                add("خطوة 8  عدد الأسطوانات يتطلب إدخال S المُدرج وتركيز التصميم C المعتمد وشحنة الأسطوانة؛ التقدير المثالي لا يصلح لاختيار المعدات.")
             }
             add("خطوة 9  الافتراضات: منهجية NFPA 2001؛ اذكر الإصدار الساري للمشروع (الإعدادات > تفاصيل التقرير > الكود/الإصدار) وأكّد التركيز و S والنظام المُدرج مع المُصنّع.")
         }

@@ -76,7 +76,7 @@ object ReportSheet {
         }
 
         // Warnings -----------------------------------------------------------
-        val warningsToPrint = if (arabicOutput && output.warningsAr.isNotEmpty()) output.warningsAr else output.warnings
+        val warningsToPrint = com.mechforge.app.ui.CalcText.warnings(calculator.def, inputs, output, arabicOutput)
         if (warningsToPrint.isNotEmpty()) {
             blocks += ReportBlock.Heading(labels.warnings)
             for (w in warningsToPrint) {

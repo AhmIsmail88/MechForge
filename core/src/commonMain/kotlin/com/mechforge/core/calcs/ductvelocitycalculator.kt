@@ -38,7 +38,7 @@ object DuctVelocityCalculator : Calculator(Def) {
 
         val hasRound = has(inputs, "d")
         val hasRect = has(inputs, "w") && has(inputs, "h")
-        if (hasRound == hasRect) {
+        if (hasRound == hasRect || (hasRound && (has(inputs, "w") || has(inputs, "h"))) || (has(inputs, "w") != has(inputs, "h"))) {
             throw ValidationException(
                 listOf(
                     InputError(

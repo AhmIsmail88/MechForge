@@ -67,7 +67,7 @@ import com.mechforge.core.calcs.ValveKvCalculator
 
 /**
  * Registry of all calculators.
- * Pilot v0.1 (12) + MVP expansion (38) + fire protection and equipment (10) + clean agent flooding (2) = 62.
+ * The catalogue currently contains 64 calculators; RegistryTest guards this count.
  */
 object CalculatorRegistry {
 
@@ -90,7 +90,6 @@ object CalculatorRegistry {
         PowerEfficiencyConverterCalculator,
         LatentHeatCalculator,
         DuctVelocityCalculator,
-        DuckFootBendBaseDesignCalculator,
         DuctSizingCalculator,
         DuctPressureLossCalculator,
         FanPowerCalculator,
@@ -112,7 +111,8 @@ object CalculatorRegistry {
         BeamSsUdlCalculator,
         BeamCantileverPointCalculator,
         GearRatioCalculator,
-        // Piping (6)
+        // Piping (7)
+        DuckFootBendBaseDesignCalculator,
         PipeSizingCalculator,
         PipeWeightCalculator,
         PipeWallThicknessCalculator,

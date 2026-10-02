@@ -16,6 +16,9 @@ object EngineFingerprint {
     /** Kept in step with the application version. */
     const val VERSION: String = "0.5.0"
 
+    /** Changes whenever calculation logic is corrected, independently of app packaging. */
+    const val CALCULATION_REVISION: String = "2026-09-30.2"
+
     val calculatorCount: Int get() = CalculatorRegistry.all.size
 
     /** FNV-1a over the sorted calculator ids, as eight hex digits. */
@@ -33,5 +36,5 @@ object EngineFingerprint {
     }
 
     /** One line, as printed in a report. */
-    val text: String get() = "MechForge " + VERSION + " - " + calculatorCount + " calculators - registry " + short
+    val text: String get() = "MechForge " + VERSION + " - " + calculatorCount + " calculators - registry " + short + " - calculations " + CALCULATION_REVISION
 }

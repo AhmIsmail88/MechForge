@@ -19,7 +19,7 @@ private val Def = CalculatorDefinition(
     description = "Required duct cross-section from airflow and target velocity, with equivalent round diameter and rectangular sides.",
     formulaDisplay = "A = Q/v ;  D_eq = √(4A/π) ;  W = √(A·r), H = √(A/r)",
     reference = "Continuity equation; velocity method per standard HVAC design practice (ASHRAE-style).",
-    notes = "r is the rectangular aspect ratio W/H (1.0 = square). Select the next standard duct size equal to or above the computed dimensions.",
+    notes = "r is the rectangular aspect ratio W/H (1.0 = square). The round diameter has equal area, not equal friction loss. Select the next standard size and calculate its pressure loss.",
     keywords = listOf("duct", "sizing", "velocity method", "equivalent diameter", "hvac"),
     inputs = listOf(
         InputSpec("q", "Airflow", "Q", UnitFamily.FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
@@ -43,13 +43,13 @@ object DuctSizingCalculator : Calculator(Def) {
         return CalcOutput(
             results = listOf(
                 result("a", "Required Duct Area", area, "m2", isPrimary = true),
-                result("deq", "Equivalent Round Diameter", dEq * 1000.0, "mm", isPrimary = true),
+                result("deq", "Equal-Area Round Diameter", dEq * 1000.0, "mm", isPrimary = true),
                 result("w", "Rectangular Width", w * 1000.0, "mm"),
                 result("h", "Rectangular Height", h * 1000.0, "mm"),
             ),
             steps = listOf(
                 "Area: A = Q/v = ${Fmt.n(q, 5)} / ${Fmt.n(v, 3)} = ${Fmt.n(area, 5)} m²",
-                "Equivalent round: D_eq = √(4A/π) = ${Fmt.n(dEq, 4)} m = ${Fmt.n(dEq * 1000.0, 0)} mm",
+                "Equal-area round: D_eq = √(4A/π) = ${Fmt.n(dEq, 4)} m = ${Fmt.n(dEq * 1000.0, 0)} mm",
                 "Rectangular (W/H = ${Fmt.n(ratio, 2)}): W = ${Fmt.n(w * 1000.0, 0)} mm, H = ${Fmt.n(h * 1000.0, 0)} mm",
             ),
             warnings = buildList {

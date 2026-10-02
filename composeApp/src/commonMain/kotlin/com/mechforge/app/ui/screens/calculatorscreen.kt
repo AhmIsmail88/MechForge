@@ -102,10 +102,10 @@ fun CalculatorScreen(
                 val restored = restoreInputs?.get(spec.id)
                 if (restored != null) {
                     val unit = Units.byId(restored.displayUnitId)
-                    InputUi(spec.id, UiFormat.n(unit.fromBase(restored.baseValue)), restored.displayUnitId)
+                    InputUi(spec.id, unit.fromBase(restored.baseValue).toString(), restored.displayUnitId)
                 } else {
                     val unitId = spec.defaultUnitId ?: Units.defaultUnit(spec.family).id
-                    InputUi(spec.id, spec.defaultValue?.let { UiFormat.n(it) } ?: "", unitId)
+                    InputUi(spec.id, spec.defaultValue?.toString() ?: "", unitId)
                 }
             }
         )
@@ -114,6 +114,10 @@ fun CalculatorScreen(
     var lastInputs by remember(calculatorId) { mutableStateOf<Map<String, InputValue>?>(null) }
     var fieldErrors by remember(calculatorId) { mutableStateOf<Map<String, String>>(emptyMap()) }
     var globalError by remember(calculatorId) { mutableStateOf<String?>(null) }
+    var reportNumber by remember(calculatorId) { mutableStateOf(restoreCalculationNumber) }
+    var reportProjectSnapshot by remember(calculatorId) { mutableStateOf(restoreProjectSnapshot) }
+    var reportTitle by remember(calculatorId) { mutableStateOf(restoreTitle) }
+    var reportStatus by remember(calculatorId) { mutableStateOf(restoreStatus) }
     var savedMessage by remember(calculatorId) { mutableStateOf<String?>(null) }
     var showSaveDialog by remember(calculatorId) { mutableStateOf(false) }
     val isFavorite = remember(calculatorId) { mutableStateOf(deps.favorites.isFavorite(calculatorId)) }
@@ -125,6 +129,13 @@ fun CalculatorScreen(
     val resultUnits = remember(calculatorId) {
         mutableStateOf<Map<String, String>>(emptyMap())
     }
+    fun invalidateResult() {
+        output = null
+        lastInputs = null
+        savedMessage = null
+        reportNumber = null
+        globalError = null
+    }
 
     Column(
         modifier = Modifier
@@ -133,11 +144,11 @@ fun CalculatorScreen(
             .padding(24.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, strings.back) }
             Column(modifier = Modifier.weight(1f)) {
                 Text(CalcText.name(def, strings.isRtl), style = MaterialTheme.typography.headlineSmall)
                 Text(
-                    restoreTitle ?: def.category.displayName,
+                    restoreTitle ?: CalcText.categoryName(def.category, strings.isRtl),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -148,7 +159,7 @@ fun CalculatorScreen(
             }) {
                 Icon(
                     Icons.Filled.Star,
-                    contentDescription = "Favorite",
+                    contentDescription = if (isFavorite.value) strings.favoriteRemove else strings.favoriteAdd,
                     tint = if (isFavorite.value) Color(0xFFF5B301) else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
@@ -177,21 +188,18 @@ fun CalculatorScreen(
         Spacer(Modifier.height(8.dp))
         for (spec in def.inputs) {
             val ui = inputsUi.first { it.specId == spec.id }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 val options = spec.options
                 OutlinedTextField(
                     value = if (options != null) {
-                        options.getOrNull(ui.text.toIntOrNull() ?: 0)?.label ?: ""
+                        ui.text.toIntOrNull()?.let { options.getOrNull(it)?.label } ?: ""
                     } else {
                         ui.text
                     },
                     onValueChange = { text ->
                         inputsUi = inputsUi.map { if (it.specId == spec.id) it.copy(text = text) else it }
                         fieldErrors = fieldErrors - spec.id
+                        invalidateResult()
                     },
                     label = {
                         Text(
@@ -203,18 +211,23 @@ fun CalculatorScreen(
                     isError = fieldErrors.containsKey(spec.id),
                     readOnly = options != null,
                     supportingText = fieldErrors[spec.id]?.let { msg -> { Text(msg, color = MaterialTheme.colorScheme.error) } },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                 )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                 if (options != null) {
                     OptionSelect(
                         options = options,
-                        selectedIndex = ui.text.toIntOrNull() ?: 0,
+                        selectedIndex = ui.text.toIntOrNull() ?: -1,
                         onSelected = { index ->
                             inputsUi = inputsUi.map {
                                 if (it.specId == spec.id) it.copy(text = index.toString()) else it
                             }
                             fieldErrors = fieldErrors - spec.id
+                            invalidateResult()
                         },
                     )
                 } else {
@@ -226,11 +239,12 @@ fun CalculatorScreen(
                             // Convert the typed value to the new unit (README: value converts on unit change)
                             val newText = ui.text.toDoubleOrNull()?.let { value ->
                                 val base = Units.byId(ui.unitId).toBase(value)
-                                UiFormat.n(Units.byId(newUnitId).fromBase(base))
+                                Units.byId(newUnitId).fromBase(base).toString()
                             } ?: ui.text
                             inputsUi = inputsUi.map {
                                 if (it.specId == spec.id) it.copy(unitId = newUnitId, text = newText) else it
                             }
+                            invalidateResult()
                         },
                     )
                 }
@@ -248,9 +262,11 @@ fun CalculatorScreen(
                                     if (it.specId == spec.id) it.copy(text = row.value, unitId = unitId ?: it.unitId) else it
                                 }
                                 fieldErrors = fieldErrors - spec.id
+                                invalidateResult()
                             },
                         )
                     }
+                }
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -261,38 +277,49 @@ fun CalculatorScreen(
                 globalError = null
                 savedMessage = null
                 try {
+                    val invalidInputs = mutableMapOf<String, String>()
                     val map = buildMap<String, InputValue> {
                         for (ui in inputsUi) {
                             val text = ui.text.trim()
                             if (text.isEmpty()) continue
                             val number = text.toDoubleOrNull()
-                            if (number == null) {
-                                fieldErrors = fieldErrors + (ui.specId to "Enter a valid number.")
+                            if (number == null || !number.isFinite()) {
+                                invalidInputs[ui.specId] = strings.errorInvalidNumber
                                 continue
                             }
-                            put(ui.specId, InputValue(ui.specId, Units.byId(ui.unitId).toBase(number), ui.unitId))
+                            val baseValue = Units.byId(ui.unitId).toBase(number)
+                            if (!baseValue.isFinite()) {
+                                invalidInputs[ui.specId] = strings.errorInvalidNumber
+                                continue
+                            }
+                            put(ui.specId, InputValue(ui.specId, baseValue, ui.unitId))
                         }
                     }
-                    val result = calc.run(map)
-                    output = result
-                    lastInputs = map
-                    fieldErrors = emptyMap()
+                    if (invalidInputs.isNotEmpty()) {
+                        invalidateResult()
+                        fieldErrors = invalidInputs
+                    } else {
+                        val result = calc.run(map)
+                        output = result
+                        lastInputs = map
+                        fieldErrors = emptyMap()
+                    }
                 } catch (e: ValidationException) {
-                    output = null
+                    invalidateResult()
                     fieldErrors = e.errors.associate { it.inputId to it.message }
                 } catch (e: NumberFormatException) {
-                    output = null
-                    globalError = "One or more inputs are not valid numbers."
+                    invalidateResult()
+                    globalError = strings.errorInvalidNumber
                 } catch (e: Exception) {
-                    output = null
-                    globalError = "Calculation error: ${e.message}"
+                    invalidateResult()
+                    globalError = "${strings.errorCalculationFailed}: ${e.message}"
                 }
             }) { Text(strings.calculate) }
             OutlinedButton(onClick = {
                 inputsUi = def.inputs.map { spec ->
                     InputUi(
                         spec.id,
-                        spec.defaultValue?.let { UiFormat.n(it) } ?: "",
+                        spec.defaultValue?.toString() ?: "",
                         spec.defaultUnitId ?: Units.defaultUnit(spec.family).id,
                     )
                 }
@@ -382,7 +409,7 @@ fun CalculatorScreen(
                             Text(step, style = MaterialTheme.typography.bodySmall)
                         }
                     }
-                    val shownWarnings = if (strings.isRtl && out.warningsAr.isNotEmpty()) out.warningsAr else out.warnings
+                    val shownWarnings = CalcText.warnings(def, lastInputs ?: emptyMap(), out, strings.isRtl)
                     if (shownWarnings.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
                         for (w in shownWarnings) {
@@ -417,7 +444,7 @@ fun CalculatorScreen(
                                     // Settings values are the fallback while a project is still blank.
                                     // a restored record prints the project data frozen with it
                                     val activeProject = ReportMeta.projectFor(
-                                        restoreProjectSnapshot,
+                                        reportProjectSnapshot,
                                         deps.projects.activeProject(),
                                     )
                                     val meta = ReportMeta.build(
@@ -444,21 +471,21 @@ fun CalculatorScreen(
                                         activeProject?.documentNumber?.takeIf { it.isNotBlank() }?.let { labels.documentNo to it },
                                         activeProject?.revision?.takeIf { it.isNotBlank() }?.let { labels.revision to it },
                                         activeProject?.status?.takeIf { it.isNotBlank() }?.let { labels.status to it },
-                                        restoreCalculationNumber?.takeIf { it.isNotBlank() }?.let { labels.registerCalcNo to it },
+                                        reportNumber?.takeIf { it.isNotBlank() }?.let { labels.registerCalcNo to it },
                                     )
                                     val qa = ReportQa.check(
                                         project = activeProject,
-                                        calculationNumber = restoreCalculationNumber,
+                                        calculationNumber = reportNumber,
                                         revision = activeProject?.revision,
-                                        status = restoreStatus ?: activeProject?.status,
-                                        assumedInputWarnings = out.warnings.filter { it.contains("assumed") },
-                                        isSaved = restoreCalculationNumber != null,
+                                        status = reportStatus ?: activeProject?.status,
+                                        assumedInputWarnings = def.inputs.filter { it.assumedWhenOmitted != null && lastInputs?.containsKey(it.id) != true }.mapNotNull { it.assumedWhenOmitted },
+                                        isSaved = reportNumber != null,
                                     )
                                     val blocks = ReportSheet.build(
                                         calculator = calc,
                                         inputs = lastInputs ?: emptyMap(),
                                         output = out,
-                                        title = restoreTitle,
+                                        title = reportTitle,
                                         labels = labels,
                                         signature = signature,
                                         documentControl = control,
@@ -487,7 +514,7 @@ fun CalculatorScreen(
                                     // Settings values are the fallback while a project is still blank.
                                     // a restored record prints the project data frozen with it
                                     val activeProject = ReportMeta.projectFor(
-                                        restoreProjectSnapshot,
+                                        reportProjectSnapshot,
                                         deps.projects.activeProject(),
                                     )
                                     val meta = ReportMeta.build(
@@ -514,21 +541,21 @@ fun CalculatorScreen(
                                         activeProject?.documentNumber?.takeIf { it.isNotBlank() }?.let { labels.documentNo to it },
                                         activeProject?.revision?.takeIf { it.isNotBlank() }?.let { labels.revision to it },
                                         activeProject?.status?.takeIf { it.isNotBlank() }?.let { labels.status to it },
-                                        restoreCalculationNumber?.takeIf { it.isNotBlank() }?.let { labels.registerCalcNo to it },
+                                        reportNumber?.takeIf { it.isNotBlank() }?.let { labels.registerCalcNo to it },
                                     )
                                     val qa = ReportQa.check(
                                         project = activeProject,
-                                        calculationNumber = restoreCalculationNumber,
+                                        calculationNumber = reportNumber,
                                         revision = activeProject?.revision,
-                                        status = restoreStatus ?: activeProject?.status,
-                                        assumedInputWarnings = out.warnings.filter { it.contains("assumed") },
-                                        isSaved = restoreCalculationNumber != null,
+                                        status = reportStatus ?: activeProject?.status,
+                                        assumedInputWarnings = def.inputs.filter { it.assumedWhenOmitted != null && lastInputs?.containsKey(it.id) != true }.mapNotNull { it.assumedWhenOmitted },
+                                        isSaved = reportNumber != null,
                                     )
                                     val blocks = ReportSheet.build(
                                         calculator = calc,
                                         inputs = lastInputs ?: emptyMap(),
                                         output = out,
-                                        title = restoreTitle,
+                                        title = reportTitle,
                                         labels = labels,
                                         signature = signature,
                                         documentControl = control,
@@ -569,7 +596,7 @@ fun CalculatorScreen(
                     val resultsJson = Snapshots.encodeResults(out)
                     // freeze the project data with the record (audit section 5.1)
                     val project = deps.projects.activeProject()
-                    deps.history.add(
+                    val saved = deps.history.add(
                         calculatorId = def.id,
                         title = title,
                         timestamp = System.currentTimeMillis(),
@@ -580,7 +607,11 @@ fun CalculatorScreen(
                         revision = project?.revision?.takeIf { it.isNotBlank() },
                         status = project?.status?.takeIf { it.isNotBlank() },
                     )
-                    savedMessage = "Saved to history."
+                    reportNumber = saved.calculation_number
+                    reportProjectSnapshot = saved.project_snapshot
+                    reportTitle = saved.title
+                    reportStatus = saved.status
+                    savedMessage = strings.calculatorSavedToHistory
                 }
                 showSaveDialog = false
             },

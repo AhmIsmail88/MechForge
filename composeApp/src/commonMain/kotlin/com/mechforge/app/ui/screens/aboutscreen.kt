@@ -8,15 +8,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.ui.i18n.LocalStrings
 
 @Composable
 fun AboutScreen() {
     val strings = LocalStrings.current
+    val uriHandler = LocalUriHandler.current
+    var contactError by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -29,6 +37,20 @@ fun AboutScreen() {
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
         )
+        Spacer(Modifier.height(12.dp))
+        Button(onClick = {
+            contactError = false
+            try {
+                uriHandler.openUri("https://www.linkedin.com/in/ahmed-ismail-soliman?utm_source=share_via&utm_content=profile&utm_medium=member_android")
+            } catch (_: IllegalArgumentException) {
+                contactError = true
+            }
+        }) {
+            Text(strings.aboutContact)
+        }
+        if (contactError) {
+            Text(strings.aboutContactError, color = MaterialTheme.colorScheme.error)
+        }
         Spacer(Modifier.height(12.dp))
         Text(strings.aboutVersion, style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(20.dp))

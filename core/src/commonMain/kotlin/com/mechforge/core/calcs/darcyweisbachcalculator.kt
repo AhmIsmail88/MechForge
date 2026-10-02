@@ -24,7 +24,7 @@ private val Def = CalculatorDefinition(
     description = "Friction head loss in a pipe. Friction factor from Colebrook-White (Re + roughness) or entered directly.",
     formulaDisplay = "h_f = f·(L/D)·v²/(2g)",
     reference = "Darcy-Weisbach (1857); Colebrook-White (1939); Moody chart equivalent.",
-    notes = "g = 9.80665 m/s². In laminar flow f = 64/Re regardless of roughness.",
+    notes = "g = 9.80665 m/s². Use the Darcy factor, not the Fanning factor (Darcy = 4 x Fanning). In laminar circular-pipe flow f = 64/Re.",
     keywords = listOf("head loss", "friction", "darcy", "weisbach", "colebrook", "pressure drop"),
     inputs = listOf(
         InputSpec("v", "Velocity", "v", UnitFamily.VELOCITY, minValue = 0.0, exclusiveMin = true, defaultUnitId = "ms"),
@@ -83,6 +83,9 @@ object DarcyWeisbachCalculator : Calculator(Def) {
         } else {
             val reVal = value(inputs, "re")
             relRough = if (hasEps) value(inputs, "eps") / d else 0.0
+            if (relRough >= 0.1) {
+                throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("eps", "Relative roughness must be below 0.1 for this calculator's supported range.")))
+            }
             f = FrictionFactor.darcy(reVal, relRough)
             re = reVal
             FrictionFactor.regimeWarning(reVal)?.let { warnings += it }

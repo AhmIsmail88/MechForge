@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
             val strings = resolveStrings(languageMode)
 
             val baseConfiguration = LocalConfiguration.current
-            val localeConfiguration = remember(strings.isRtl) {
+            val localeConfiguration = remember(baseConfiguration, strings.isRtl) {
                 Configuration(baseConfiguration).apply {
                     setLocale(if (strings.isRtl) Locale("ar") else Locale("en"))
                 }

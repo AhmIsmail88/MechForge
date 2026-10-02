@@ -38,16 +38,16 @@ class AirDensityTest {
         val base = SensibleHeatCalculator.run(
             mapOf(
                 "q" to com.mechforge.core.engine.InputValue("q", 1.0, "m3s"),
-                "tin" to com.mechforge.core.engine.InputValue("tin", 20.0, "c"),
-                "tout" to com.mechforge.core.engine.InputValue("tout", 30.0, "c"),
+                "tin" to com.mechforge.core.engine.InputValue("tin", 293.15, "c"),
+                "tout" to com.mechforge.core.engine.InputValue("tout", 303.15, "c"),
             ),
         )
         val hot = SensibleHeatCalculator.run(
             mapOf(
                 "q" to com.mechforge.core.engine.InputValue("q", 1.0, "m3s"),
-                "tin" to com.mechforge.core.engine.InputValue("tin", 20.0, "c"),
-                "tout" to com.mechforge.core.engine.InputValue("tout", 30.0, "c"),
-                "tair" to com.mechforge.core.engine.InputValue("tair", 45.0, "c"),
+                "tin" to com.mechforge.core.engine.InputValue("tin", 293.15, "c"),
+                "tout" to com.mechforge.core.engine.InputValue("tout", 303.15, "c"),
+                "tair" to com.mechforge.core.engine.InputValue("tair", 318.15, "c"),
                 "alt" to com.mechforge.core.engine.InputValue("alt", 500.0, "m"),
             ),
         )

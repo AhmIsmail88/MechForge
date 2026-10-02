@@ -2,7 +2,7 @@
 
 <img src="docs/assets/cover.png" width="100%" alt="MechForge - 64 verified mechanical engineering calculators, offline-first, Arabic and English, PDF and Excel reports">
 
-<img src="docs/assets/cover-ar.png" width="100%" alt="MechForge - مجموعة أدوات الهندسة الميكانيكية، 63 حاسبة متحققة، عربي وإنجليزي">
+<img src="docs/assets/cover-ar.png" width="100%" alt="MechForge - مجموعة أدوات الهندسة الميكانيكية، 64 حاسبة، عربي وإنجليزي">
 
 **A local-first mechanical-engineering toolkit for engineers who need to check their numbers.**
 
@@ -46,6 +46,19 @@ next to the result — never just a bare number.
   reference and a signature block.
 - **One engine, two apps**: the same Kotlin Multiplatform engine and the same Compose UI
   are used by the Android app and the desktop (JVM) app.
+
+## Calculation audit — September 2026
+
+The [full 64-calculator audit](docs/calculator-audit-2026-09-30.md) documents corrected
+equations, independent numerical checks, source editions and remaining design limits.
+Calculation revision: **2026-09-30.2**. Numerical verification is not blanket code
+compliance; fire suppression and structural-base estimates still need the documented
+project and manufacturer checks.
+
+The [connected fictional project](docs/assumed-project-review-2026-09-30.md) and
+[seven-item follow-up](docs/remaining-items-review-2026-09-30.md) record linked
+calculations, supplementary contact/network studies, Android verification, and
+explicitly unresolved manufacturer, structural and on-device checks.
 
 ## What is in 0.5.0
 
@@ -106,10 +119,10 @@ next to the result — never just a bare number.
 | Category | Calculators | Examples |
 | --- | --- | --- |
 | Hydraulics | 10 | pump power, pipe velocity, Reynolds number, Darcy-Weisbach, friction factor, orifice flow, Manning, Hazen-Williams, NPSH available, minor losses |
-| HVAC | 10 | sensible heat, total cooling load, airflow converter, kW ↔ TR / COP / EER, latent heat, duct velocity, duct sizing, duct friction loss, fan power, air changes per hour |
+| HVAC | 11 | sensible heat, total cooling load, airflow converter, kW ↔ TR / COP / EER, latent heat, duct velocity, duct sizing, duct friction loss, fan power, air changes per hour, heat dissipation |
 | Thermodynamics | 6 | ideal gas, Carnot efficiency, thermal efficiency, isentropic relations, compressor power, LMTD |
 | Mechanical design | 8 | power ↔ torque ↔ speed, torsional stress, bolt torque and design preload, bearing life (L10 / Lnm), spring rate, simply supported beam, cantilever beam, gear ratio |
-| Piping | 6 | pipe sizing, pipe weight (with content), wall thickness (ASME B31.3 form), thermal expansion, equivalent length, valve Kv / Cv |
+| Piping | 7 | pipe sizing, pipe weight (with content), wall thickness (ASME B31.3 form), thermal expansion, equivalent length, valve Kv / Cv, duck foot bend base |
 | Water &amp; wastewater | 5 | tank volume, detention time, chlorine dose, peak flow, hydraulic loading |
 | Fire protection | 7 | sprinkler discharge (K-factor), hose / nozzle flow, fire pump head, fire pump power, water hammer (Joukowsky), **FM-200 (HFC-227ea) total flooding**, **CO₂ total flooding (NFPA 12)** |
 | Equipment | 5 | heat exchanger duty, effectiveness-NTU, pump affinity laws, fan laws, multi-stage compression ratio |

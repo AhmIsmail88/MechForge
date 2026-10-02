@@ -1,6 +1,7 @@
 package com.mechforge.core
 
 import com.mechforge.core.calcs.PipeVelocityCalculator
+import com.mechforge.core.calcs.HazenWilliamsCalculator
 import com.mechforge.core.engine.Calculator
 import com.mechforge.core.engine.CalculatorRegistry
 import com.mechforge.core.engine.InputValue
@@ -51,6 +52,31 @@ class ValidationTest {
         } catch (e: ValidationException) {
             assertTrue(e.errors.any { it.inputId == "d" && it.message.contains("Invalid unit") })
         }
+    }
+
+    @Test
+    fun nonFiniteInputIsRejectedBeforeCalculation() {
+        for (bad in listOf(Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY)) {
+            try {
+                T.run(PipeVelocityCalculator, T.iv("q", 10.0, "m3h"), T.iv("d", bad, "mm"))
+                fail("expected ValidationException for $bad")
+            } catch (e: ValidationException) {
+                assertTrue(e.errors.any { it.inputId == "d" && it.message.contains("finite") })
+            }
+        }
+    }
+
+    @Test
+    fun hazenWilliamsGradientUsesActualLength() {
+        val out = T.run(
+            HazenWilliamsCalculator,
+            T.iv("c", 130.0, "dash"), T.iv("d", 300.0, "mm"),
+            T.iv("q", 100.0, "m3h"), T.iv("l", 250.0, "m"),
+        )
+        val headLoss = out.results.first { it.id == "hf" }.value
+        val gradient = out.results.first { it.id == "gradient" }.value
+        assertEquals(headLoss / 250.0, gradient, 1e-12)
+        assertTrue(out.steps.any { it.contains("L = 250") })
     }
 }
 

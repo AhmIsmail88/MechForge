@@ -14,13 +14,18 @@ abstract class Calculator(val def: CalculatorDefinition) {
         val errors = validateDefinition(def, inputs)
         if (errors.isNotEmpty()) throw ValidationException(errors)
         val output = calculate(inputs)
+        if (output.results.any { !it.value.isFinite() }) {
+            throw ValidationException(listOf(InputError(def.inputs.first().id, "Inputs produce an undefined or overflowing result; check their magnitudes and the equation limits.")))
+        }
         // an input the caller left out while the calculator falls back to a built-in number
         // must never stay silent: report it as an assumption at the top of the warnings.
         val assumed = def.inputs
             .filter { it.assumedWhenOmitted != null && !inputs.containsKey(it.id) }
             .map { it.assumedWhenOmitted!! }
-        if (assumed.isEmpty()) return output
-        return output.copy(warnings = assumed + output.warnings)
+        return output.copy(
+            warnings = assumed + output.warnings,
+            calculationRevision = EngineFingerprint.CALCULATION_REVISION,
+        )
     }
 
     protected abstract fun calculate(inputs: Map<String, InputValue>): CalcOutput
@@ -63,6 +68,14 @@ abstract class Calculator(val def: CalculatorDefinition) {
                     errors += InputError(spec.id, "Invalid unit for ${spec.label}.")
                     continue
                 }
+                if (spec.allowedUnitIds != null && iv.displayUnitId !in spec.allowedUnitIds) {
+                    errors += InputError(spec.id, "Invalid unit for ${spec.label}.")
+                    continue
+                }
+                if (!iv.baseValue.isFinite()) {
+                    errors += InputError(spec.id, "${spec.label} must be a finite number.")
+                    continue
+                }
                 spec.minValue?.let { min ->
                     val tooLow = if (spec.exclusiveMin) iv.baseValue <= min else iv.baseValue < min
                     if (tooLow) {
@@ -78,6 +91,9 @@ abstract class Calculator(val def: CalculatorDefinition) {
                             "${spec.label} must be one of the listed options (0..${options.size - 1}).",
                         )
                     }
+                }
+                if (spec.integerOnly && iv.baseValue != floor(iv.baseValue)) {
+                    errors += InputError(spec.id, "${spec.label} must be a whole number.")
                 }
                 spec.maxValue?.let { max ->
                     val tooHigh = if (spec.exclusiveMax) iv.baseValue >= max else iv.baseValue > max

@@ -172,6 +172,8 @@ interface UiStrings {
     // ---- About ----------------------------------------------------------
     val aboutTitle: String
     val aboutVersion: String
+    val aboutContact: String
+    val aboutContactError: String
     val aboutMissionTitle: String
     val aboutMissionBody: String
     val aboutLocalFirstTitle: String
@@ -372,8 +374,7 @@ object ArStrings : UiStrings {
     override val settingsAppearance = "المظهر"
     override val settingsLanguage = "اللغة"
     override val settingsLanguagePhaseNote =
-        "تُترجم واجهة التطبيق بالكامل إلى العربية. أما أسماء الحاسبات ووصفها " +
-            "ومعادلاتها الهندسية فتبقى بالإنجليزية في هذه المرحلة."
+        "تتوفر واجهة التطبيق وأسماء الحاسبات ووصفها بالعربية. تبقى الرموز والوحدات والمعادلات بالصيغة الدولية."
     override val themeSystem = "حسب النظام"
     override val themeLight = "فاتح"
     override val themeDark = "داكن"
@@ -386,6 +387,8 @@ object ArStrings : UiStrings {
 
     override val aboutTitle = "حول التطبيق"
     override val aboutVersion = "الإصدار 01"
+    override val aboutContact = "تواصل معي على LinkedIn"
+    override val aboutContactError = "تعذّر فتح الرابط. تأكد من وجود متصفح أو تطبيق LinkedIn."
     override val aboutMissionTitle = "احسب. تحقّق. اهندس."
     override val aboutMissionBody =
         "يمنح MechForge المهندس الميكانيكي مجموعة واحدة موثوقة تعمل دون اتصال " +
@@ -603,8 +606,7 @@ object EnStrings : UiStrings {
     override val settingsAppearance = "Appearance"
     override val settingsLanguage = "Language"
     override val settingsLanguagePhaseNote =
-        "The app interface is fully available in Arabic. Calculator names, descriptions " +
-            "and engineering formulas stay in English in this phase."
+        "The interface, calculator names and descriptions are available in Arabic. Symbols, units and formulas retain their international notation."
     override val themeSystem = "System"
     override val themeLight = "Light"
     override val themeDark = "Dark"
@@ -618,6 +620,8 @@ object EnStrings : UiStrings {
 
     override val aboutTitle = "About"
     override val aboutVersion = "Version 01"
+    override val aboutContact = "Contact me on LinkedIn"
+    override val aboutContactError = "Unable to open the link. Check that a browser or LinkedIn is installed."
     override val aboutMissionTitle = "Calculate. Check. Engineer."
     override val aboutMissionBody =
         "MechForge gives mechanical engineers one reliable, offline toolkit for the " +

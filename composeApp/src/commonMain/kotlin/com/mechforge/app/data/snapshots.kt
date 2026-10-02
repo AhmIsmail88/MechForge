@@ -35,6 +35,7 @@ object Snapshots {
     fun decodeResults(jsonText: String): com.mechforge.core.engine.CalcOutput? =
         runCatching {
             json.decodeFromString(com.mechforge.core.engine.CalcOutput.serializer(), jsonText)
+                .takeIf { it.calculationRevision == com.mechforge.core.engine.EngineFingerprint.CALCULATION_REVISION }
         }.getOrNull()
 
     fun encodeResults(output: com.mechforge.core.engine.CalcOutput): String =

@@ -17,7 +17,7 @@ private val Def = CalculatorDefinition(
     description = "Equivalent straight-pipe length of a fitting or valve from its loss coefficient and friction factor.",
     formulaDisplay = "L_eq = K·D / f",
     reference = "Equivalence between local-loss and friction-loss formulations (Crane TP-410 style practice).",
-    notes = "f should be the friction factor at the operating Reynolds number. K values come from manufacturer data or reference tables (not embedded).",
+    notes = "f must be the Darcy friction factor (four times the Fanning factor) at the operating Reynolds number. K values come from manufacturer data or reference tables (not embedded).",
     keywords = listOf("equivalent length", "fitting", "valve", "k value", "piping"),
     inputs = listOf(
         InputSpec("k", "Loss coefficient", "K", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),

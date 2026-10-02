@@ -19,14 +19,14 @@ private val Def = CalculatorDefinition(
     description = "Log mean temperature difference for counter-current or parallel-flow heat exchangers, with duty when U and A are given.",
     formulaDisplay = "LMTD = (ΔT₁ − ΔT₂)/ln(ΔT₁/ΔT₂) ;  Q = U·A·LMTD",
     reference = "Standard heat-exchanger relations (e.g. Incropera & DeWitt, Fundamentals of Heat and Mass Transfer).",
-    notes = "Arrangement is selected by the user (counter-current inlets: Th_in/Tc_out, parallel: Th_in/Tc_in). LMTD assumes constant U and no phase change.",
+    notes = "Arrangement is selected by the user (counter-current inlets: Th_in/Tc_out, parallel: Th_in/Tc_in). LMTD assumes constant U; phase change at constant temperature is allowed. Multipass and crossflow exchangers require a separate correction factor.",
     keywords = listOf("lmtd", "heat exchanger", "duty", "u value", "temperature difference"),
     inputs = listOf(
         InputSpec("thin", "Hot inlet temperature", "T_h,in", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("thout", "Hot outlet temperature", "T_h,out", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("tcin", "Cold inlet temperature", "T_c,in", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
         InputSpec("tcout", "Cold outlet temperature", "T_c,out", UnitFamily.TEMPERATURE, defaultUnitId = "c"),
-        InputSpec("arr", "Arrangement (1 = counter-current, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash", assumedWhenOmitted = "Flow arrangement assumed as counter-flow - check it against the exchanger actually specified."),
+        InputSpec("arr", "Arrangement (1 = counter-current, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, maxValue = 1.0, integerOnly = true, defaultUnitId = "dash", assumedWhenOmitted = "Flow arrangement assumed as counter-flow - check it against the exchanger actually specified."),
         InputSpec("u", "Overall coefficient U (optional)", "U", UnitFamily.HEAT_TRANSFER_COEFF, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "wm2k"),
         InputSpec("a", "Heat transfer area A (optional)", "A", UnitFamily.AREA, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m2"),
     ),
@@ -41,6 +41,12 @@ object LmtdCalculator : Calculator(Def) {
         val tcOut = value(inputs, "tcout")
         val counter = optionalValue(inputs, "arr", 1.0) >= 0.5
 
+        if (thOut > thIn || tcOut < tcIn || minOf(thIn, thOut, tcIn, tcOut) <= 0.0) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("thin", "Temperatures must be above absolute zero; the hot stream must not heat up and the cold stream must not cool down.")))
+        }
+        if (has(inputs, "u") != has(inputs, "a")) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("u", "Provide both U and heat transfer area for duty.")))
+        }
         val dt1 = if (counter) thIn - tcOut else thIn - tcIn
         val dt2 = if (counter) thOut - tcIn else thOut - tcOut
 

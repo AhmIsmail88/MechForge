@@ -39,7 +39,7 @@ object HazenWilliamsCalculator : Calculator(Def) {
         val d = value(inputs, "d")
         val sGiven = has(inputs, "s")
         val qGiven = has(inputs, "q") && has(inputs, "l")
-        if (sGiven == qGiven) {
+        if (sGiven == qGiven || (sGiven && has(inputs, "q"))) {
             throw ValidationException(
                 listOf(
                     InputError(
@@ -57,29 +57,30 @@ object HazenWilliamsCalculator : Calculator(Def) {
         val area = PI * d * d / 4.0
         val v = q / area
 
-        val l = if (sGiven) 1000.0 else value(inputs, "l")
-        val hf1000 = 10.67 * l * q.pow(1.852) / (c.pow(1.852) * d.pow(4.87))
-        // The slope actually realised: for the S route it is the entered slope, for the Q route it
-        // comes out of the head loss over the given length.
-        val s = if (sGiven) value(inputs, "s") else hf1000 / l
+        val l = if (sGiven) optionalValue(inputs, "l", 1000.0) else value(inputs, "l")
+        val hf = 10.67 * l * q.pow(1.852) / (c.pow(1.852) * d.pow(4.87))
+        // Report the gradient from the computed head loss over the actual length in either route.
+        // The two empirical SI coefficients are rounded, so this can differ slightly from an entered S.
+        val s = hf / l
 
         return CalcOutput(
             results = listOf(
                 result("q", "Discharge", q * 3600.0, "m3h", isPrimary = true),
                 result("v", "Velocity", v, "ms", isPrimary = true),
-                result("hf", "Head Loss over the length", hf1000, "m"),
-                result("gradient", "Hydraulic Gradient", hf1000 / 1000.0, "dash"),
+                result("hf", "Head Loss over the length", hf, "m"),
+                result("gradient", "Hydraulic Gradient", s, "dash"),
             ),
             steps = listOf(
                 "D^2.63 = ${Fmt.n(d, 4)}^2.63 = ${Fmt.n(d.pow(2.63), 6)}",
-                "S^0.54 = ${Fmt.n(s, 5)}^0.54 = ${Fmt.n(s.pow(0.54), 6)}",
+                if (sGiven) "S^0.54 = ${Fmt.n(value(inputs, "s"), 5)}^0.54 = ${Fmt.n(value(inputs, "s").pow(0.54), 6)}"
+                else "Computed hydraulic gradient: S = h_f/L = ${Fmt.n(s, 6)}",
                 if (sGiven) {
                     "Discharge: Q = 0.2785·C·D^2.63·S^0.54 = 0.2785 × ${Fmt.n(c, 0)} × ${Fmt.n(d.pow(2.63), 6)} × ${Fmt.n(value(inputs, "s").pow(0.54), 6)} = ${Fmt.n(q, 6)} m³/s = ${Fmt.n(q * 3600.0, 2)} m³/h"
                 } else {
                     "Discharge entered: Q = ${Fmt.n(q * 3600.0, 2)} m³/h (${Fmt.n(q, 6)} m³/s) over L = ${Fmt.n(l, 1)} m"
                 },
                 "Velocity: v = Q/A = ${Fmt.n(q, 6)} / ${Fmt.n(area, 6)} = ${Fmt.n(v, 3)} m/s",
-                "Head loss (L = 1000 m): h_f = 10.67·L·Q^1.852/(C^1.852·D^4.87) = ${Fmt.n(hf1000, 3)} m",
+                "Head loss (L = ${Fmt.n(l, 1)} m): h_f = 10.67·L·Q^1.852/(C^1.852·D^4.87) = ${Fmt.n(hf, 3)} m",
             ),
             warnings = buildList {
                 if (v > 3.0) add("Velocity above 3 m/s — review surge/erosion and pressure class.")
@@ -87,14 +88,15 @@ object HazenWilliamsCalculator : Calculator(Def) {
             },
             stepsAr = listOf(
                 "D^2.63 = ${Fmt.n(d, 4)}^2.63 = ${Fmt.n(d.pow(2.63), 6)}",
-                "S^0.54 = ${Fmt.n(s, 5)}^0.54 = ${Fmt.n(s.pow(0.54), 6)}",
+                if (sGiven) "S^0.54 = ${Fmt.n(value(inputs, "s"), 5)}^0.54 = ${Fmt.n(value(inputs, "s").pow(0.54), 6)}"
+                else "الميل الهيدروليكي المحسوب: S = h_f/L = ${Fmt.n(s, 6)}",
                 if (sGiven) {
                     "التصرف: Q = 0.2785·C·D^2.63·S^0.54 = 0.2785 × ${Fmt.n(c, 0)} × ${Fmt.n(d.pow(2.63), 6)} × ${Fmt.n(value(inputs, "s").pow(0.54), 6)} = ${Fmt.n(q, 6)} m³/s = ${Fmt.n(q * 3600.0, 2)} m³/h"
                 } else {
                     "التصرف مُدخل: Q = ${Fmt.n(q * 3600.0, 2)} m³/h (${Fmt.n(q, 6)} m³/s) على طول L = ${Fmt.n(l, 1)} m"
                 },
                 "السرعة: v = Q/A = ${Fmt.n(q, 6)} / ${Fmt.n(area, 6)} = ${Fmt.n(v, 3)} m/s",
-                "فقد الرفع (L = 1000 m): h_f = 10.67·L·Q^1.852/(C^1.852·D^4.87) = ${Fmt.n(hf1000, 3)} m",
+                "فقد الرفع (L = ${Fmt.n(l, 1)} m): h_f = 10.67·L·Q^1.852/(C^1.852·D^4.87) = ${Fmt.n(hf, 3)} m",
             ),
             warningsAr = buildList {
                 if (v > 3.0) {

@@ -1,0 +1,1142 @@
+[
+  {
+    "calculator": "pipe-velocity",
+    "displayInputs": "q:100:m3h d:154.08:mm",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "v",
+          "label": "Flow Velocity",
+          "value": 1.4897557773124612,
+          "unitId": "ms",
+          "isPrimary": true
+        }
+      ],
+      "steps": [
+        "Area: A = π·D²/4 = π × 0.1541² / 4 = 0.018646 m²",
+        "Velocity: v = Q / A = 0.027778 / 0.018646 = 1.490 m/s"
+      ],
+      "stepsAr": [
+        "المساحة: A = π·D²/4 = π × 0.1541² / 4 = 0.018646 m²",
+        "السرعة: v = Q / A = 0.027778 / 0.018646 = 1.490 m/s"
+      ]
+    }
+  },
+  {
+    "calculator": "reynolds-number",
+    "displayInputs": "v:1.4897557773124612:ms d:154.08:mm nu:1:cst",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "re",
+          "label": "Reynolds Number",
+          "value": 229541.57016830408,
+          "unitId": "dash",
+          "isPrimary": true
+        }
+      ],
+      "steps": [
+        "Re = v·D / ν = 1.490 × 0.1541 / 0.000001000 = 229542",
+        "Flow regime: turbulent (laminar < 2300, transitional 2300–4000, turbulent > 4000)"
+      ],
+      "stepsAr": [
+        "Re = v·D / ν = 1.490 × 0.1541 / 0.000001000 = 229542",
+        "نظام السريان: مضطرب (صفحي < 2300، انتقالي 2300-4000، مضطرب > 4000)"
+      ]
+    }
+  },
+  {
+    "calculator": "darcy-weisbach",
+    "displayInputs": "v:1.4897557773124612:ms d:154.08:mm l:60:m re:229541.57016830408:dash eps:0.045:mm",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "hf",
+          "label": "Head Loss",
+          "value": 0.7665432483626422,
+          "unitId": "m",
+          "isPrimary": true
+        },
+        {
+          "id": "f",
+          "label": "Friction Factor f",
+          "value": 0.017396112068620493,
+          "unitId": "dash"
+        }
+      ],
+      "steps": [
+        "Friction factor: Colebrook-White at Re = 229542 (ε/D = 0.000292) → f = 0.01740",
+        "Head loss: h_f = f·(L/D)·v²/(2g) = 0.01740 × (60.00/0.1541) × 1.490²/(2 × 9.80665) = 0.767 m"
+      ],
+      "stepsAr": [
+        "معامل الاحتكاك: كولبروك-وايت عند Re = 229542 (ε/D = 0.000292) ← f = 0.01740",
+        "فقد الرفع: h_f = f·(L/D)·v²/(2g) = 0.01740 × (60.00/0.1541) × 1.490²/(2 × 9.80665) = 0.767 m"
+      ]
+    }
+  },
+  {
+    "calculator": "minor-losses",
+    "displayInputs": "v:1.4897557773124612:ms k:5:dash",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "hm",
+          "label": "Minor Head Loss",
+          "value": 0.5657824731268719,
+          "unitId": "m",
+          "isPrimary": true
+        }
+      ],
+      "steps": [
+        "Velocity head: v²/(2g) = 1.490² / (2 × 9.80665) = 0.11316 m",
+        "Minor loss: h_m = K·v²/(2g) = 5.000 × 0.11316 = 0.5658 m"
+      ],
+      "stepsAr": [
+        "رأس السرعة: v²/(2g) = 1.490² / (2 × 9.80665) = 0.11316 m",
+        "الفقد الفرعي: h_m = K·v²/(2g) = 5.000 × 0.11316 = 0.5658 m"
+      ]
+    }
+  },
+  {
+    "calculator": "fire-pump-head",
+    "displayInputs": "preq:4:bar pavail:0:bar hstatic:10:m hf:2.3323257214895143:m rho:998.2:kgm3",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "h",
+          "label": "Total Pump Head",
+          "value": 53.19452620147061,
+          "unitId": "m",
+          "isPrimary": true
+        },
+        {
+          "id": "phead",
+          "label": "Pressure Head Contribution",
+          "value": 40.86220047998109,
+          "unitId": "m"
+        },
+        {
+          "id": "dp",
+          "label": "Pressure Difference",
+          "value": 4,
+          "unitId": "bar"
+        }
+      ],
+      "steps": [
+        "Pressure difference: 4.000 bar",
+        "Pressure head: (P_req - P_avail)/(rho*g) = 400000 / (998.2 x 9.80665) = 40.862 m",
+        "Static elevation: 10.00 m   Friction and minor losses: 2.33 m",
+        "Total head: H = 40.862 + 10.00 + 2.33 = 53.19 m"
+      ],
+      "warnings": [
+        "Use residual supply pressure at the design flow and elevations/losses between the same reference points. NFPA 20 pump-curve acceptance and system hydraulic demand are separate checks.",
+        "Select the pump from its certified curve (NFPA 20 churn/rated/overload points)."
+      ],
+      "stepsAr": [
+        "فرق الضغط: 4.000 bar",
+        "ضغط الرأس: (P_req - P_avail)/(rho*g) = 400000 / (998.2 × 9.80665) = 40.862 m",
+        "الارتفاع الاستاتيكي: 10.00 m   الاحتكاك والفقد الفرعي: 2.33 m",
+        "الرفع الكلي: H = 40.862 + 10.00 + 2.33 = 53.19 m"
+      ],
+      "warningsAr": [
+        "استخدم ضغط الإمداد المتبقي عند التصرف التصميمي والارتفاعات والفواقد بين نفس نقطتي المرجع. قبول منحنى المضخة وفق NFPA 20 والطلب الهيدروليكي للشبكة يحتاجان فحصًا منفصلًا.",
+        "اختر المضخة من منحنى معتمد (نقاط NFPA 20: الحجز والمعدل والحمل الزائد)."
+      ]
+    }
+  },
+  {
+    "calculator": "fire-pump-power",
+    "displayInputs": "q:100:m3h h:53.19452620147061:m eta:75:pct rho:998.2:kgm3 bhp150:26:kw bhpmax:30:kw",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "hydraulic",
+          "label": "Hydraulic Power",
+          "value": 14.464475338693866,
+          "unitId": "kw"
+        },
+        {
+          "id": "shaft",
+          "label": "Shaft Power",
+          "value": 19.285967118258487,
+          "unitId": "kw",
+          "isPrimary": true
+        },
+        {
+          "id": "driver",
+          "label": "Maximum certified curve brake power",
+          "value": 30,
+          "unitId": "kw"
+        },
+        {
+          "id": "motor",
+          "label": "Preliminary motor rating (verify NFPA 20 driver selection)",
+          "value": 30,
+          "unitId": "kw"
+        }
+      ],
+      "steps": [
+        "Flow: 1666.7 L/min = 0.02778 m3/s",
+        "Hydraulic power: P_h = rho*g*Q*H = 998.2 x 9.80665 x 0.02778 x 53.19 = 14.46 kW",
+        "Shaft power: P = P_h/eta = 14.46 / 0.7500 = 19.29 kW",
+        "Maximum brake power across certified curve: 30.00 kW",
+        "Preliminary standard rating: 30.0 kW"
+      ],
+      "warnings": [
+        "Verify non-overloading over the entire pump curve, driver/controller suitability and ambient/altitude derating under NFPA 20 before selection."
+      ],
+      "stepsAr": [
+        "التدفق: 1666.7 L/min = 0.02778 m3/s",
+        "القدرة الهيدروليكية: P_h = rho*g*Q*H = 998.2 × 9.80665 × 0.02778 × 53.19 = 14.46 kW",
+        "قدرة العمود: P = P_h/eta = 14.46 / 0.7500 = 19.29 kW",
+        "أكبر قدرة فرملة عبر المنحنى المعتمد: 30.00 kW",
+        "قدرة قياسية أولية: 30.0 kW"
+      ],
+      "warningsAr": [
+        "تحقق من عدم زيادة الحمل عبر كامل منحنى المضخة وملاءمة المحرك والمتحكم وتصحيح الحرارة والارتفاع طبقًا لـ NFPA 20."
+      ]
+    }
+  },
+  {
+    "calculator": "npsh-available",
+    "displayInputs": "patm:101.325:kpa pv:2.339:kpa rho:998.2:kgm3 hs:2:m hf:1:m npshr:3:m",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "npsha",
+          "label": "NPSH Available",
+          "value": 11.111964441778522,
+          "unitId": "m",
+          "isPrimary": true
+        },
+        {
+          "id": "phead",
+          "label": "Pressure Head Contribution",
+          "value": 10.111964441778522,
+          "unitId": "m"
+        },
+        {
+          "id": "npshr",
+          "label": "NPSH Required (pump curve)",
+          "value": 3,
+          "unitId": "m"
+        },
+        {
+          "id": "margin",
+          "label": "NPSH margin (NPSHa - NPSHr)",
+          "value": 8.111964441778522,
+          "unitId": "m"
+        },
+        {
+          "id": "marginRatio",
+          "label": "NPSHa / NPSHr",
+          "value": 3.703988147259507,
+          "unitId": "dash"
+        }
+      ],
+      "steps": [
+        "Pressure head: (p_atm − p_v)/(ρ·g) = (101325 − 2339) / (998.2 × 9.80665) = 10.112 m",
+        "Static head: 2.000 m   Suction losses: −1.000 m",
+        "NPSHa = 10.112 + 2.000 − 1.000 = 11.112 m"
+      ],
+      "stepsAr": [
+        "مساهمة ضغط الرأس: (p_atm − p_v)/(ρ·g) = (101325 − 2339) / (998.2 × 9.80665) = 10.112 m",
+        "الرفع الاستاتيكي: 2.000 m   فقد خط الشفط: −1.000 m",
+        "NPSHa = 10.112 + 2.000 − 1.000 = 11.112 m"
+      ]
+    }
+  },
+  {
+    "calculator": "tank-volume",
+    "displayInputs": "q:100:m3h t:1:h",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "v",
+          "label": "Required Volume",
+          "value": 100,
+          "unitId": "m3",
+          "isPrimary": true
+        },
+        {
+          "id": "vl",
+          "label": "Required Volume (litres)",
+          "value": 100000,
+          "unitId": "liter"
+        }
+      ],
+      "steps": [
+        "V = Q·t = 100.00 m³/h × 1.000 h = 100.000 m³",
+        "Depth/area check: with a usable depth of 3.0 m the required plan area would be 33.3 m²."
+      ],
+      "warnings": [
+        "Add freeboard and structural allowances; dead storage is not deducted here."
+      ],
+      "stepsAr": [
+        "V = Q·t = 100.00 m³/h × 1.000 h = 100.000 m³",
+        "مراجعة العمق والمساحة: بعمق صافٍ 3.0 m تكون المساحة الأفقية المطلوبة 33.3 m²."
+      ],
+      "warningsAr": [
+        "أضف السماح الحر والسماح الإنشائي؛ التخزين الميت غير مخصوم هنا."
+      ]
+    }
+  },
+  {
+    "calculator": "heat-dissipation",
+    "displayInputs": "p:30:kw dt:10:delk tair:35:c alt:0:m cp:1005:jkgk fancap:4000:m3h nfans:3:dash",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "q",
+          "label": "Required Airflow (Fan Capacity)",
+          "value": 9381.252052100712,
+          "unitId": "m3h",
+          "isPrimary": true
+        },
+        {
+          "id": "qCfm",
+          "label": "Required Airflow (imperial)",
+          "value": 5521.596494170292,
+          "unitId": "cfm",
+          "isPrimary": true
+        },
+        {
+          "id": "qLs",
+          "label": "Required Airflow (L/s)",
+          "value": 2605.903347805753,
+          "unitId": "ls"
+        },
+        {
+          "id": "mdot",
+          "label": "Air Mass Flow",
+          "value": 2.985074626865672,
+          "unitId": "kgs"
+        },
+        {
+          "id": "densityUsed",
+          "label": "Air Density Used",
+          "value": 1.1455047361519344,
+          "unitId": "kgm3"
+        },
+        {
+          "id": "cpUsed",
+          "label": "Specific Heat Used",
+          "value": 1005,
+          "unitId": "jkgk"
+        },
+        {
+          "id": "fansNeeded",
+          "label": "Fans Required",
+          "value": 3,
+          "unitId": "dash",
+          "isPrimary": true
+        },
+        {
+          "id": "fanTotal",
+          "label": "Selected Fan Capacity",
+          "value": 12000,
+          "unitId": "m3h"
+        },
+        {
+          "id": "fanTotalCfm",
+          "label": "Selected Fan Capacity (imperial)",
+          "value": 7062.933344297719,
+          "unitId": "cfm"
+        },
+        {
+          "id": "fanMargin",
+          "label": "Selected Capacity Margin",
+          "value": 27.914695536966015,
+          "unitId": "pct"
+        }
+      ],
+      "steps": [
+        "Heat load: P = 30.000 kW   Allowable rise: dT = 10.00 K",
+        "Air properties: rho = 1.1455 kg/m3, c_p = 1005.0 J/(kg.K)",
+        "Mass flow: m_dot = P/(c_p*dT) = 30000.0 / (1005.0 x 10.00) = 2.98507 kg/s",
+        "Volumetric flow: Q = m_dot/rho = 2.98507 / 1.1455 = 2.60590 m3/s",
+        "Fan capacity = 9381.3 m3/h = 5522 CFM = 2605.9 L/s",
+        "Rise check: dT = P/(rho*c_p*Q) = 10.00 K at this airflow",
+        "Fans of 4000.0 m3/h each: 3 fan(s) required (selected 12000.0 m3/h)"
+      ],
+      "warnings": [
+        "Air density from 35.0 C at 0.0 m = 1.1455047361519344 kg/m3 (dry-air approximation).",
+        "Airflow is inversely proportional to the allowable rise: halving dT doubles the fan capacity."
+      ],
+      "stepsAr": [
+        "الحمل الحراري: P = 30.000 kW، وفرق الحرارة المسموح: dT = 10.00 K",
+        "خواص الهواء: rho = 1.1455 kg/m3، و c_p = 1005.0 J/(kg.K)",
+        "معدل الكتلة: m_dot = P/(c_p*dT) = 30000.0 / (1005.0 × 10.00) = 2.98507 kg/s",
+        "التدفق الحجمي: Q = m_dot/rho = 2.98507 / 1.1455 = 2.60590 m3/s",
+        "سعة المروحة = 9381.3 m3/h = 5522 CFM = 2605.9 L/s",
+        "مراجعة الفرق: dT = P/(rho*c_p*Q) = 10.00 K عند هذا التدفق",
+        "مراوح بسعة 4000.0 m3/h للمروحة: مطلوب 3 مروحة (السعة المختارة 12000.0 m3/h)"
+      ],
+      "warningsAr": [
+        "كثافة الهواء من درجة حرارة 35.0 °C وارتفاع 0.0 م = 1.1455047361519344 كغ/م³ (تقريب الهواء الجاف).",
+        "التدفق يتناسب عكسيًا مع فرق الحرارة المسموح: تقليل الفرق إلى النصف يضاعف سعة المروحة."
+      ]
+    }
+  },
+  {
+    "calculator": "air-changes-hour",
+    "displayInputs": "vroom:320:m3 ach:6:perh",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "q",
+          "label": "Required Airflow (Fan Capacity)",
+          "value": 1920,
+          "unitId": "m3h",
+          "isPrimary": true
+        },
+        {
+          "id": "qCfm",
+          "label": "Required Airflow (imperial)",
+          "value": 1130.069335087635,
+          "unitId": "cfm",
+          "isPrimary": true
+        },
+        {
+          "id": "qLs",
+          "label": "Required Airflow (L/s)",
+          "value": 533.3333333333334,
+          "unitId": "ls"
+        },
+        {
+          "id": "ach",
+          "label": "Air Changes per Hour",
+          "value": 6,
+          "unitId": "perh",
+          "isPrimary": true
+        },
+        {
+          "id": "vroom",
+          "label": "Room Volume",
+          "value": 320,
+          "unitId": "m3"
+        },
+        {
+          "id": "time",
+          "label": "Time per Air Change",
+          "value": 10,
+          "unitId": "min"
+        }
+      ],
+      "steps": [
+        "Room volume: 320.00 m3   Target ACH: 6.00 1/h",
+        "Q = ACH*V/3600 = 6.00 x 320.00 / 3600 = 0.53333 m3/s",
+        "Fan capacity = 1920.0 m3/h = 1130 CFM = 533.3 L/s",
+        "ACH = Q*3600/V = 1920.0 / 320.00 = 6.00 1/h (one air change every 10.0 min)"
+      ],
+      "stepsAr": [
+        "حجم الغرفة: 320.00 m3   معدل التغيير المستهدف: 6.00 1/h",
+        "Q = ACH*V/3600 = 6.00 × 320.00 / 3600 = 0.53333 m3/s",
+        "سعة المروحة = 1920.0 m3/h = 1130 CFM = 533.3 L/s",
+        "ACH = Q*3600/V = 1920.0 / 320.00 = 6.00 1/h (تغيير هواء كل 10.0 دقيقة)"
+      ]
+    }
+  },
+  {
+    "calculator": "fan-power",
+    "displayInputs": "q:4000:m3h dp:400:pa etaf:65:pct etad:95:pct",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "pair",
+          "label": "Air Power",
+          "value": 0.4444444444444445,
+          "unitId": "kw"
+        },
+        {
+          "id": "pshaft",
+          "label": "Shaft Power",
+          "value": 0.6837606837606838,
+          "unitId": "kw",
+          "isPrimary": true
+        },
+        {
+          "id": "pmotor",
+          "label": "Motor Power",
+          "value": 0.7197480881691408,
+          "unitId": "kw",
+          "isPrimary": true
+        },
+        {
+          "id": "motor",
+          "label": "Standard Motor Rating (IEC 60034)",
+          "value": 0.75,
+          "unitId": "kw",
+          "isPrimary": true
+        }
+      ],
+      "steps": [
+        "Air power: P_air = Q·Δp = 1.11111 × 400.0 = 444.44 W",
+        "Shaft power: P_shaft = P_air/η_fan = 444.44 / 0.6500 = 683.76 W = 0.684 kW",
+        "Motor power: P_motor = P_shaft/η_drive = 0.720 kW",
+        "Standard IEC motor rating selected: 0.750 kW (next rating at or above the motor power)"
+      ],
+      "warnings": [
+        "The drive efficiency defaults to 1.0 (direct drive): belt drives are lower. The reported motor power is the shaft power, not the electrical input, and IEC 60034-1 derating above 40 C or 1000 m is not applied.",
+        "Motor rating is the next standard IEC rating; check the ambient/altitude derating, the starting method and the fan inertia before ordering."
+      ],
+      "stepsAr": [
+        "القدرة الهوائية: P_air = Q·Δp = 1.11111 × 400.0 = 444.44 W",
+        "قدرة العمود: P_shaft = P_air/η_fan = 444.44 / 0.6500 = 683.76 W = 0.684 kW",
+        "قدرة المحرك: P_motor = P_shaft/η_drive = 0.720 kW",
+        "قدرة المحرك القياسية المختارة IEC: 0.750 kW (أقرب قدرة قياسية عند أو أعلى من قدرة المحرك)"
+      ],
+      "warningsAr": [
+        "كفاءة التوصيل افتراضيًا 1.0 (توصيل مباشر) وأحزمة التوصيل أقل. قدرة المحرك المعلنة هي قدرة العمود لا القدرة الكهربائية، ولا يُطبق تخفيض IEC 60034-1 فوق 40 °م أو 1000 م.",
+        "قدرة المحرك هي أقرب قدرة قياسية IEC؛ راجع خفض القدرة حسب الحرارة والارتفاع وطريقة البدء وعزم المروحة قبل الشراء."
+      ]
+    }
+  },
+  {
+    "calculator": "duct-velocity",
+    "displayInputs": "q:12000:m3h w:800:mm h:600:mm",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "v",
+          "label": "Air Velocity",
+          "value": 6.944444444444445,
+          "unitId": "ms",
+          "isPrimary": true
+        },
+        {
+          "id": "vFpm",
+          "label": "Air Velocity (imperial)",
+          "value": 1367.0166229221347,
+          "unitId": "fpm"
+        },
+        {
+          "id": "a",
+          "label": "Duct Area",
+          "value": 0.48,
+          "unitId": "m2"
+        },
+        {
+          "id": "de",
+          "label": "Friction-Equivalent Round Diameter (ASHRAE)",
+          "value": 755.4176309326716,
+          "unitId": "mm",
+          "isRecommended": true
+        },
+        {
+          "id": "aspect",
+          "label": "Aspect Ratio W/H",
+          "value": 1.3333333333333335,
+          "unitId": "dash"
+        }
+      ],
+      "steps": [
+        "Rectangular duct area: A = W*H = 0.8000 x 0.6000 = 0.48000 m2",
+        "Velocity: v = Q/A = 3.33333 / 0.48000 = 6.944 m/s (1367 ft/min)",
+        "Friction-equivalent diameter (ASHRAE) = 1.30 x (W*H)^0.625 / (W+H)^0.25 = 1.30 x (800 x 600)^0.625 / (1400)^0.25 = 755.4 mm - not the equal-area diameter",
+        "Aspect ratio W/H = 1.33 (practice prefers 4:1 or flatter sections are avoided)"
+      ],
+      "stepsAr": [
+        "مساحة الدكت المستطيل: A = W×H = 0.8000 × 0.6000 = 0.48000 m2",
+        "السرعة: v = Q/A = 3.33333 / 0.48000 = 6.944 m/s (1367 ft/min)",
+        "قطر الاحتكاك المكافئ (ASHRAE) = 1.30 × (W×H)^0.625 / (W+H)^0.25 = 1.30 × (800 × 600)^0.625 / (1400)^0.25 = 755.4 mm - وليس قطر المساحة المتساوية",
+        "نسبة الأبعاد W/H = 1.33 (الممارسة تُفضّل 4:1 أو أقل)"
+      ]
+    }
+  },
+  {
+    "calculator": "duct-pressure-loss",
+    "displayInputs": "v:6.944444444444445:ms w:800:mm h:600:mm l:20:m tair:35:c alt:0:m nu:16.5:cst eps:0.09:mm",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "dp",
+          "label": "Friction Pressure Loss",
+          "value": 12.714334997506235,
+          "unitId": "pa",
+          "isPrimary": true
+        },
+        {
+          "id": "dpPerM",
+          "label": "Loss per metre",
+          "value": 0.6357167498753118,
+          "unitId": "pam"
+        },
+        {
+          "id": "f",
+          "label": "Friction Factor",
+          "value": 0.01578210550836592,
+          "unitId": "dash"
+        },
+        {
+          "id": "dh",
+          "label": "Hydraulic Diameter",
+          "value": 685.7142857142857,
+          "unitId": "mm"
+        },
+        {
+          "id": "re",
+          "label": "Reynolds Number",
+          "value": 288600.2886002886,
+          "unitId": "dash"
+        }
+      ],
+      "steps": [
+        "Hydraulic diameter: D_h = 0.6857 m (rectangular 2WH/(W+H))",
+        "Reynolds number: Re = v·D_h/ν = 6.944 × 0.6857 / 0.00001650 = 288600",
+        "Relative roughness: ε/D_h = 0.090 mm / 685.7 mm = 0.000131",
+        "Friction factor (Colebrook-White): f = 0.01578",
+        "Velocity pressure: ρv²/2 = 1.146 × 6.944² / 2 = 27.621 Pa",
+        "Pressure loss: Δp = f·(L/D_h)·ρv²/2 = 0.01578 × (20.00/0.6857) × 27.621 = 12.71 Pa"
+      ],
+      "warnings": [
+        "Air density from 35.0 C at 0.0 m = 1.1455047361519344 kg/m3 (dry-air approximation).",
+        "Uses the straight-duct friction only — add fitting/terminal losses for a full system total."
+      ],
+      "stepsAr": [
+        "القطر الهيدروليكي: D_h = 0.6857 m (مستطيل 2WH/(W+H))",
+        "رقم رينولدز: Re = v·D_h/ν = 6.944 × 0.6857 / 0.00001650 = 288600",
+        "الخشونة النسبية: ε/D_h = 0.090 mm / 685.7 mm = 0.000131",
+        "معامل الاحتكاك (كولبروك-وايت): f = 0.01578",
+        "ضغط السرعة: ρv²/2 = 1.146 × 6.944² / 2 = 27.621 Pa",
+        "فقد الضغط: Δp = f·(L/D_h)·ρv²/2 = 0.01578 × (20.00/0.6857) × 27.621 = 12.71 Pa"
+      ],
+      "warningsAr": [
+        "كثافة الهواء من درجة حرارة 35.0 °C وارتفاع 0.0 م = 1.1455047361519344 كغ/م³ (تقريب الهواء الجاف).",
+        "يحسب الاحتكاك في المسار المستقيم فقط - أضف فقد الوصلات والمنافذ للوصول إلى إجمالي النظام."
+      ]
+    }
+  },
+  {
+    "calculator": "pipe-wall-thickness",
+    "displayInputs": "p:16:bar d:168.3:mm sigma:138:mpa e:1:dash weld:1:dash y:0.4:dash ca:1:mm ma:0:mm mill:12.5:pct",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "tp",
+          "label": "Pressure Design Thickness t",
+          "value": 0.9711482977495672,
+          "unitId": "mm"
+        },
+        {
+          "id": "t",
+          "label": "Minimum Thickness (t + CA + MA)",
+          "value": 1.9711482977495671,
+          "unitId": "mm",
+          "isPrimary": true
+        },
+        {
+          "id": "tNom",
+          "label": "Required Nominal Thickness (incl. mill tolerance)",
+          "value": 2.252740911713791,
+          "unitId": "mm",
+          "isPrimary": true
+        },
+        {
+          "id": "odRatio",
+          "label": "Nominal D/t Ratio",
+          "value": 74.70899077868853,
+          "unitId": "dash"
+        }
+      ],
+      "steps": [
+        "p = 16.0000 bar   D = 168.30 mm   S = 138.0 MPa   E = 1.000   W = 1.000   Y = 0.400",
+        "t = p*D/(2*(S*E*W + p*Y)) = 1600000.0 x 0.16830 / (2 x (138000000.0 x 1.000 x 1.000 + 1600000.0 x 0.400)) = 0.9711 mm",
+        "Minimum thickness: t + CA + MA = 0.9711 + 1.000 + 0.000 = 1.9711 mm",
+        "Required nominal thickness: 1.9711 / (1 - 12.50 %) = 2.2527 mm",
+        "Order the next heavier standard wall thickness (select by schedule and verify against the pipe standard)."
+      ],
+      "warnings": [
+        "S must be the code allowable stress at the design temperature, and E/Y must match the pipe and material - confirm against ASME B31.3 (or the governing code) before ordering.",
+        "The nominal thickness must also cover the mill tolerance and any thinning (bending, threading/grooving); the next heavier standard wall thickness is normally selected."
+      ],
+      "stepsAr": [
+        "p = 16.0000 bar   D = 168.30 mm   S = 138.0 MPa   E = 1.000   W = 1.000   Y = 0.400",
+        "t = p·D/(2·(S·E·W + p·Y)) = 1600000.0 × 0.16830 / (2 × (138000000.0 × 1.000 × 1.000 + 1600000.0 × 0.400)) = 0.9711 mm",
+        "السماكة الدنيا: t + CA + MA = 0.9711 + 1.000 + 0.000 = 1.9711 mm",
+        "السماكة الاسمية المطلوبة: 1.9711 / (1 − 12.50 %) = 2.2527 mm",
+        "اطلب السماكة القياسية الأثقل التالية (حسب الـ schedule، وراجع مقابل معيار المواسير)."
+      ],
+      "warningsAr": [
+        "S يجب أن تكون الإجهاد المسموح وفق الكود عند حرارة التصميم، وE و Y مطابقين للماسورة والمادة - أكّدها مقابل ASME B31.3 (أو الكود الحاكم) قبل الطلب.",
+        "السماكة الاسمية لازم تغطي تفاوت الطاحونة وأي ترقيق (الثني أو القلاووظ أو التجليف)؛ وعادة يُختار الجدول الأثقل التالي."
+      ]
+    }
+  },
+  {
+    "calculator": "fm200-agent-quantity",
+    "displayInputs": "v:300:m3 vgross:320:m3 vexcl:20:m3 hazard:2:dash c:7.5:pct t:20:c s:0.1373:m3perkg mcyl:60:kg",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "vnet",
+          "label": "Net protected volume used",
+          "value": 300,
+          "unitId": "m3"
+        },
+        {
+          "id": "vexcl",
+          "label": "Excluded volume (gross - net)",
+          "value": 20,
+          "unitId": "m3"
+        },
+        {
+          "id": "cUsed",
+          "label": "Design concentration used",
+          "value": 7.5,
+          "unitId": "pct"
+        },
+        {
+          "id": "sUsed",
+          "label": "Specific vapour volume used",
+          "value": 0.1373,
+          "unitId": "m3perkg"
+        },
+        {
+          "id": "wbasic",
+          "label": "Preliminary basic agent quantity W_basic",
+          "value": 177.16186689238398,
+          "unitId": "kg"
+        },
+        {
+          "id": "wadd",
+          "label": "Additional quantity W_add",
+          "value": 0,
+          "unitId": "kg"
+        },
+        {
+          "id": "w",
+          "label": "Preliminary final quantity W_final",
+          "value": 177.16186689238398,
+          "unitId": "kg",
+          "isPrimary": true
+        },
+        {
+          "id": "wLb",
+          "label": "Preliminary final quantity (imperial)",
+          "value": 390.5750594799114,
+          "unitId": "lb",
+          "isPrimary": true
+        },
+        {
+          "id": "f",
+          "label": "Equivalent flooding factor (W_basic / V)",
+          "value": 0.5905395563079466,
+          "unitId": "kgm3"
+        },
+        {
+          "id": "fLb",
+          "label": "Equivalent flooding factor (imperial)",
+          "value": 0.03686618007991619,
+          "unitId": "lbft3"
+        },
+        {
+          "id": "vapourVolume",
+          "label": "Agent vapour volume at design T",
+          "value": 24.324324324324323,
+          "unitId": "m3"
+        },
+        {
+          "id": "cylinders",
+          "label": "Preliminary cylinders (60.000 kg each)",
+          "value": 3,
+          "unitId": "dash"
+        },
+        {
+          "id": "installed",
+          "label": "Installed agent capacity",
+          "value": 180,
+          "unitId": "kg"
+        },
+        {
+          "id": "margin",
+          "label": "Capacity margin",
+          "value": 2.8381331076160166,
+          "unitId": "kg"
+        },
+        {
+          "id": "marginPct",
+          "label": "Capacity margin",
+          "value": 1.602000000000014,
+          "unitId": "pct"
+        }
+      ],
+      "steps": [
+        "Step 1  Volumes: net V = 300.000 m3   gross = 320.000 m3   excluded = 20.000 m3   (equivalent room size about 6.69 x 6.69 x 6.69 m)",
+        "Step 2  Agent: HFC-227ea (FM-200), M = 0.17003 kg/mol",
+        "Step 3  Hazard: Class C - energized electrical / electronic (7.0 %) -> design concentration C = 7.500 % (entered)",
+        "Step 4  S = 0.137300 m3/kg (entered - NFPA 2001 / listed value)",
+        "Step 5  C/(100-C) = 7.500 / 92.500 = 0.081081",
+        "Step 5  W_basic = (V_net / S) x (C/(100-C)) = (300.000 / 0.137300) x 0.081081 = 177.16 kg",
+        "Step 6  Additional quantity = 0 kg (no applicable special conditions entered)",
+        "Step 7  W_final = W_basic + W_add = 177.16 + 0.00 = 177.16 kg",
+        "Step 8  Cylinders = CEILING(177.16 / 60.000 kg) = 3 x 60.000 kg = 180.00 kg installed",
+        "Step 9  Assumptions: NFPA 2001 methodology; state the edition in force for the project (Settings > Report details > Code / edition) and confirm the concentration, S and the listed system with the manufacturer."
+      ],
+      "warnings": [
+        "No leakage, piping or reserve allowance is added automatically. Any additional quantity must come from the actual NFPA 2001 provisions and the actual enclosure conditions, entered separately - piping/nozzle content and the network design are a separate engineered-system calculation.",
+        "Confirm the minimum design concentration for the hazard with the NFPA 2001 edition in force and the agent manufacturer's listed design manual.",
+        "Class C: for energized electrical hazards - in particular above 480 V that remain energized during and after discharge - do not assume the standard design concentration is sufficient; perform the applicable hazard analysis/testing."
+      ],
+      "stepsAr": [
+        "خطوة 1  الأحجام: الحجم الصافي V = 300.000 m3   الإجمالي = 320.000 m3   المستثنى = 20.000 m3   (مكافئ غرفة بحجم 6.69 × 6.69 × 6.69 م)",
+        "خطوة 2  العامل: HFC-227ea (FM-200)، M = 0.17003 kg/mol",
+        "خطوة 3  الخطر: Class C - energized electrical / electronic (7.0 %) ← تركيز التصميم C = 7.500 % (مُدخل)",
+        "خطوة 4  S = 0.137300 m3/kg (مُدخل - قيمة NFPA 2001 أو قيمة مُدرجة)",
+        "خطوة 5  C/(100−C) = 7.500 / 92.500 = 0.081081",
+        "خطوة 5  W_basic = (V_net / S) × (C/(100−C)) = (300.000 / 0.137300) × 0.081081 = 177.16 kg",
+        "خطوة 6  الكمية الإضافية = 0 kg (لا توجد ظروف خاصة مطبقة مُدخلة)",
+        "خطوة 7  W_final = W_basic + W_add = 177.16 + 0.00 = 177.16 kg",
+        "خطوة 8  الأسطوانات = CEILING(177.16 / 60.000 kg) = 3 × 60.000 kg = 180.00 kg مُركّبة",
+        "خطوة 9  الافتراضات: منهجية NFPA 2001؛ اذكر الإصدار الساري للمشروع (الإعدادات > تفاصيل التقرير > الكود/الإصدار) وأكّد التركيز و S والنظام المُدرج مع المُصنّع."
+      ],
+      "warningsAr": [
+        "لا تُضاف أي بدلات تسريب أو مواسير أو احتياطي تلقائيًا. أي كمية إضافية يجب أن تأتي من أحكام NFPA 2001 الفعلية وظروف الحيز الفعلية وتُدخل منفصلة - محتوى المواسير والفوهات وتصميم الشبكة حساب نظام هندسي منفصل.",
+        "أكّد أقل تركيز تصميم للخطر من إصدار NFPA 2001 الساري ومن دليل التصميم المُدرج لمُصنّع العامل.",
+        "Class C: للمخاطر الكهربائية المكهربة - خصوصًا فوق 480 V التي تبقى مكهربة أثناء وبعد التصريف - لا تفترض كفاية تركيز التصميم القياسي؛ نفّذ تحليل واختبار الخطر المطبق."
+      ]
+    }
+  },
+  {
+    "calculator": "valve-kv",
+    "displayInputs": "kv:10:dash dp:2:bar sg:0.9982:dash p1:10:bar pv:0.02339:bar pc:220.64:bar fl:0.8:dash fp:0.9:dash flp:0.72:dash",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "q",
+          "label": "Preliminary Liquid Flow Rate",
+          "value": 12.739392678871614,
+          "unitId": "m3h",
+          "isPrimary": true
+        },
+        {
+          "id": "cv",
+          "label": "Equivalent Cv (US)",
+          "value": 11.559999999999999,
+          "unitId": "dash"
+        },
+        {
+          "id": "dp",
+          "label": "Pressure Drop",
+          "value": 2,
+          "unitId": "bar"
+        },
+        {
+          "id": "dpChoked",
+          "label": "Choked pressure-drop limit",
+          "value": 6.3856723400029,
+          "unitId": "bar"
+        },
+        {
+          "id": "dpSizing",
+          "label": "Pressure drop used for sizing",
+          "value": 2,
+          "unitId": "bar"
+        },
+        {
+          "id": "ff",
+          "label": "Liquid critical pressure ratio factor",
+          "value": 0.9571170904431997,
+          "unitId": "dash"
+        }
+      ],
+      "steps": [
+        "Pressure drop: ΔP = 200000.0 Pa = 2.000 bar",
+        "Flow: Q = Fp*Kv*sqrt(dP_sizing/SG) = 0.900 * 10.000 * sqrt(2.000/0.998) = 12.739 m³/h",
+        "Equivalent Cv = 1.156 × Kv = 11.560",
+        "FF = 0.95712; dP_choked = (FLP/Fp)^2*(P1-FF*Pv) = 6.38567 bar; dP_sizing = min(dP,dP_choked) = 2.00000 bar"
+      ],
+      "warnings": [
+        "Liquid sizing only; cavitation onset/damage, noise, laminar flow and gas/steam sizing are not validated."
+      ],
+      "stepsAr": [
+        "فرق الضغط: ΔP = 200000.0 Pa = 2.000 bar",
+        "التدفق: Q = Fp*Kv*sqrt(dP_sizing/SG) = 0.900 * 10.000 * sqrt(2.000/0.998) = 12.739 m³/h",
+        "المكافئ Cv = 1.156 × Kv = 11.560",
+        "FF = 0.95712; dP_choked = (FLP/Fp)^2*(P1-FF*Pv) = 6.38567 bar; dP_sizing = min(dP,dP_choked) = 2.00000 bar"
+      ],
+      "warningsAr": [
+        "حساب السوائل فقط؛ بدء التكهف وأضراره والضوضاء والسريان الصفحي والغازات والبخار غير متحققة."
+      ]
+    }
+  },
+  {
+    "calculator": "valve-kv",
+    "displayInputs": "kv:10:dash dp:9.5:bar sg:0.9982:dash p1:10:bar pv:0.02339:bar pc:220.64:bar fl:0.8:dash fp:0.9:dash flp:0.72:dash",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "q",
+          "label": "Preliminary Liquid Flow Rate",
+          "value": 22.763395384811037,
+          "unitId": "m3h",
+          "isPrimary": true
+        },
+        {
+          "id": "cv",
+          "label": "Equivalent Cv (US)",
+          "value": 11.559999999999999,
+          "unitId": "dash"
+        },
+        {
+          "id": "dp",
+          "label": "Pressure Drop",
+          "value": 9.5,
+          "unitId": "bar"
+        },
+        {
+          "id": "dpChoked",
+          "label": "Choked pressure-drop limit",
+          "value": 6.3856723400029,
+          "unitId": "bar"
+        },
+        {
+          "id": "dpSizing",
+          "label": "Pressure drop used for sizing",
+          "value": 6.3856723400029,
+          "unitId": "bar"
+        },
+        {
+          "id": "ff",
+          "label": "Liquid critical pressure ratio factor",
+          "value": 0.9571170904431997,
+          "unitId": "dash"
+        }
+      ],
+      "steps": [
+        "Pressure drop: ΔP = 950000.0 Pa = 9.500 bar",
+        "Flow: Q = Fp*Kv*sqrt(dP_sizing/SG) = 0.900 * 10.000 * sqrt(6.386/0.998) = 22.763 m³/h",
+        "Equivalent Cv = 1.156 × Kv = 11.560",
+        "FF = 0.95712; dP_choked = (FLP/Fp)^2*(P1-FF*Pv) = 6.38567 bar; dP_sizing = min(dP,dP_choked) = 6.38567 bar"
+      ],
+      "warnings": [
+        "Flow is choked; capacity uses the limiting pressure drop. This does not establish acceptable cavitation, erosion or noise.",
+        "Liquid sizing only; cavitation onset/damage, noise, laminar flow and gas/steam sizing are not validated."
+      ],
+      "stepsAr": [
+        "فرق الضغط: ΔP = 950000.0 Pa = 9.500 bar",
+        "التدفق: Q = Fp*Kv*sqrt(dP_sizing/SG) = 0.900 * 10.000 * sqrt(6.386/0.998) = 22.763 m³/h",
+        "المكافئ Cv = 1.156 × Kv = 11.560",
+        "FF = 0.95712; dP_choked = (FLP/Fp)^2*(P1-FF*Pv) = 6.38567 bar; dP_sizing = min(dP,dP_choked) = 6.38567 bar"
+      ],
+      "warningsAr": [
+        "السريان مختنق؛ استُخدم فرق الضغط الحدي لحساب السعة. هذا لا يثبت قبول التكهف أو التآكل أو الضوضاء.",
+        "حساب السوائل فقط؛ بدء التكهف وأضراره والضوضاء والسريان الصفحي والغازات والبخار غير متحققة."
+      ]
+    }
+  },
+  {
+    "calculator": "duck-foot-bend-base",
+    "displayInputs": "d:154.08:mm tElbow:7.11:mm tPipe:7.11:mm l:3:m q:100:m3h pPump:12:bar pDes:16:bar pTest:24:bar fy:235:mpa fos:1.67:dash rhoW:998.2:kgm3 gammaS:7850:kgm3 h:0.3:m wElbow:50:kg dPlate:800:mm nRibs:4:dash hRib:150:mm nBolts:8:dash bcd:650:mm sigmaBolt:140:mpa tPlateSel:20:mm tRibSel:12:mm dBoltSel:20:mm edgeSel:75:mm atBolt:245:mm2",
+    "output": {
+      "calculationRevision": "2026-09-30.2",
+      "results": [
+        {
+          "id": "v",
+          "label": "Water velocity in the bend",
+          "value": 1.4897557773124612,
+          "unitId": "ms"
+        },
+        {
+          "id": "rGov",
+          "label": "Governing resultant thrust R",
+          "value": 63.28614769884652,
+          "unitId": "kn",
+          "isPrimary": true
+        },
+        {
+          "id": "nTotal",
+          "label": "Total vertical load on the base N_total",
+          "value": 46.61948277086431,
+          "unitId": "kn"
+        },
+        {
+          "id": "hTotal",
+          "label": "Total horizontal load H_total",
+          "value": 44.75006419302779,
+          "unitId": "kn"
+        },
+        {
+          "id": "moment",
+          "label": "Overturning moment at the plate M",
+          "value": 13425.019257908338,
+          "unitId": "nm"
+        },
+        {
+          "id": "bearing",
+          "label": "Theoretical mean bearing pressure (overturning omitted)",
+          "value": 92.74651409213128,
+          "unitId": "kpa"
+        },
+        {
+          "id": "cantilever",
+          "label": "Plate cantilever c",
+          "value": 315.85,
+          "unitId": "mm"
+        },
+        {
+          "id": "tPlateReq",
+          "label": "Theoretical uniform-bearing plate thickness",
+          "value": 14.044769329738433,
+          "unitId": "mm"
+        },
+        {
+          "id": "tPlateMargin",
+          "label": "Base plate margin (selected - required)",
+          "value": 5.955230670261567,
+          "unitId": "mm"
+        },
+        {
+          "id": "tRibReq",
+          "label": "Theoretical equal-load rib thickness",
+          "value": 6.975987309902528,
+          "unitId": "mm"
+        },
+        {
+          "id": "tRibMargin",
+          "label": "Rib margin (selected - required)",
+          "value": 5.024012690097472,
+          "unitId": "mm"
+        },
+        {
+          "id": "tMax",
+          "label": "Maximum tensile force per bolt T_max",
+          "value": 10.326937890698721,
+          "unitId": "kn",
+          "isPrimary": true
+        },
+        {
+          "id": "vBolt",
+          "label": "Shear force per bolt",
+          "value": 5.593758024128474,
+          "unitId": "kn"
+        },
+        {
+          "id": "dBoltReq",
+          "label": "Theoretical equivalent solid diameter (not a thread size)",
+          "value": 9.691183658526791,
+          "unitId": "mm"
+        },
+        {
+          "id": "sigmaTAct",
+          "label": "Theoretical gross-section tensile stress (thread area not used)",
+          "value": 32.87166424615385,
+          "unitId": "mpa"
+        },
+        {
+          "id": "tauAct",
+          "label": "Theoretical gross-section shear stress",
+          "value": 17.805484800000002,
+          "unitId": "mpa"
+        },
+        {
+          "id": "interaction",
+          "label": "Theoretical gross-section interaction (not a code check)",
+          "value": 0.31632454681318684,
+          "unitId": "dash"
+        },
+        {
+          "id": "edgeMin",
+          "label": "Guide minimum edge distance (2 x bolt diameter)",
+          "value": 40,
+          "unitId": "mm"
+        },
+        {
+          "id": "dPlateMin",
+          "label": "Minimum plate diameter for the bolt circle",
+          "value": 800,
+          "unitId": "mm"
+        },
+        {
+          "id": "eccentricity",
+          "label": "Theoretical load eccentricity M/N",
+          "value": 287.9701459557708,
+          "unitId": "mm"
+        },
+        {
+          "id": "kernRadius",
+          "label": "Circular full-contact kern radius D/8",
+          "value": 100,
+          "unitId": "mm"
+        },
+        {
+          "id": "sigmaThread",
+          "label": "Theoretical threaded tensile stress (elastic bolt-group force)",
+          "value": 42.15076690081111,
+          "unitId": "mpa"
+        }
+      ],
+      "steps": [
+        "Rigid circular contact screening: e=M/N=287.970 mm; kern D/8=100.000 mm. Full contact: no; partial-contact analysis required.",
+        "Linear full-contact pressure: q = N/A +/- 32*M/(pi*D^3); apply only when e <= D/8.",
+        "Threaded area A_t=245.000 mm2; sigma_thread=T_max/A_t=42.151 MPa (elastic-group force, not anchor acceptance).",
+        "Geometry: A = pi/4 x D^2 = pi/4 x 0.1541^2 = 0.018646 m2   |   V = Q/A = 0.027778 / 0.018646 = 1.4898 m/s",
+        "Operating thrust per leg: Fp_op = P_pump x A = 1200000.0 x 0.018646 = 22375.0 N   |   Fm = rho x Q x V = 998.2 x 0.027778 x 1.4898 = 41.3 N",
+        "F_op = 22375.0 + 41.3 = 22416.3 N   ->   R_op = sqrt(2) x F_op = 31701.5 N",
+        "Design thrust (static): Fp_des = 1600000.0 x 0.018646 = 29833.4 N   ->   R_des = sqrt(2) x Fp_des = 42190.8 N",
+        "Governing: R_gov = max(31.7, 42.2, 63.3) = 63.3 kN   |   Rh = Rv = R_gov / sqrt(2) = 44.8 kN",
+        "Weights: W_pipe = pi x (D + t_pipe) x t_pipe x L x gamma_s = 84.79 kg   |   W_water = A x L x rho_w = 55.84 kg   |   W_elbow = 50.0 kg",
+        "N_total = Rv + (W_pipe + W_water + W_elbow) x 9.81 = 44.8 kN + 190.63 x 9.80665 / 1000 = 46.6 kN   |   M = H_total x H = 13.4 kN.m",
+        "Base plate: q = N_total / A_plate = 92.75 kPa   |   c = (D_plate - (D + 2*t_elbow))/2 = 315.8 mm   |   M_plate = q x c^2 / 2 = 4.63 kN.m/m",
+        "sigma_allow = Fy / FOS = 235.0 / 1.670 = 140.7 MPa   ->   t_plate_req = sqrt(6 x M_plate / sigma_allow) = 14.04 mm",
+        "Ribs: F_rib = N_total / n_ribs = 11654.9 N   |   M_rib = F_rib x c = 3.68 kN.m   ->   t_rib_req = 6 x M_rib / (sigma_allow x h_rib^2) = 6.98 mm",
+        "Bolts: T_max = 4 x M / (n_bolts x BCD) = 10326.9 N   |   V_bolt = H_total / n_bolts = 5593.8 N   ->   d_bolt_req = sqrt(4 x T_max / (pi x sigma_bolt)) = 9.69 mm",
+        "Bolt interaction = sqrt((sigma_t/sigma_bolt)^2 + (tau/(0.6 x sigma_bolt))^2) = sqrt((32.9/140.0)^2 + (17.8/84.0)^2) = 0.316",
+        "Plate fit: edge_min = 2 x d_bolt = 40.0 mm   |   D_plate_min = BCD + 2 x edge_sel = 800.0 mm",
+        "Elbow geometry recorded for the drawing: t_elbow = 7.1 mm, D = 154.1 mm, L = 3.000 m, h_rib = 150.0 mm, n_ribs = 4, n_bolts = 8."
+      ],
+      "warnings": [
+        "The rigid circular full-contact model predicts uplift (e > D_plate/8). Uniform bearing and the plate/rib estimates cannot establish adequacy; solve partial contact and anchor forces together.",
+        "PRELIMINARY MODEL ONLY: no structural pass/fail is issued. Uniform bearing ignores overturning; rib load sharing and the elastic bolt group are unverified assumptions. Bolt stresses use gross shank area, not threaded tensile area; equivalent solid diameter is NOT a selectable bolt size. Complete contact/uplift, threaded area, weld, anchor and concrete checks are required.",
+        "D = 154.1 mm legs are assumed equal in diameter, which is what makes the resultant sqrt(2) times one leg. H = 0.300 m and W_elbow = 50.0 kg are estimates: confirm them against the fabrication drawing and the supplier before construction.",
+        "The governing case was hydrostatic test pressure at 63.3 kN. Gravity is taken as 9.80665 m/s2, the same constant as the rest of the engine.",
+        "Initial design assistance: the result must be reviewed and approved by a licensed structural or mechanical engineer. NOT covered here: concrete anchorage (ACI 318-25 ch. 17 breakout, pullout, pryout, side-blowout), plate bending at the bolt group (AISC Design Guide 1, frequently the governing plate check), rib shear and bearing, wind and seismic loads, and friction as a shear path - all of which can govern.",
+        "Pump operating pressure should be entered as the maximum the pump can develop (shut-off or relief setting, gauge), not the rated duty pressure."
+      ],
+      "stepsAr": [
+        "فحص تلامس دائرة صلبة: e=M/N=287.970 mm; نواة التلامس D/8=100.000 mm. التلامس الكامل: لا؛ يلزم تحليل التلامس الجزئي.",
+        "ضغط التلامس الكامل الخطي: q = N/A +/- 32*M/(pi*D^3)؛ صالح فقط عند e <= D/8.",
+        "مساحة القلاووظ A_t=245.000 mm2; sigma_thread=T_max/A_t=42.151 MPa (قوة المجموعة المرنة وليست قبول الأنكر).",
+        "الهندسة: A = π/4 × D^2 = π/4 × 0.1541^2 = 0.018646 m2   |   V = Q/A = 0.027778 / 0.018646 = 1.4898 m/s",
+        "قوة الدفع لحالة التشغيل لكل فرع: Fp_op = P_pump × A = 1200000.0 × 0.018646 = 22375.0 N   |   Fm = ρ × Q × V = 998.2 × 0.027778 × 1.4898 = 41.3 N",
+        "F_op = 22375.0 + 41.3 = 22416.3 N   →   R_op = √2 × F_op = 31701.5 N",
+        "قوة الدفع لحالة الضغط التصميمي (استاتيكي): Fp_des = 1600000.0 × 0.018646 = 29833.4 N   →   R_des = √2 × Fp_des = 42190.8 N",
+        "الحالة الحاكمة: R_gov = max(31.7, 42.2, 63.3) = 63.3 kN   |   Rh = Rv = R_gov / √2 = 44.8 kN",
+        "الأوزان: W_pipe = π × (D + t_pipe) × t_pipe × L × γ_s = 84.79 kg   |   W_water = A × L × ρ_w = 55.84 kg   |   W_elbow = 50.0 kg",
+        "N_total = Rv + (W_pipe + W_water + W_elbow) × 9.81 = 44.8 kN + 190.63 × 9.80665 / 1000 = 46.6 kN   |   M = H_total × H = 13.4 kN.m",
+        "بالتة القاعدة: q = N_total / A_plate = 92.75 kPa   |   c = (D_plate - (D + 2*t_elbow))/2 = 315.8 mm   |   M_plate = q × c^2 / 2 = 4.63 kN.m/m",
+        "σ_allow = Fy / FOS = 235.0 / 1.670 = 140.7 MPa   →   t_plate_req = √(6 × M_plate / σ_allow) = 14.04 mm",
+        "الأعصاب: F_rib = N_total / n_ribs = 11654.9 N   |   M_rib = F_rib × c = 3.68 kN.m   →   t_rib_req = 6 × M_rib / (σ_allow × h_rib^2) = 6.98 mm",
+        "البراغي: T_max = 4 × M / (n_bolts × BCD) = 10326.9 N   |   V_bolt = H_total / n_bolts = 5593.8 N   →   d_bolt_req = √(4 × T_max / (π × σ_bolt)) = 9.69 mm",
+        "تفاعل البرغي = √((σ_t/σ_bolt)^2 + (τ/(0.6 × σ_bolt))^2) = √((32.9/140.0)^2 + (17.8/84.0)^2) = 0.316",
+        "استيعاب البالتة: edge_min = 2 × d_bolt = 40.0 mm   |   D_plate_min = BCD + 2 × edge_sel = 800.0 mm",
+        "مقاسات الكوع للرسم: t_elbow = 7.1 mm, D = 154.1 mm, L = 3.000 m, h_rib = 150.0 mm, n_ribs = 4, n_bolts = 8."
+      ],
+      "warningsAr": [
+        "نموذج التلامس الكامل للوحة الدائرية الصلبة يتوقع رفعًا (e > D_plate/8). الضغط المنتظم وتقديرات البالتة والأعصاب لا تثبت الكفاية؛ يلزم حل التلامس الجزئي وقوى الأنكر معًا.",
+        "نموذج مبدئي فقط: لا يصدر حكم أمان إنشائي. الضغط المنتظم يهمل الانقلاب، وتوزيع حمل الأعصاب ومجموعة البراغي افتراضات غير متحققة. إجهاد البرغي محسوب بمساحة الساق لا مساحة شد القلاووظ؛ القطر المصمت المكافئ ليس مقاس برغي للاختيار. يلزم فحص التلامس والرفع والقلاووظ واللحام والأنكر والخرسانة.",
+        "الأقطار D = 154.1 mm مفترض تساويها، وهو ما يجعل المحصلة √2 من القوة لفرع واحد. و H = 0.300 m و W_elbow = 50.0 kg تقديرية: أكّدها من الرسم التصنيعي والمورد قبل التنفيذ.",
+        "الحالة الحاكمة كانت ضغط الاختبار الهيدروستاتيكيعند 63.3 kN. الجاذبية مأخوذة 9.80665 m/s2، نفس الثابت في باقي المحرك.",
+        "مساعدة تصميم مبدئية: يجب مراجعة النتيجة واعتمادها من مهندس إنشائي/ميكانيكي مرخّص. غير مغطى هنا: تثبيت الخرسانة (ACI 318-25 الفصل 17 - الانفصال والقشط والانحشار والقص الجانبي)، وانحناء اللوحة عند مجموعة البراغي (AISC Design Guide 1 وهو غالبًا الفحص الحاكم للوحة)، وقص وانحشار الأعصاب، وأحمال الرياح والزلازل، والاحتكاك كمسار قص - وكلها قد تحكم.",
+        "يُفضَّل إدخال ضغط تشغيل المضخة كأقصى ضغط يمكن أن تنتجه (ضغط الغلق أو ضبط صمام الأمان، gauge) لا ضغط نقطة التشغيل المقننة."
+      ]
+    }
+  }
+]

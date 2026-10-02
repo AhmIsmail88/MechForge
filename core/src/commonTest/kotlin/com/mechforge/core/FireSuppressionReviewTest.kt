@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
  *     S = 8.31446261815324*294.15/(101325*0.17003) = 0.141958 m3/kg
  *     W_basic = (47.04/0.141958)*(7/93) = 24.9414 kg
  *     30 kg listed cylinder -> 1 cylinder, margin 30 - 24.9414 = 5.0586 kg (20.28 %)
- *   CO2, V_net = 47.04 m3, deep-seated dry electrical (50 %), NFPA 12 table f = 1.60
+ *   CO2, V_net = 47.04 m3, deep-seated dry electrical (50 %), illustrative user-supplied factor f = 1.60 (not a verified code table entry)
  *     W_basic = 47.04 * 1.60 = 75.264 kg
  *     45 kg cylinder -> 2 cylinders (NOT 3), installed 90 kg, margin 14.736 kg
  */
@@ -30,16 +30,17 @@ class FireSuppressionReviewTest {
             T.iv("hazard", 2.0, "dash"), // Class C
             T.iv("t", 21.0, "c"),
             T.iv("mcyl", 30.0, "kg"),
+            T.iv("s", 0.13782, "m3perkg"), T.iv("c", 7.0, "pct"),
         )
         assertEquals(7.0, out.results.first { it.id == "cUsed" }.value, 1e-9)
-        assertEquals(0.141958, out.results.first { it.id == "sUsed" }.value, 1e-5)
-        assertEquals(24.9414, out.results.first { it.id == "wbasic" }.value, 0.01)
+        assertEquals(0.13782, out.results.first { it.id == "sUsed" }.value, 1e-5)
+        assertEquals(25.690358157671767, out.results.first { it.id == "wbasic" }.value, 0.01)
         assertEquals(0.0, out.results.first { it.id == "wadd" }.value, 1e-9)
-        assertEquals(24.9414, out.results.first { it.id == "w" }.value, 0.01)
+        assertEquals(25.690358157671767, out.results.first { it.id == "w" }.value, 0.01)
         assertEquals(1.0, out.results.first { it.id == "cylinders" }.value, 1e-9)
         assertEquals(30.0, out.results.first { it.id == "installed" }.value, 1e-9)
-        assertEquals(5.0586, out.results.first { it.id == "margin" }.value, 0.01)
-        assertEquals(20.28, out.results.first { it.id == "marginPct" }.value, 0.05)
+        assertEquals(4.309641842328233, out.results.first { it.id == "margin" }.value, 0.01)
+        assertEquals(16.77532798833818, out.results.first { it.id == "marginPct" }.value, 0.05)
     }
 
     @Test
@@ -113,7 +114,7 @@ class FireSuppressionReviewTest {
     }
 
     @Test
-    fun co2MatchesTheNfpa12ReviewExampleWithTheTableFloodingFactor() {
+    fun co2MultipliesTheEnteredIllustrativeFactorCorrectly() {
         val out = T.run(
             Co2AgentQuantityCalculator,
             T.iv("v", 47.04, "m3"),

@@ -30,7 +30,7 @@ class FanCoverageTest {
         assertEquals(3.0, FanCoverage.provided(3.0, 1.0)!!, 1e-12)
         assertNull(FanCoverage.provided(null, 1.0))
         assertNull(FanCoverage.provided(3.0, null))
-        assertNull(FanCoverage.provided(0.0, 1.0))
+        assertEquals(0.0, FanCoverage.provided(0.0, 1.0))
         assertNull(FanCoverage.provided(3.0, 0.0))
     }
 

@@ -62,7 +62,7 @@ object FanLawsCalculator : Calculator(Def) {
                 "Power: P2 = P1 x r^3 x (rho2/rho1) = ${Fmt.n(p1 / 1000.0, 3)} x ${Fmt.n(r * r * r, 4)} x ${Fmt.n(densityRatio, 4)} = ${Fmt.n(p2, 3)} kW",
             ),
             warnings = buildList {
-                if (!has(inputs, "rho1") || !has(inputs, "rho2")) add("Densities not provided - assumed 1.2 kg/m3 for both (no density correction).")
+                if (!has(inputs, "rho1") || !has(inputs, "rho2")) add("Each omitted density defaults to 1.2 kg/m3; entered densities are retained.")
                 if (r < 0.5 || r > 1.5) add("Speed ratio far from 1: the fan laws assume the same system curve and no damper change - verify on the fan curve.")
                 if (p2 > p1 / 1000.0 * 1.5) add("Power rises steeply with speed (N^3) - check the motor rating at the new duty.")
             },

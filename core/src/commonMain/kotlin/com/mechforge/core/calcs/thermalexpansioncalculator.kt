@@ -49,8 +49,8 @@ object ThermalExpansionCalculator : Calculator(Def) {
             warnings = buildList {
                 add("The expansion coefficient is a single value while the real expansion depends on the temperature range (B31.3 Appendix C tabulates total expansion from 21 C); stainless steel is about 16-17e-6, and a negative temperature difference means contraction.")
                 if (!has(inputs, "alpha")) add("Expansion coefficient not provided — assumed 12 µm/(m·K) (carbon steel).")
-                if (dl > 0.025) {
-                    add("Total expansion exceeds 25 mm — expansion loops, anchors or expansion joints are likely required. Check the applicable design basis.")
+                if (kotlin.math.abs(dl) > 0.025) {
+                    add("Magnitude of thermal movement exceeds 25 mm — expansion loops, anchors or expansion joints are likely required. Check the applicable design basis.")
                 }
             },
             stepsAr = listOf(
@@ -63,7 +63,7 @@ object ThermalExpansionCalculator : Calculator(Def) {
                 if (!has(inputs, "alpha")) {
                     add("لم يُدخل معامل التمدد - افتُرض 12 µm/(m·K) (صلب كربوني).")
                 }
-                if (dl > 0.025) {
+                if (kotlin.math.abs(dl) > 0.025) {
                     add("التمدد الكلي يتجاوز 25 mm - غالبًا ستلزم حلقات تمدد أو مثبتات أو وصلات تمدد. راجع أساس التصميم المطبق.")
                 }
             },

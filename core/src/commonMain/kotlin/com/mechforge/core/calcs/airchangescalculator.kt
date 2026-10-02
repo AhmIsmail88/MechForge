@@ -33,7 +33,7 @@ private val Def = CalculatorDefinition(
         InputSpec("vroom", "Room volume", "V", UnitFamily.VOLUME, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3"),
         InputSpec("ach", "Air changes per hour", "ACH", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "perh"),
         InputSpec("fancap", "Fan capacity (per fan)", "Q_fan", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
-        InputSpec("nfans", "Number of fans selected", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),
+        InputSpec("nfans", "Number of fans selected", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash", integerOnly = true),
     ),
 )
 

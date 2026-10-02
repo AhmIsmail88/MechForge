@@ -17,7 +17,7 @@ import kotlin.math.pow
 /**
  * Carbon dioxide (CO2) total flooding agent quantity - NFPA 12 design route.
  *
- *     W_basic = V_net * f
+ *     W_basic = max(V_net * f, W_min)
  *     W_final = W_basic + W_additional          (additional entered, never a blanket %)
  *     cylinders = ceil(W_final / cylinder charge)
  *
@@ -25,7 +25,7 @@ import kotlin.math.pow
  *
  *  1. cross-checks the net protected volume against the gross and excluded volumes;
  *  2. takes f from the NFPA 12 table / listed value when the engineer enters it, and
- *     otherwise shows the ideal-gas equivalent (f = rho_vapour * C/(100-C)) clearly
+ *     otherwise shows the ideal-gas equivalent (f = rho_vapour * ln[100/(100-C)]) clearly
  *     labelled as a theoretical estimate - not as a table value;
  *  3. keeps the basic quantity, the additional quantity (unclosable openings and other
  *     applicable corrections) and the final quantity as separate numbers;
@@ -55,7 +55,7 @@ private val Def = CalculatorDefinition(
     name = "CO2 Total Flooding Quantity (NFPA 12)",
     category = CalculatorCategory.FIRE_PROTECTION,
     description = "CO2 total flooding system in the NFPA 12 order: net protected volume, hazard classification, design concentration, the applicable flooding factor, the basic quantity, separately entered additional quantity, and the cylinder selection.",
-    formulaDisplay = "W_basic = V_net * f   then   W_final = W_basic + W_additional     (f = NFPA 12 flooding factor; ideal-gas estimate f = rho_vapour * C / (100 - C))",
+    formulaDisplay = "W_basic = max(V_net * f, W_min) ; W_final = W_basic + W_additional (f: NFPA 12 table/listed factor; theoretical comparison only: f = rho_vapour * ln[100/(100-C)])",
     reference = "NFPA 12 total flooding: agent mass = net enclosure volume x flooding factor, with the flooding factor and design concentration taken from the standard (table/listed data) for the hazard classification. State the edition in force in the report.",
     notes = "Step 1: net protected volume = gross volume - excluded (non-protected) volume; enter the gross volume too and the calculator cross-checks the net value and prints the equivalent room size, which catches a misplaced decimal point. Step 2-3: the hazard classification sets the design concentration (editable) - 34 % for surface fires, 50 % for deep-seated and for deep-seated dry electrical hazards. Step 4: the flooding factor is the NFPA 12 design data - enter the applicable table/listed value in the f field; if it is left empty the ideal-gas equivalent is shown and labelled as a theoretical estimate. Step 5-6: W_basic = V_net x f, plus an additional quantity entered for the applicable special conditions (unclosable openings and similar); no leakage, piping or reserve percentage is ever added automatically.",
     keywords = listOf("co2", "carbon dioxide", "total flooding", "nfpa 12", "fire", "suppression", "flooding factor", "gas", "hazard class", "deep seated", "deep-seated dry electrical", "cylinder", "unclosable openings"),
@@ -78,6 +78,8 @@ private val Def = CalculatorDefinition(
             "ftable", "Flooding factor from the NFPA 12 table / listed data", "f", UnitFamily.DENSITY,
             required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3",
         ),
+        InputSpec("wmin", "Applicable minimum basic quantity (after hazard corrections)", "W_min", UnitFamily.MASS,
+            required = false, minValue = 0.0, defaultUnitId = "kg"),
         InputSpec(
             "addkg", "Additional CO2 - unclosable openings / applicable corrections", "W_add", UnitFamily.MASS,
             required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "kg", defaultValue = 0.0,
@@ -104,7 +106,7 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
         val fEntered = has(inputs, "ftable")
 
         val vapourDensity = P_STD * M_CO2 / (R_GAS * temperatureK) // kg/m3
-        // The theoretical gas quantity for a closed vessel follows the logarithmic dilution relation
+        // The theoretical gas quantity for a constant-volume vented enclosure follows the logarithmic dilution relation
         // V_gas/V_room = ln(100/(100-C)). The C/(100-C) form used before belongs to the clean agents of
         // NFPA 2001, not to CO2: at 65 % it is about 77 % higher, so the quantity it produced was not
         // conservative. That form is kept only to show how far the two are apart.
@@ -113,7 +115,11 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
         val fCleanAgentForm = vapourDensity * cFraction / (1.0 - cFraction) // kg/m3 - the old form
         val floodingFactor = if (fEntered) value(inputs, "ftable") else fTheory
 
-        val basic = volume * floodingFactor // kg
+        if (has(inputs, "wmin") && !fEntered) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("ftable", "A table minimum requires an entered flooding factor on the same hazard/correction basis.")))
+        }
+        val minimum = optionalValue(inputs, "wmin", 0.0)
+        val basic = maxOf(volume * floodingFactor, minimum) // kg
         val final = basic + additional // kg
         val finalLb = final / 0.45359237
         val cylinders = ceil(final / charge)
@@ -122,6 +128,9 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
         val excludedFromGross = if (gross != null) gross - volume else null
         val netFromGross = if (gross != null && has(inputs, "vexcl")) gross - value(inputs, "vexcl") else null
         val side = volume.pow(1.0 / 3.0)
+        val consistentVolumes = (gross == null || volume <= gross) &&
+            (netFromGross == null || abs(netFromGross - volume) <= 0.02 * volume)
+        val selectionReady = fEntered && has(inputs, "mcyl") && consistentVolumes
 
         val results = buildList {
             add(result("vnet", "Net protected volume used", volume, "m3"))
@@ -153,18 +162,20 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
                 result(
                     "w",
                     if (fEntered) {
-                        "Final required quantity W_final"
+                        "Preliminary final quantity W_final"
                     } else {
                         "Theoretical final quantity (NOT a design value - enter f from NFPA 12)"
                     },
                     final, "kg", isPrimary = fEntered,
                 ),
             )
-            add(result("wLb", "Final quantity (imperial)", finalLb, "lb", isPrimary = fEntered))
-            add(result("cylinders", "Cylinders required (${Fmt.n(charge, 1)} kg each)", cylinders, "dash"))
+            add(result("wLb", if (fEntered) "Preliminary final quantity (imperial)" else "Theoretical final quantity (imperial)", finalLb, "lb", isPrimary = fEntered))
+            if (selectionReady) {
+            add(result("cylinders", "Preliminary cylinders (${Fmt.n(charge, 1)} kg each)", cylinders, "dash"))
             add(result("installed", "Installed CO2 capacity", installed, "kg"))
             add(result("margin", "Capacity margin", installed - final, "kg"))
             add(result("marginPct", "Capacity margin", (installed - final) / final * 100.0, "pct"))
+            }
         }
 
         val steps = buildList {
@@ -176,12 +187,12 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
                 if (has(inputs, "c")) " (entered)" else " (from the hazard classification)")
             add(
                 if (fEntered) {
-                    "Step 4  Flooding factor f = ${Fmt.n(floodingFactor, 4)} kg/m3 (entered: NFPA 12 table / listed data). For reference, the theoretical closed-vessel value is ${Fmt.n(fTheory, 4)} kg/m3 and the clean-agent form would be ${Fmt.n(fCleanAgentForm, 4)} kg/m3"
+                    "Step 4  Flooding factor f = ${Fmt.n(floodingFactor, 4)} kg/m3 (entered: NFPA 12 table / listed data). For reference, the theoretical constant-volume vented-mixing value is ${Fmt.n(fTheory, 4)} kg/m3 and the clean-agent form would be ${Fmt.n(fCleanAgentForm, 4)} kg/m3"
                 } else {
                     "Step 4  Theoretical flooding factor = rho_vapour x ln(100/(100-C)) = ${Fmt.n(vapourDensity, 4)} x ${Fmt.n(ratioLog, 5)} = ${Fmt.n(floodingFactor, 4)} kg/m3 - comparison only. The NFPA 12 flooding factor comes from its table, with the volume factor depending on the enclosure size and the material factor on the hazard: enter it in the f field for a design quantity. (The clean-agent form rho*C/(100-C) would give ${Fmt.n(fCleanAgentForm, 4)} kg/m3, which is not the CO2 relation.)"
                 },
             )
-            add("Step 5  W_basic = V_net x f = ${Fmt.n(volume, 3)} x ${Fmt.n(floodingFactor, 4)} = ${Fmt.n(basic, 2)} kg")
+            add("Step 5  W_basic = max(V_net x f, W_min) = max(${Fmt.n(volume, 3)} x ${Fmt.n(floodingFactor, 4)}, ${Fmt.n(minimum, 3)}) = ${Fmt.n(basic, 2)} kg")
             add(
                 if (additional <= 0.0) {
                     "Step 6  Additional CO2 quantity = 0 kg (no unclosable openings or other applicable corrections entered)"
@@ -190,7 +201,7 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
                 },
             )
             add("Step 7  W_final = W_basic + W_add = ${Fmt.n(basic, 2)} + ${Fmt.n(additional, 2)} = ${Fmt.n(final, 2)} kg")
-            add("Step 8  Cylinders = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(charge, 1)} kg) = ${Fmt.n(cylinders, 0)} x ${Fmt.n(charge, 1)} kg = ${Fmt.n(installed, 1)} kg installed, margin ${Fmt.n(installed - final, 2)} kg (${Fmt.n((installed - final) / final * 100.0, 1)} %)")
+            if (selectionReady) add("Step 8  Cylinders = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(charge, 1)} kg) = ${Fmt.n(cylinders, 0)} x ${Fmt.n(charge, 1)} kg = ${Fmt.n(installed, 1)} kg installed, margin ${Fmt.n(installed - final, 2)} kg (${Fmt.n((installed - final) / final * 100.0, 1)} %)") else add("Step 8  Cylinder count requires the NFPA 12 factor and an entered listed cylinder charge; also verify table minimum quantities and all applicable corrections.")
             add("Step 9  Assumptions: NFPA 12 methodology; state the edition in force for the project (Settings > Report details > Code / edition), and confirm the design concentration and flooding factor with the standard and the system manufacturer.")
         }
 
@@ -203,12 +214,12 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
                 if (has(inputs, "c")) " (مُدخل)" else " (من تصنيف الخطر)")
             add(
                 if (fEntered) {
-                    "خطوة 4  معامل الغمر f = ${Fmt.n(floodingFactor, 4)} kg/m3 (مُدخل: جدول NFPA 12 أو بيانات مُدرجة). وللمراجعة: القيمة النظرية لوعاء مغلق ${Fmt.n(fTheory, 4)} kg/m3 وصيغة الوكلاء النظيفين ${Fmt.n(fCleanAgentForm, 4)} kg/m3"
+                    "خطوة 4  معامل الغمر f = ${Fmt.n(floodingFactor, 4)} kg/m3 (مُدخل: جدول NFPA 12 أو بيانات مُدرجة). وللمراجعة: القيمة النظرية لحيز ثابت الحجم مع تنفيس ${Fmt.n(fTheory, 4)} kg/m3 وصيغة الوكلاء النظيفين ${Fmt.n(fCleanAgentForm, 4)} kg/m3"
                 } else {
                     "خطوة 4  معامل الغمر النظري = ρ_بخار × ln(100/(100−C)) = ${Fmt.n(vapourDensity, 4)} × ${Fmt.n(ratioLog, 5)} = ${Fmt.n(floodingFactor, 4)} kg/m3 - للمقارنة فقط. معامل الغمر في NFPA 12 يأتي من جدوله، بمعامل الحجم حسب حجم الحيز ومعامل المادة حسب الخطر: أدخله في خانة f للحصول على كمية تصميمية. (وصيغة الوكلاء النظيفين ρ×C/(100−C) تعطي ${Fmt.n(fCleanAgentForm, 4)} kg/m3 وهي ليست علاقة CO2.)"
                 },
             )
-            add("خطوة 5  W_basic = V_net × f = ${Fmt.n(volume, 3)} × ${Fmt.n(floodingFactor, 4)} = ${Fmt.n(basic, 2)} kg")
+            add("خطوة 5  W_basic = max(V_net × f, W_min) = max(${Fmt.n(volume, 3)} × ${Fmt.n(floodingFactor, 4)}, ${Fmt.n(minimum, 3)}) = ${Fmt.n(basic, 2)} kg")
             add(
                 if (additional <= 0.0) {
                     "خطوة 6  كمية CO2 الإضافية = 0 kg (لا توجد فتحات غير قابلة للغلق أو تصحيحات مطبقة)"
@@ -217,11 +228,12 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
                 },
             )
             add("خطوة 7  W_final = W_basic + W_add = ${Fmt.n(basic, 2)} + ${Fmt.n(additional, 2)} = ${Fmt.n(final, 2)} kg")
-            add("خطوة 8  الأسطوانات = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(charge, 1)} kg) = ${Fmt.n(cylinders, 0)} × ${Fmt.n(charge, 1)} kg = ${Fmt.n(installed, 1)} kg مُركّبة، والهامش ${Fmt.n(installed - final, 2)} kg (${Fmt.n((installed - final) / final * 100.0, 1)} %)")
+            if (selectionReady) add("خطوة 8  الأسطوانات = CEILING(${Fmt.n(final, 2)} / ${Fmt.n(charge, 1)} kg) = ${Fmt.n(cylinders, 0)} × ${Fmt.n(charge, 1)} kg = ${Fmt.n(installed, 1)} kg مُركّبة، والهامش ${Fmt.n(installed - final, 2)} kg (${Fmt.n((installed - final) / final * 100.0, 1)} %)") else add("خطوة 8  عدد الأسطوانات يتطلب معامل NFPA 12 وشحنة أسطوانة مُدرجة مُدخلة؛ يلزم أيضًا مراجعة الكميات الدنيا بالجدول وكل التصحيحات المطبقة.")
             add("خطوة 9  الافتراضات: منهجية NFPA 12؛ اذكر الإصدار الساري للمشروع (الإعدادات > تفاصيل التقرير > الكود/الإصدار)، وأكّد تركيز التصميم ومعامل الغمر مع المعيار ومُصنّع النظام.")
         }
 
         val warnings = buildList {
+            if (fEntered && !has(inputs, "wmin")) add("The applicable minimum table quantity was not entered; only V*f is used before additions. Verify the minimum on the same hazard/correction basis before selection.")
             add("CO2 design concentrations are life threatening: the applicable standard's requirements for occupant evacuation, alarms, warning signs, ventilation and lockout must be met before commissioning.")
             if (netFromGross != null && abs(netFromGross - volume) > 0.02 * volume) {
                 add("Volume check: gross - excluded = ${Fmt.n(netFromGross, 3)} m3 does not match the entered net volume ${Fmt.n(volume, 3)} m3. Correct the net volume before using the result.")
@@ -230,7 +242,7 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
                 add("Volume check: the net volume is larger than the gross room volume - check the decimal point (a 100x slip gives a 100x agent quantity).")
             }
             if (!fEntered) {
-                add("No NFPA 12 flooding factor was entered: the quantity shown is the theoretical closed-vessel value from rho*ln(100/(100-C)) and is a comparison, not a design value. The NFPA 12 flooding factor depends on the enclosure size (larger for smaller enclosures) and on the material - take it from the standard's table and enter it in the f field.")
+                add("No NFPA 12 flooding factor was entered: the quantity shown is the theoretical constant-volume vented-mixing value from rho*ln(100/(100-C)) and is a comparison, not a design value. The NFPA 12 flooding factor depends on the enclosure size (larger for smaller enclosures) and on the material - take it from the standard's table and enter it in the f field.")
                 add("The clean-agent form rho*C/(100-C) would give ${Fmt.n(fCleanAgentForm, 4)} kg/m3 here. It belongs to NFPA 2001 and overstates CO2 at high concentrations, so it is shown only to make the difference visible.")
             }
             add("No additional allowance is added automatically: no leakage %, no piping %, no reserve. Any additional CO2 must come from the actual NFPA 12 provisions and the actual enclosure conditions (for example unclosable openings), entered separately - 0 kg when none apply.")
@@ -245,6 +257,7 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
         }
 
         val warningsAr = buildList {
+            if (fEntered && !has(inputs, "wmin")) add("لم تُدخل كمية الجدول الدنيا؛ استُخدم V*f فقط قبل الإضافات. تحقق من الحد الأدنى على نفس أساس الخطر والتصحيحات قبل الاختيار.")
             add("تركيزات CO2 التصميمية مهددة للحياة: يجب استيفاء متطلبات المعيار المطبق لإخلاء الموجودين والإنذار ولوحات التحذير والتهوية والفصل قبل التشغيل.")
             if (netFromGross != null && abs(netFromGross - volume) > 0.02 * volume) {
                 add("فحص الحجم: الإجمالي − المستثنى = ${Fmt.n(netFromGross, 3)} m3 لا يطابق الحجم الصافي المُدخل ${Fmt.n(volume, 3)} m3. صحّح الحجم الصافي قبل استخدام النتيجة.")
@@ -253,7 +266,7 @@ object Co2AgentQuantityCalculator : Calculator(Def) {
                 add("فحص الحجم: الحجم الصافي أكبر من حجم الغرفة الإجمالي - راجع الفاصلة العشرية (خطأ 100 مرة يعطي كمية عامل 100 مرة).")
             }
             if (!fEntered) {
-                add("لم يُدخل معامل غمر من NFPA 12: الكمية المعروضة هي القيمة النظرية لوعاء مغلق من ρ×ln(100/(100−C)) وهي للمقارنة لا للتصميم. معامل الغمر في NFPA 12 يعتمد على حجم الحيز (أكبر للحيزات الصغيرة) وعلى المادة - خذه من جدول المعيار وأدخله في خانة f.")
+                add("لم يُدخل معامل غمر من NFPA 12: الكمية المعروضة هي القيمة النظرية لحيز ثابت الحجم مع تنفيس من ρ×ln(100/(100−C)) وهي للمقارنة لا للتصميم. معامل الغمر في NFPA 12 يعتمد على حجم الحيز (أكبر للحيزات الصغيرة) وعلى المادة - خذه من جدول المعيار وأدخله في خانة f.")
                 add("صيغة الوكلاء النظيفين ρ×C/(100−C) تعطي ${Fmt.n(fCleanAgentForm, 4)} kg/m3 هنا، وهي تنتمي إلى NFPA 2001 وتبالغ عند التركيزات العالية، لذا تُعرض فقط لإظهار الفرق.")
             }
             add("لا تُضاف أي بدلات تلقائيًا: لا نسبة تسريب ولا نسبة مواسير ولا احتياطي. أي كمية CO2 إضافية يجب أن تأتي من أحكام NFPA 12 الفعلية وظروف الحيز الفعلية (مثل الفتحات غير القابلة للغلق) وتُدخل منفصلة - 0 kg عند عدم وجودها.")

@@ -22,7 +22,7 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("patm", "Absolute pressure at surface", "p_atm", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
         InputSpec("alt", "Site altitude (computes the atmospheric pressure)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
-        InputSpec("npshr", "NPSH required by the pump (at the duty flow)", "NPSHr", UnitFamily.LENGTH, required = false, minValue = 0.0, defaultUnitId = "m"),
+        InputSpec("npshr", "NPSH required by the pump (at the duty flow)", "NPSHr", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m"),
         InputSpec("pv", "Vapour pressure of liquid", "p_v", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "kpa"),
         InputSpec("rho", "Liquid density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
         InputSpec("hs", "Static suction head", "h_static", UnitFamily.LENGTH, defaultUnitId = "m"),
@@ -58,7 +58,7 @@ object NpshAvailableCalculator : Calculator(Def) {
             if (!has(inputs, "patm") && !has(inputs, "alt")) add("Atmospheric pressure not provided - assumed 101.325 kPa, the sea-level value. At altitude it is lower and NPSHa falls with it; enter the site altitude and it is computed.")
             npshr?.let { r ->
                 val margin = npsha - r
-                if (margin < 0.5) add("NPSH margin (NPSHa - NPSHr) is ${Fmt.n(margin, 3)} m - below the 0.5 m minimum margin of ANSI/HI 9.6.1.")
+                if (margin < 0.5) add("NPSH margin (NPSHa - NPSHr) is ${Fmt.n(margin, 3)} m - below a 0.5 m screening threshold. ANSI/HI 9.6.1:2024 requires an application-specific margin assessment; 0.5 m is not a universal acceptance limit.")
             }
             if (npsha < 3.0) add("NPSHa below 3 m - a common rule of thumb, not a code limit. Verify against the pump NPSHr curve with an adequate safety margin (ANSI/HI 9.6.1).")
             if (npsha <= 0.0) add("NPSHa is not positive — the pump would cavitate at this duty.")
@@ -98,7 +98,7 @@ object NpshAvailableCalculator : Calculator(Def) {
                 npshr?.let { r ->
                     val margin = npsha - r
                     if (margin < 0.5) {
-                        add("هامش NPSH (NPSHa - NPSHr) = ${Fmt.n(margin, 3)} m - أقل من الحد الأدنى 0.5 m وفق ANSI/HI 9.6.1.")
+                        add("هامش NPSH (NPSHa - NPSHr) = ${Fmt.n(margin, 3)} m - أقل من عتبة فحص أولية 0.5 m؛ يجب تحديد الهامش حسب التطبيق وفق ANSI/HI 9.6.1:2024.")
                     }
                 }
                 if (npsha < 3.0) {

@@ -23,9 +23,9 @@ private val Def = CalculatorDefinition(
     notes = "Assumes each stage has the same ratio and that intercooling returns the gas to the inlet temperature (the usual basis for minimum work). Discharge temperatures must still be checked against the material limits.",
     keywords = listOf("compressor", "compression ratio", "staging", "intercooler", "equipment", "gas"),
     inputs = listOf(
-        InputSpec("p1", "Inlet pressure", "P1", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
-        InputSpec("p2", "Discharge pressure", "P2", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
-        InputSpec("crmax", "Maximum per-stage ratio", "CR_max", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = false, defaultUnitId = "dash", assumedWhenOmitted = "Maximum per-stage ratio assumed as 4.0 - enter a value from the compressor manufacturer data."),
+        InputSpec("p1", "Absolute inlet pressure", "P1", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
+        InputSpec("p2", "Absolute discharge pressure", "P2", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
+        InputSpec("crmax", "Maximum per-stage ratio", "CR_max", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = true, defaultUnitId = "dash"),
         InputSpec("t1", "Inlet temperature (for the temperature limit)", "T1", UnitFamily.TEMPERATURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c"),
         InputSpec("t2max", "Maximum allowable discharge temperature", "T2max", UnitFamily.TEMPERATURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c",
             assumedWhenOmitted = "No discharge-temperature limit given: the per-stage ratio falls back to the entered CR_max. The limit is what actually caps a stage, since CR_max = (T2max/T1)^(n/(n-1))."),
@@ -46,7 +46,14 @@ object CompressionRatioCalculator : Calculator(Def) {
         val crFromLimit = if (has(inputs, "t1") && has(inputs, "t2max")) {
             (value(inputs, "t2max") / value(inputs, "t1")).pow(nExp / (nExp - 1.0))
         } else null
-        val crMax = crFromLimit ?: optionalValue(inputs, "crmax", 4.0)
+        if (has(inputs, "t1") != has(inputs, "t2max")) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("t2max", "Provide both inlet temperature and maximum discharge temperature.")))
+        }
+        val enteredLimit = inputs["crmax"]?.baseValue
+        val crMax = if (crFromLimit != null) minOf(crFromLimit, enteredLimit ?: Double.POSITIVE_INFINITY) else (enteredLimit ?: 4.0)
+        if (!crMax.isFinite() || crMax <= 1.0) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("crmax", "Per-stage ratio must exceed 1 and maximum discharge temperature must exceed inlet temperature.")))
+        }
 
         if (p2 < p1) {
             throw com.mechforge.core.engine.ValidationException(
@@ -55,7 +62,11 @@ object CompressionRatioCalculator : Calculator(Def) {
         }
 
         val ratio = p2 / p1
-        val stages = if (ratio <= crMax) 1 else ceil(ln(ratio) / ln(crMax)).toInt()
+        val stageCount = if (ratio <= crMax) 1.0 else ceil(ln(ratio) / ln(crMax))
+        if (!stageCount.isFinite() || stageCount > Int.MAX_VALUE) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("crmax", "The specified stage limit produces an unsupported number of stages.")))
+        }
+        val stages = stageCount.toInt()
         val perStage = ratio.pow(1.0 / stages)
         val interstage = p1 * perStage
 
@@ -79,7 +90,7 @@ object CompressionRatioCalculator : Calculator(Def) {
                 "First interstage pressure (after intercooling): ${Fmt.n(interstage / 1e5, 3)} bar",
             ),
             warnings = buildList {
-                if (!has(inputs, "crmax")) add("Maximum per-stage ratio not provided - assumed 4.0 (typical air compressors; verify with the machine data).")
+                if (!has(inputs, "crmax") && crFromLimit == null) add("Maximum per-stage ratio assumed as 4.0 (typical air compressors; verify with the machine data).")
                 if (stages > 4) add("More than 4 stages: consider a different machine type or review the required discharge pressure.")
                 add("Check the discharge temperature and the intercooler duty for each stage before selecting the machine.")
             },
@@ -96,7 +107,7 @@ object CompressionRatioCalculator : Calculator(Def) {
                 "ضغط ما بين المرحلتين (بعد التبريد البيني): ${Fmt.n(interstage / 1e5, 3)} bar",
             ),
             warningsAr = buildList {
-                if (!has(inputs, "crmax")) {
+                if (!has(inputs, "crmax") && crFromLimit == null) {
                     add("لم تُدخل أقصى نسبة لكل مرحلة - افتُرضت 4.0 (ضواغط هواء معتادة؛ تحقق من بيانات الماكينة).")
                 }
                 if (stages > 4) {

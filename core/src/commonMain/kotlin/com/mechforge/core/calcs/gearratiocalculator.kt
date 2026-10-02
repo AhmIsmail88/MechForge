@@ -20,8 +20,8 @@ private val Def = CalculatorDefinition(
     notes = "Ideal (loss-free) torque relation. Real drives lose a few percent per mesh. Module m in mm; pitch diameter d = m·z.",
     keywords = listOf("gear", "ratio", "speed", "torque", "module", "pitch diameter"),
     inputs = listOf(
-        InputSpec("z1", "Driving teeth", "z₁", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
-        InputSpec("z2", "Driven teeth", "z₂", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
+        InputSpec("z1", "Driving teeth", "z₁", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", integerOnly = true),
+        InputSpec("z2", "Driven teeth", "z₂", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash", integerOnly = true),
         InputSpec("n1", "Driving speed (optional)", "n₁", UnitFamily.ROTATIONAL_SPEED, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "rpm"),
         InputSpec("t1", "Driving torque (optional)", "T₁", UnitFamily.TORQUE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "nm"),
         InputSpec("m", "Module (optional)", "m", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),

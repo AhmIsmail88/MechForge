@@ -69,35 +69,6 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
         ) {
             Spacer(Modifier.height(12.dp))
 
-            val results = if (query.isBlank()) {
-                emptyList()
-            } else {
-                CalculatorRegistry.search(query)
-            }
-            if (results.isNotEmpty()) {
-                Card {
-                    // The padding has to be at least the card's corner radius (shapes.medium = 14dp),
-                    // otherwise the rounded corner clips the first row: the first result used to read
-                    // "ipe Flow Velocity" because the top-left curve cut the P away.
-                    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
-                        for (calc in results) {
-                            Text(
-                                "${CalcText.name(calc.def, strings.isRtl)}  —  ${calc.def.category.displayName}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        query = ""
-                                        onNavigate(Screen.Calculator(calc.def.id))
-                                    }
-                                    .padding(10.dp),
-                            )
-                        }
-                    }
-                }
-                Spacer(Modifier.height(14.dp))
-            }
-
             // Favorites
             val favoriteCalcs = CalculatorRegistry.all.filter { it.def.id in favoriteIds }
             if (favoriteCalcs.isNotEmpty()) {
@@ -159,7 +130,7 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                     FilterChip(
                         selected = selectedCategory == category,
                         onClick = { selectedCategory = category },
-                        label = { Text(category.displayName) },
+                        label = { Text(CalcText.categoryName(category, strings.isRtl)) },
                     )
                 }
             }
@@ -169,8 +140,19 @@ fun HomeScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
             // Wrapping rows (not a fixed-height lazy grid): every card is always laid out and
             // reachable by scrolling. The previous fixed-height grid clipped the tail of the
             // list on phones, where the grid collapses to a single column.
-            val calculators = CalculatorRegistry.all
-                .filter { selectedCategory == null || it.def.category == selectedCategory }
+            val engineMatches = if (query.isBlank()) emptySet() else CalculatorRegistry.search(query).map { it.def.id }.toSet()
+            val calculators = CalculatorRegistry.all.filter { calc ->
+                (selectedCategory == null || calc.def.category == selectedCategory) &&
+                    (query.isBlank() || calc.def.id in engineMatches ||
+                        CalcText.name(calc.def, strings.isRtl).contains(query.trim(), ignoreCase = true) ||
+                        CalcText.description(calc.def, strings.isRtl).contains(query.trim(), ignoreCase = true) ||
+                        CalcText.categoryName(calc.def.category, strings.isRtl).contains(query.trim(), ignoreCase = true))
+            }
+            if (calculators.isEmpty()) {
+                Text(strings.homeNoMatches, style = MaterialTheme.typography.bodyLarge)
+                Text(strings.homeNoMatchesHint, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(14.dp))
+            }
 
             BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                 val minCardWidth = 230.dp
@@ -209,7 +191,7 @@ private fun CalculatorCard(calc: Calculator, modifier: Modifier = Modifier, onCl
             Text(CalcText.name(calc.def, LocalStrings.current.isRtl), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(4.dp))
             Text(
-                calc.def.category.displayName,
+                CalcText.categoryName(calc.def.category, LocalStrings.current.isRtl),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
             )

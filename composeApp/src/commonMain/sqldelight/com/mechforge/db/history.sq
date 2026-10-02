@@ -39,6 +39,12 @@ SELECT * FROM calculation_history ORDER BY timestamp DESC;
 getHistoryById:
 SELECT * FROM calculation_history WHERE id = ?;
 
+lastInsertedHistoryId:
+SELECT last_insert_rowid();
+
+updateHistoryNumber:
+UPDATE calculation_history SET calculation_number = ? WHERE id = ?;
+
 updateHistoryTitle:
 UPDATE calculation_history SET title = ? WHERE id = ?;
 

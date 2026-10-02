@@ -27,8 +27,8 @@ private val Def = CalculatorDefinition(
         InputSpec("d", "Round duct diameter", "D", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("w", "Rectangular width", "W", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
         InputSpec("h", "Rectangular height", "H", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "mm"),
-        InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Air density assumed as 1.2 kg/m3 (20 C, sea level) - correct it for the actual temperature and altitude."),
-                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
+        InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
+                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c"),
         InputSpec("alt", "Site altitude (for the density)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
         InputSpec("nu", "Kinematic viscosity", "ν", UnitFamily.KINEMATIC_VISCOSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "cst", assumedWhenOmitted = "Kinematic viscosity assumed as 1.5e-5 m2/s (air at 20 C) - correct it for the actual temperature."),
         InputSpec("eps", "Absolute roughness", "ε", UnitFamily.LENGTH, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "mm", libraryKey = "roughness", assumedWhenOmitted = "Absolute roughness assumed as 9e-5 m (galvanised steel) - use the value for the actual duct material."),
@@ -41,27 +41,14 @@ object DuctPressureLossCalculator : Calculator(Def) {
         val v = value(inputs, "v")
         val l = value(inputs, "l")
 
-        // Air density: an explicit input wins; otherwise, when the site conditions are given,
-        // the density is computed from them. Without either, the 1.2 kg/m3 shorthand stays.
-        val rhoFromSite = if (has(inputs, "tair") && has(inputs, "alt")) {
-            airDensity(value(inputs, "tair"), value(inputs, "alt"))
-        } else null
-        val rho = if (has(inputs, "rho")) value(inputs, "rho") else (rhoFromSite ?: 1.2)
-        val rhoSiteWarning = rhoFromSite?.let { r ->
-            "Air density from " + Fmt.n(value(inputs, "tair"), 1) + " C at " + Fmt.n(value(inputs, "alt"), 0) +
-                " m = " + Fmt.n(r, 4) + " kg/m3" +
-                (if (abs(r - 1.2) / 1.2 > 0.05) {
-                    " - differs from the 1.2 shorthand by more than 5 percent: the airflow scales with it."
-                } else {
-                    ""
-                })
-        }
+        val air = resolveAirDensity(inputs)
+        val rho = air.value
         val nu = optionalValue(inputs, "nu", 1.5e-5)
         val eps = optionalValue(inputs, "eps", 9e-5)
 
         val hasRound = has(inputs, "d")
         val hasRect = has(inputs, "w") && has(inputs, "h")
-        if (!hasRound && !hasRect) {
+        if ((!hasRound && !hasRect) || (hasRound && (has(inputs, "w") || has(inputs, "h"))) || (has(inputs, "w") != has(inputs, "h"))) {
             throw com.mechforge.core.engine.ValidationException(
                 listOf(
                     com.mechforge.core.engine.InputError(
@@ -81,12 +68,18 @@ object DuctPressureLossCalculator : Calculator(Def) {
 
         val re = v * dh / nu
         val relRough = eps / dh
+        if (!hasRound && re < 4000.0) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("v", "The rectangular hydraulic-diameter model is limited to turbulent flow (Re >= 4000).")))
+        }
+        if (relRough >= 0.1) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("eps", "Relative roughness must be below 0.1 for this calculator's supported range.")))
+        }
         val f = FrictionFactor.darcy(re, relRough)
         val velocityPressure = rho * v * v / 2.0
         val dp = f * (l / dh) * velocityPressure
 
         val warnings = buildList {
-            rhoSiteWarning?.let { add(it) }
+            addAll(air.warnings)
             FrictionFactor.regimeWarning(re)?.let { add(it) }
             add("Uses the straight-duct friction only — add fitting/terminal losses for a full system total.")
             if (dp / l > 1.5) add("Friction loss above 1.5 Pa/m - above the usual design band; check the fan energy against the project criterion.")
@@ -119,6 +112,7 @@ object DuctPressureLossCalculator : Calculator(Def) {
             ),
             warnings = warnings,
             warningsAr = buildList {
+                addAll(air.warningsAr)
                 // the same condition as FrictionFactor.regimeWarning
                 if (re >= 2300.0 && re <= 4000.0) {
                     add("رقم رينولدز في المنطقة الانتقالية (2300-4000)؛ معامل الاحتكاك غير مؤكد فيها - تعامل مع النتيجة بحذر.")

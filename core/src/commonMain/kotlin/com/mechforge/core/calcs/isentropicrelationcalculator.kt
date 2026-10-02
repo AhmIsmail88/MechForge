@@ -21,8 +21,8 @@ private val Def = CalculatorDefinition(
     notes = "k = c_p/c_v (1.4 for air at ambient conditions). Assumes reversible adiabatic (isentropic) compression or expansion.",
     keywords = listOf("isentropic", "adiabatic", "ideal gas", "compression", "expansion", "k"),
     inputs = listOf(
-        InputSpec("p1", "Inlet pressure", "P₁", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
-        InputSpec("p2", "Outlet pressure", "P₂", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
+        InputSpec("p1", "Absolute inlet pressure", "P₁", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
+        InputSpec("p2", "Absolute outlet pressure", "P₂", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kpa"),
         InputSpec("t1", "Inlet temperature", "T₁", UnitFamily.TEMPERATURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c"),
         InputSpec("k", "Specific heat ratio", "k", UnitFamily.DIMENSIONLESS, required = false, minValue = 1.0, exclusiveMin = true, defaultUnitId = "dash"),
     ),

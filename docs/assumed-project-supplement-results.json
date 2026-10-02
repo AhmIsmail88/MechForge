@@ -1,0 +1,252 @@
+{
+  "basis": "FICTIONAL STUDY ONLY",
+  "base_contact": {
+    "max_anchor_tension_kN": 1.1798769145519206,
+    "total_anchor_tension_kN": 3.225592895510844,
+    "compression_kN": 49.84507566637514,
+    "anchor_tensions_kN": [
+      0,
+      0,
+      0.14584268870045358,
+      0.8770153017790078,
+      1.1798769145519206,
+      0.877015301779008,
+      0.1458426887004538,
+      0
+    ],
+    "max_pressure_kPa": 551.9092996113371,
+    "contact_area_fraction": 0.42695041766632785,
+    "neutral_axis_mm": 45.838786224524846,
+    "force_residual_N": -5.093170329928398e-11,
+    "moment_residual_Nm": 2.000888343900442e-11,
+    "rotation_rad": 0.000025972602219189123,
+    "foundation_k_N_per_m3": 60000000000,
+    "thread_stress_MPa": 4.815824141028248,
+    "weld_6mm_elastic_equivalent_MPa": 166.64363042150558,
+    "stiffness_sensitivity": [
+      {
+        "max_anchor_tension_kN": 1.768889692273933,
+        "total_anchor_tension_kN": 4.433083156840533,
+        "compression_kN": 51.052565927704876,
+        "anchor_tensions_kN": [
+          0,
+          0,
+          0.0628844165336655,
+          1.2692123157496344,
+          1.768889692273933,
+          1.269212315749635,
+          0.0628844165336659,
+          0
+        ],
+        "max_pressure_kPa": 498.81168596998356,
+        "contact_area_fraction": 0.48090427200481906,
+        "neutral_axis_mm": 11.979702328044171,
+        "force_residual_N": 1.0186340659856796e-10,
+        "moment_residual_Nm": 9.094947017729282e-12,
+        "rotation_rad": 0.00004285099593696119,
+        "foundation_k_N_per_m3": 30000000000
+      },
+      {
+        "max_anchor_tension_kN": 0.755528346389887,
+        "total_anchor_tension_kN": 2.1854301450114675,
+        "compression_kN": 48.80491291587573,
+        "anchor_tensions_kN": [
+          0,
+          0,
+          0.13977309152080622,
+          0.5751778077899841,
+          0.755528346389887,
+          0.5751778077899842,
+          0.13977309152080636,
+          0
+        ],
+        "max_pressure_kPa": 605.4656619002683,
+        "contact_area_fraction": 0.3834220406724115,
+        "neutral_axis_mm": 73.77323114184445,
+        "force_residual_N": -4.3655745685100555e-11,
+        "moment_residual_Nm": -7.275957614183426e-12,
+        "rotation_rad": 0.00001546638002810878,
+        "foundation_k_N_per_m3": 120000000000
+      }
+    ],
+    "limitations": [
+      "Rigid plate; foundation stiffness and anchor effective length assumed.",
+      "No ACI concrete breakout/pullout/pryout/edge/group/seismic checks.",
+      "No plate flexibility/prying or stiffener/weld load-sharing model; elastic weld stress is screening only."
+    ]
+  },
+  "pump": {
+    "curve": [
+      [
+        0,
+        70,
+        12,
+        2
+      ],
+      [
+        50,
+        65,
+        17,
+        2.5
+      ],
+      [
+        100,
+        55,
+        22,
+        3
+      ],
+      [
+        125,
+        48,
+        26,
+        3.8
+      ],
+      [
+        150,
+        38,
+        30,
+        4.5
+      ]
+    ],
+    "operating_flow_m3h": 105.50565798324527,
+    "operating_head_m": 53.45841576469131,
+    "rows": [
+      {
+        "flow_m3h": 50,
+        "head_m": 65,
+        "shaft_kW": 17,
+        "npsha_m": 11.861964441778522,
+        "npshr_m": 2.5,
+        "margin_m": 9.361964441778522,
+        "ratio": 4.744785776711408
+      },
+      {
+        "flow_m3h": 100,
+        "head_m": 55,
+        "shaft_kW": 22,
+        "npsha_m": 11.111964441778522,
+        "npshr_m": 3,
+        "margin_m": 8.111964441778522,
+        "ratio": 3.703988147259507
+      },
+      {
+        "flow_m3h": 105.50565798324527,
+        "head_m": 53.458415764691324,
+        "shaft_kW": 22.880905277319243,
+        "npsha_m": 10.99882005513077,
+        "npshr_m": 3.1761810554638488,
+        "margin_m": 7.822638999666921,
+        "ratio": 3.462907140073129
+      },
+      {
+        "flow_m3h": 125,
+        "head_m": 48,
+        "shaft_kW": 26,
+        "npsha_m": 10.549464441778522,
+        "npshr_m": 3.8,
+        "margin_m": 6.749464441778522,
+        "ratio": 2.776174853099611
+      },
+      {
+        "flow_m3h": 150,
+        "head_m": 38,
+        "shaft_kW": 30,
+        "npsha_m": 9.861964441778522,
+        "npshr_m": 4.5,
+        "margin_m": 5.361964441778522,
+        "ratio": 2.1915476537285605
+      }
+    ],
+    "shutoff_ratio": 1.2727272727272727,
+    "flow150_head_ratio": 0.6909090909090909,
+    "note": "No manufacturer curve or certification; fixed-friction Q squared system approximation."
+  },
+  "fire_demand": {
+    "assumed_class": "OH1 study assumption; actual occupancy/storage not specified",
+    "density_gpm_ft2": 0.15,
+    "area_ft2": 1500,
+    "hose_gpm": 250,
+    "duration_min": 90,
+    "lower_bound_flow_m3h": 107.884235844,
+    "usable_storage_m3": 161.826353766,
+    "storage_shortfall_m3": 61.82635376600001,
+    "assumed_dead_volume_m3": 10,
+    "assumed_freeboard_volume_m3": 10,
+    "preliminary_gross_tank_m3": 182,
+    "note": "Density times area is a lower bound; hydraulic over-discharge and hose connection locations remain unresolved.",
+    "symmetric_network": {
+      "sprinklers_per_branch": [
+        {
+          "index_from_remote": 1,
+          "pressure_bar": 0.7729394486222497,
+          "flow_m3h": 4.258588257
+        },
+        {
+          "index_from_remote": 2,
+          "pressure_bar": 0.7837159017987652,
+          "flow_m3h": 4.288172477552852
+        },
+        {
+          "index_from_remote": 3,
+          "pressure_bar": 0.8228695578839291,
+          "flow_m3h": 4.393983417772225
+        },
+        {
+          "index_from_remote": 4,
+          "pressure_bar": 0.9072854843461852,
+          "flow_m3h": 4.61386514818401
+        }
+      ],
+      "branch_flow_m3h": 17.554609300509085,
+      "sprinkler_total_m3h": 52.663827901527256,
+      "total_including_hose_m3h": 109.44500466152726,
+      "manifold_pressure_bar": 1.3896946290272632,
+      "pump_head_at_demand_m": 25.87730881152129,
+      "usable_storage_90min_m3": 164.1675069922909,
+      "gross_tank_with_20m3_allowances_m3": 185,
+      "note": "All branches assumed identical. Hose at pump discharge with 2 bar minimum; excludes unspecified valves/backflow devices. Separate fire network supersedes the original 4 bar receiving-vessel topology."
+    }
+  },
+  "gas_sensitivity": {
+    "baseline_300m3_kg": 177.16186689238398,
+    "no_exclusions_320m3_kg": 188.97265801854294,
+    "no_exclusions_cylinders_60kg": 4,
+    "original_installed_concentration_at_320m3_pct": 7.169421607477504,
+    "original_installed_concentration_at_300m3_pct": 7.611005377039487,
+    "hypothetical_240kg_at_35C_300m3_pct": 10.39426523297491,
+    "note": "S at 35 C = 0.145 m3/kg is only a sensitivity assumption. Neither 3 nor 4 cylinders is approved."
+  },
+  "ventilation": {
+    "losses_Pa": {
+      "straight_duct": 12.714334997506235,
+      "two_elbows_K_0_35_each": 19.334811808120033,
+      "transition_K_0_25": 6.905289931471441,
+      "discharge_K_1": 27.621159725885764,
+      "intake_louver_assumed": 50,
+      "dirty_filter_assumed": 120,
+      "damper_assumed": 30,
+      "branch_and_system_effect_assumed": 40
+    },
+    "total_Pa": 306.57559646298347,
+    "ten_percent_design_allowance_Pa": 337.2331561092818,
+    "assumed_fan_pressure_Pa": 400,
+    "remaining_Pa": 62.76684389071818,
+    "two_fans_flow_m3h": 8000,
+    "required_flow_m3h": 9381.252052100712,
+    "two_fans_temperature_rise_K": 11.726565065125888,
+    "recommendation": "For N+1 at assumed duty use 4 units: 3 duty plus 1 standby; verify actual parallel curves and isolation."
+  },
+  "piping": {
+    "material": "Illustrative carbon steel; S=138 MPa is an unverified project assumption",
+    "span_m": 3,
+    "udl_Nm": 459.69535927883874,
+    "bending_stress_MPa": 3.714401355585163,
+    "deflection_mm": 0.20690738388954785,
+    "free_expansion_60m_30K_mm": 21.6,
+    "fully_restrained_thermal_stress_MPa": 72,
+    "required_kv_for_10m3h": 7.849667760524472,
+    "valve_p2_bar_abs": 8,
+    "valve_pv_bar_abs": 0.02339,
+    "note": "P2>Pv excludes bulk flashing at this point only; incipient cavitation/noise require valve-specific data."
+  }
+}

@@ -26,7 +26,7 @@ private val Def = CalculatorDefinition(
         InputSpec("wout", "Leaving humidity ratio", "w_out", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = false, maxValue = 0.2, defaultUnitId = "dash"),
         InputSpec("rho", "Air density", "ρ", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
                 InputSpec("alt", "Site altitude (for the density)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
-                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
+                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c"),
     ),
 )
 
@@ -38,29 +38,15 @@ object LatentHeatCalculator : Calculator(Def) {
         val q = value(inputs, "q")
         val wIn = value(inputs, "win")
         val wOut = value(inputs, "wout")
-        // Air density: an explicit input wins; otherwise, when the site conditions are given,
-        // the density is computed from them. Without either, the 1.2 kg/m3 shorthand stays.
-        val rhoFromSite = if (has(inputs, "tair") && has(inputs, "alt")) {
-            airDensity(value(inputs, "tair"), value(inputs, "alt"))
-        } else null
-        val rho = if (has(inputs, "rho")) value(inputs, "rho") else (rhoFromSite ?: 1.2)
-        val rhoSiteWarning = rhoFromSite?.let { r ->
-            "Air density from " + Fmt.n(value(inputs, "tair"), 1) + " C at " + Fmt.n(value(inputs, "alt"), 0) +
-                " m = " + Fmt.n(r, 4) + " kg/m3" +
-                (if (abs(r - 1.2) / 1.2 > 0.05) {
-                    " - differs from the 1.2 shorthand by more than 5 percent: the airflow scales with it."
-                } else {
-                    ""
-                })
-        }
+        val air = resolveAirDensity(inputs)
+        val rho = air.value
 
         val massFlow = rho * q
         val dw = wOut - wIn
         val ql = massFlow * H_FG * dw
 
         val warnings = buildList {
-            rhoSiteWarning?.let { add(it) }
-            if (!has(inputs, "rho")) add("Air density not provided — assumed 1.2 kg/m³ (standard air ~20 °C).")
+            addAll(air.warnings)
             if (dw > 0) add("Δw > 0 — moisture is ADDED to the air (humidification duty).")
             if (dw < 0) add("Δw < 0 — moisture is REMOVED from the air (dehumidification duty).")
         }
@@ -82,9 +68,7 @@ object LatentHeatCalculator : Calculator(Def) {
                 "Q_l = ṁ·h_fg·Δw = ${Fmt.n(massFlow, 4)} × 2501 × ${Fmt.n(dw, 5)} = ${Fmt.n(ql, 3)} kW",
             ),
             warningsAr = buildList {
-                if (!has(inputs, "rho")) {
-                    add("لم تُدخل كثافة الهواء - افتُرضت 1.2 kg/m³ (هواء قياسي عند نحو 20 °C).")
-                }
+                addAll(air.warningsAr)
                 if (dw > 0) {
                     add("Δw > 0 - الرطوبة تُضاف إلى الهواء (حمل ترطيب).")
                 }

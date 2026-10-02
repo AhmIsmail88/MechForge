@@ -95,7 +95,7 @@ fun ConverterScreen() {
         Spacer(Modifier.height(16.dp))
 
         val parsed = valueText.trim().toDoubleOrNull()
-        if (parsed == null) {
+        if (parsed == null || !parsed.isFinite()) {
             Text(strings.converterEnterNumber, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             val result = runCatching { Units.convert(parsed, fromUnitId, toUnitId) }

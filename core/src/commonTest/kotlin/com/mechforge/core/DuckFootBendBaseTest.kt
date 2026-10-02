@@ -67,9 +67,9 @@ class DuckFootBendBaseTest {
         assertTrue(rel(value(defaults(), "hTotal"), 1017.876) < 1e-5, "horizontal load, kN")
         assertTrue(rel(value(defaults(), "moment"), 916088.4178) < 1e-5, "overturning moment, N.m")
         assertTrue(rel(value(defaults(), "bearing"), 372.2445) < 1e-5, "bearing stress, kPa")
-        assertTrue(rel(value(defaults(), "cantilever"), 500.0) < 1e-9, "plate cantilever, mm")
-        assertTrue(rel(value(defaults(), "tPlateReq"), 44.5401) < 1e-4, "required plate thickness, mm")
-        assertTrue(rel(value(defaults(), "tRibReq"), 31.2484) < 1e-4, "required rib thickness, mm")
+        assertTrue(rel(value(defaults(), "cantilever"), 490.0) < 1e-9, "plate cantilever, mm")
+        assertTrue(rel(value(defaults(), "tPlateReq"), 43.6510952) < 1e-4, "required plate thickness, mm")
+        assertTrue(rel(value(defaults(), "tRibReq"), 30.6258952) < 1e-4, "required rib thickness, mm")
         assertTrue(rel(value(defaults(), "tMax"), 190.8518) < 1e-4, "bolt tension, kN")
         assertTrue(rel(value(defaults(), "vBolt"), 84.823) < 1e-4, "bolt shear, kN")
         assertTrue(rel(value(defaults(), "dBoltReq"), 41.6619) < 1e-4, "required bolt diameter, mm")
@@ -78,11 +78,9 @@ class DuckFootBendBaseTest {
         assertTrue(rel(value(defaults(), "interaction"), 0.937517) < 1e-4, "bolt interaction")
         assertTrue(rel(value(defaults(), "dPlateMin"), 1800.0) < 1e-9, "minimum plate diameter, mm")
 
-        // All four checks pass with the note's selected sizes.
-        assertEquals(1.0, value(defaults(), "checkPlate"))
-        assertEquals(1.0, value(defaults(), "checkRib"))
-        assertEquals(1.0, value(defaults(), "checkBolt"))
-        assertEquals(1.0, value(defaults(), "checkPlateDia"))
+        // Simplified section estimates must not claim structural acceptance.
+        assertTrue(out.results.none { it.id.startsWith("check") })
+        assertTrue(out.warnings.any { it.contains("PRELIMINARY MODEL ONLY") })
         assertTrue(out.steps.size >= 10, "the working should be shown")
     }
 
@@ -120,15 +118,12 @@ class DuckFootBendBaseTest {
                 "$id differs between unit systems",
             )
         }
-        assertEquals(1.0, value(imperial, "checkPlate"))
-        assertEquals(1.0, value(imperial, "checkBolt"))
     }
 
     @Test
     fun aThinBasePlateFailsItsCheckAndSaysSo() {
         val thin = defaults() + ("tPlateSel" to input("tPlateSel", 20.0, "mm"))
         val out = Calc.run(thin)
-        assertEquals(0.0, out.results.first { it.id == "checkPlate" }.value)
         assertTrue(
             out.warnings.any { it.contains("Base plate thickness NOT sufficient") },
             "a failing plate check must state what to increase",
@@ -143,7 +138,6 @@ class DuckFootBendBaseTest {
     fun aPlateTooSmallForTheBoltCircleFailsTheFitCheck() {
         val small = defaults() + ("dPlate" to input("dPlate", 1700.0, "mm"))
         val out = Calc.run(small)
-        assertEquals(0.0, out.results.first { it.id == "checkPlateDia" }.value)
         assertTrue(out.warnings.any { it.contains("Plate diameter NOT sufficient") })
     }
 

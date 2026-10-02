@@ -19,7 +19,7 @@ private val Def = CalculatorDefinition(
     description = "Heat duty of a heat exchanger from the fluid side, cross-checked with U x A x LMTD when the area and terminal temperatures are given.",
     formulaDisplay = "Q = m_dot*cp*(T_out - T_in) ;  Q = U*A*LMTD",
     reference = "Standard heat-exchanger relations (e.g. Incropera & DeWitt, Fundamentals of Heat and Mass Transfer).",
-    notes = "cp defaults to 4186 J/(kg.K) (water). The area-side check needs U, A and the four terminal temperatures; LMTD assumes constant U and no phase change.",
+    notes = "cp defaults to 4186 J/(kg.K) (water). The area-side check needs U, A and the four terminal temperatures; LMTD assumes constant U; the fluid-side cp equation excludes phase change. Multipass/crossflow requires a separate correction factor.",
     keywords = listOf("heat exchanger", "duty", "lmtd", "u value", "thermal", "equipment"),
     inputs = listOf(
         InputSpec("m", "Mass flow", "m_dot", UnitFamily.MASS_FLOW, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgs"),
@@ -32,7 +32,7 @@ private val Def = CalculatorDefinition(
         InputSpec("thout", "Hot outlet (optional)", "T_h,out", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
         InputSpec("tcin", "Cold inlet (optional)", "T_c,in", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
         InputSpec("tcout", "Cold outlet (optional)", "T_c,out", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
-        InputSpec("arr", "Arrangement (1 = counter, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash"),
+        InputSpec("arr", "Arrangement (1 = counter, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, maxValue = 1.0, integerOnly = true, defaultUnitId = "dash"),
     ),
 )
 
@@ -58,6 +58,10 @@ object HeatExchangerDutyCalculator : Calculator(Def) {
             "Q = m_dot*cp*dT = ${Fmt.n(m, 4)} × ${Fmt.n(cp / 1000.0, 4)} × ${Fmt.n(dT, 2)} = ${Fmt.n(qFluid / 1000.0, 3)} kW",
         )
 
+        val areaKeys = listOf("u", "a", "thin", "thout", "tcin", "tcout")
+        if (areaKeys.any { has(inputs, it) } && !areaKeys.all { has(inputs, it) }) {
+            throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("u", "Area-side verification requires U, A and all four terminal temperatures.")))
+        }
         val hasAreaSide = has(inputs, "u") && has(inputs, "a") &&
             has(inputs, "thin") && has(inputs, "thout") && has(inputs, "tcin") && has(inputs, "tcout")
         if (hasAreaSide) {
@@ -70,6 +74,9 @@ object HeatExchangerDutyCalculator : Calculator(Def) {
             val counter = optionalValue(inputs, "arr", 1.0) >= 0.5
             val dt1 = if (counter) thin - tcout else thin - tcin
             val dt2 = if (counter) thout - tcin else thout - tcout
+            if (dt1 <= 0.0 || dt2 <= 0.0 || thout > thin || tcout < tcin || minOf(thin, thout, tcin, tcout) <= 0.0) {
+                throw com.mechforge.core.engine.ValidationException(listOf(com.mechforge.core.engine.InputError("thin", "Invalid heat-exchanger temperatures or terminal differences.")))
+            }
             if (dt1 > 0.0 && dt2 > 0.0) {
                 val lmtd = if (abs(dt1 - dt2) < 1e-9) dt1 else (dt1 - dt2) / ln(dt1 / dt2)
                 val qArea = u * a * lmtd
@@ -79,8 +86,8 @@ object HeatExchangerDutyCalculator : Calculator(Def) {
                 stepsAr += "LMTD = ${Fmt.n(lmtd, 3)} K (${if (counter) "متعاكس" else "متوازي"})"
                 steps += "Area side: Q = U*A*LMTD = ${Fmt.n(u, 1)} x ${Fmt.n(a, 4)} x ${Fmt.n(lmtd, 3)} = ${Fmt.n(qArea / 1000.0, 3)} kW"
                 stepsAr += "جانب المساحة: Q = U*A*LMTD = ${Fmt.n(u, 1)} × ${Fmt.n(a, 4)} × ${Fmt.n(lmtd, 3)} = ${Fmt.n(qArea / 1000.0, 3)} kW"
-                steps += "Cross-check: fluid side ${Fmt.n(qFluid / 1000.0, 3)} kW vs area side ${Fmt.n(qArea / 1000.0, 3)} kW (difference ${Fmt.n(abs(qFluid - qArea) / maxOf(abs(qFluid), 1e-9) * 100.0, 1)}%)"
-                stepsAr += "مقارنة: جانب السائل ${Fmt.n(qFluid / 1000.0, 3)} kW مقابل جانب المساحة ${Fmt.n(qArea / 1000.0, 3)} kW (الفرق ${Fmt.n(abs(qFluid - qArea) / maxOf(abs(qFluid), 1e-9) * 100.0, 1)}%)"
+                steps += "Cross-check: fluid side ${Fmt.n(qFluid / 1000.0, 3)} kW vs area side ${Fmt.n(qArea / 1000.0, 3)} kW (difference ${Fmt.n(abs(abs(qFluid) - qArea) / maxOf(abs(qFluid), 1e-9) * 100.0, 1)}%)"
+                stepsAr += "مقارنة: جانب السائل ${Fmt.n(qFluid / 1000.0, 3)} kW مقابل جانب المساحة ${Fmt.n(qArea / 1000.0, 3)} kW (الفرق ${Fmt.n(abs(abs(qFluid) - qArea) / maxOf(abs(qFluid), 1e-9) * 100.0, 1)}%)"
             } else {
                 steps += "Area side not computed: the terminal temperature differences are not positive for the selected arrangement."
                 stepsAr += "جانب المساحة لم يُحسب: الفروق الطرفية في الحرارة غير موجبة للترتيب المختار."

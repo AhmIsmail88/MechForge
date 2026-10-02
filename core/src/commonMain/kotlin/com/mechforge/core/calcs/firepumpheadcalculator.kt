@@ -17,11 +17,11 @@ private val Def = CalculatorDefinition(
     description = "Total head a fire pump must develop from the required discharge pressure, the available supply pressure, static elevation and friction losses.",
     formulaDisplay = "H = (P_req - P_avail)/(rho*g) + H_static + H_friction",
     reference = "Bernoulli/energy balance applied to a booster pump (NFPA 20 practice).",
-    notes = "Pressures are ABSOLUTE or gauge, as long as both are on the same basis. This gives the pump duty point; the pump is then selected from its certified curve (NFPA 20).",
+    notes = "Pressures are ABSOLUTE or gauge, as long as both are on the same basis. H_static is the elevation difference between those same pressure reference points. Velocity-head differences are assumed negligible. This gives the pump duty point; the pump is then selected from its certified curve (NFPA 20).",
     keywords = listOf("fire pump", "booster", "head", "nfpa 20", "fire", "duty point"),
     inputs = listOf(
-        InputSpec("preq", "Required discharge pressure", "P_req", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
-        InputSpec("pavail", "Available supply pressure", "P_avail", UnitFamily.PRESSURE, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "bar"),
+        InputSpec("preq", "Required residual pressure at demand point", "P_req", UnitFamily.PRESSURE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "bar"),
+        InputSpec("pavail", "Available residual supply pressure at design flow", "P_avail", UnitFamily.PRESSURE, required = false, defaultUnitId = "bar", assumedWhenOmitted = "Supply pressure assumed as zero gauge; use gauge pressure for the demand point too when supply is omitted."),
         InputSpec("hstatic", "Static elevation gain", "H_static", UnitFamily.LENGTH, defaultUnitId = "m"),
         InputSpec("hf", "Friction and minor losses", "H_friction", UnitFamily.LENGTH, minValue = 0.0, exclusiveMin = false, defaultUnitId = "m"),
         InputSpec("rho", "Water density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
@@ -55,7 +55,7 @@ object FirePumpHeadCalculator : Calculator(Def) {
                 "Total head: H = ${Fmt.n(pressureHead, 3)} + ${Fmt.n(hStatic, 2)} + ${Fmt.n(hFriction, 2)} = ${Fmt.n(total, 2)} m",
             ),
             warnings = buildList {
-                add("The available suction pressure defaults to zero and is not flagged as an assumption: a suction lift (tank below the pump) is a negative head - enter it explicitly. The NFPA 20 acceptance criteria (churn at or below 140 % of rated pressure, and at least 65 % of rated pressure at 150 % of rated flow) are not checked here.")
+                add("Use residual supply pressure at the design flow and elevations/losses between the same reference points. NFPA 20 pump-curve acceptance and system hydraulic demand are separate checks.")
                 if (!has(inputs, "rho")) add("Density not provided - assumed 998.2 kg/m3 (water at 20 C).")
                 if (total <= 0.0) add("Total head is not positive - the supply pressure already exceeds the requirement.")
                 add("Select the pump from its certified curve (NFPA 20 churn/rated/overload points).")
@@ -67,7 +67,7 @@ object FirePumpHeadCalculator : Calculator(Def) {
                 "الرفع الكلي: H = ${Fmt.n(pressureHead, 3)} + ${Fmt.n(hStatic, 2)} + ${Fmt.n(hFriction, 2)} = ${Fmt.n(total, 2)} m",
             ),
             warningsAr = buildList {
-                add("الضغط المتاح عند السحب افتراضيًا صفر وبدون إعلانه كافتراض: رفع بالسحب (خزان تحت المضخة) رأس سالب - أدخله صراحة. معايير قبول NFPA 20 (churn حتى 140% من الضغط المقنن و65% على الأقل عند 150% من التصرف) غير مفحوصة هنا.")
+                add("استخدم ضغط الإمداد المتبقي عند التصرف التصميمي والارتفاعات والفواقد بين نفس نقطتي المرجع. قبول منحنى المضخة وفق NFPA 20 والطلب الهيدروليكي للشبكة يحتاجان فحصًا منفصلًا.")
                 if (!has(inputs, "rho")) {
                     add("لم تُدخل الكثافة - افتُرضت 998.2 kg/m3 (مياه عند 20 °C).")
                 }

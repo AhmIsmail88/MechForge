@@ -124,9 +124,9 @@ class Fm200AgentQuantityTest {
         val withCharge = T.run(
             Fm200AgentQuantityCalculator,
             T.iv("v", 100.0, "m3"), T.iv("hazard", 0.0, "dash"), T.iv("t", 21.0, "c"),
-            T.iv("mcyl", 40.0, "kg"),
+            T.iv("mcyl", 40.0, "kg"), T.iv("s", 0.13782, "m3perkg"), T.iv("c", 7.0, "pct"),
         )
-        // 53.022 / 40 = 1.33 -> 2 cylinders
+        // 54.614 / 40 -> 2 cylinders; property and concentration are explicitly supplied.
         assertEquals(2.0, withCharge.results.first { it.id == "cylinders" }.value, 1e-9)
     }
 
@@ -170,7 +170,12 @@ class Fm200AgentQuantityTest {
 class Co2AgentQuantityTest {
 
     @Test
-    fun surfaceFireHazardGivesThirtyFourPercentAndCylinderCount() {
+    fun displayedTheoreticalFormulaMatchesTheCalculation() {
+        assertTrue(Co2AgentQuantityCalculator.def.formulaDisplay.contains("ln[100/(100-C)]"))
+    }
+
+    @Test
+    fun surfaceFireTheoryDoesNotSelectCylinders() {
         val out = T.run(
             Co2AgentQuantityCalculator,
             T.iv("v", 100.0, "m3"), T.iv("hazard", 0.0, "dash"), T.iv("t", 21.0, "c"),
@@ -181,8 +186,7 @@ class Co2AgentQuantityTest {
         assertEquals(75.7621, out.results.first { it.id == "w" }.value, 0.01)
         assertEquals(0.047297, out.results.first { it.id == "fLb" }.value, 1e-5)
         assertEquals(167.03, out.results.first { it.id == "wLb" }.value, 0.1)
-        // 45 kg cylinder: 75.7621 / 45 = 1.68 -> 2 cylinders
-        assertEquals(2.0, out.results.first { it.id == "cylinders" }.value, 1e-9)
+        assertTrue(out.results.none { it.id == "cylinders" }, "Theory must not select cylinders")
     }
 
     @Test
@@ -194,7 +198,7 @@ class Co2AgentQuantityTest {
         assertEquals(50.0, out.results.first { it.id == "cUsed" }.value, 1e-9)
         assertEquals(1.263835, out.results.first { it.id == "f" }.value, 1e-5)
         assertEquals(126.3835, out.results.first { it.id == "w" }.value, 0.01)
-        assertEquals(3.0, out.results.first { it.id == "cylinders" }.value, 1e-9)
+        assertTrue(out.results.none { it.id == "cylinders" }, "Theory must not select cylinders")
     }
 
     @Test
@@ -206,8 +210,7 @@ class Co2AgentQuantityTest {
         )
         assertEquals(30.0, out.results.first { it.id == "cUsed" }.value, 1e-9)
         assertEquals(65.0336, out.results.first { it.id == "w" }.value, 0.01)
-        // 78.1427 / 20 = 3.91 -> 4 cylinders
-        assertEquals(4.0, out.results.first { it.id == "cylinders" }.value, 1e-9)
+        assertTrue(out.results.none { it.id == "cylinders" }, "Theory must not select cylinders")
     }
 
     @Test

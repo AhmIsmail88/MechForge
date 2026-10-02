@@ -10,7 +10,7 @@ import com.mechforge.core.engine.InputValue
 import com.mechforge.core.units.UnitFamily
 import com.mechforge.core.util.Fmt
 import kotlin.math.abs
-import kotlin.math.exp
+import kotlin.math.expm1
 
 /** Heat exchanger effectiveness from NTU and the capacity ratio. */
 private val Def = CalculatorDefinition(
@@ -25,7 +25,6 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("ntu", "Number of transfer units", "NTU", UnitFamily.DIMENSIONLESS, minValue = 0.0, exclusiveMin = true, defaultUnitId = "dash"),
         InputSpec("cr", "Capacity ratio", "Cr", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, maxValue = 1.0, defaultUnitId = "dash", assumedWhenOmitted = "Capacity ratio assumed as 0 - this models one stream condensing or evaporating at constant temperature."),
-        InputSpec("arr", "Arrangement (1 = counter, 0 = parallel)", "arr", UnitFamily.DIMENSIONLESS, required = false, defaultUnitId = "dash", assumedWhenOmitted = "Flow arrangement assumed as counter-flow - check it against the exchanger actually specified."),
         InputSpec(
             "arr", "Flow arrangement", "Arrangement", UnitFamily.DIMENSIONLESS,
             required = false, allowedUnitIds = listOf("dash"), defaultUnitId = "dash", defaultValue = 0.0,
@@ -46,13 +45,13 @@ object HxEffectivenessNtuCalculator : Calculator(Def) {
         val counter = optionalValue(inputs, "arr", 0.0) < 0.5
 
         val eps = if (abs(cr) < 1e-9) {
-            1.0 - exp(-ntu)
+            -expm1(-ntu)
         } else if (counter && abs(1.0 - cr) < 1e-9) {
             ntu / (1.0 + ntu)
         } else if (counter) {
-            (1.0 - exp(-ntu * (1.0 - cr))) / (1.0 - cr * exp(-ntu * (1.0 - cr)))
+            (-expm1(-ntu * (1.0 - cr))) / ((1.0 - cr) - cr * expm1(-ntu * (1.0 - cr)))
         } else {
-            (1.0 - exp(-ntu * (1.0 + cr))) / (1.0 + cr)
+            -expm1(-ntu * (1.0 + cr)) / (1.0 + cr)
         }
 
         return CalcOutput(

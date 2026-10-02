@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
 import com.mechforge.app.ui.Screen
+import com.mechforge.app.ui.CalcText
 import com.mechforge.app.ui.theme.glassBorder
 import com.mechforge.core.engine.CalculatorRegistry
 import com.mechforge.app.ui.i18n.LocalStrings
@@ -53,9 +54,9 @@ fun FavoritesScreen(deps: AppDependencies, onNavigate: (Screen) -> Unit) {
                         .clickable { onNavigate(Screen.Calculator(calc.def.id)) },
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
-                        Text(calc.def.name, style = MaterialTheme.typography.titleSmall)
+                        Text(CalcText.name(calc.def, strings.isRtl), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            calc.def.category.displayName,
+                            CalcText.categoryName(calc.def.category, strings.isRtl),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )

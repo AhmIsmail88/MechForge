@@ -35,6 +35,15 @@ def lmtd(dt1, dt2):
     return dt1 if abs(dt1 - dt2) < 1e-12 else (dt1 - dt2) / math.log(dt1 / dt2)
 
 
+def site_air_density(raw):
+    if "rho" in raw:
+        return raw["rho"]
+    if "tair" in raw and "alt" in raw:
+        pressure = 101325.0 * (1.0 - 2.25577e-5 * raw["alt"]) ** 5.25588
+        return pressure / (287.05 * raw["tair"])
+    return 1.2
+
+
 def expectation(calc, scenario, raw):
     """raw maps input id -> SI base value."""
     x = lambda k: raw[k]
@@ -60,7 +69,7 @@ def expectation(calc, scenario, raw):
         m = h_total * x("h")
         a_plate = math.pi / 4.0 * x("dPlate") ** 2
         qb = n_total / a_plate
-        c = (x("dPlate") - d) / 2.0
+        c = (x("dPlate") - d - 2.0 * x("tElbow")) / 2.0
         m_plate = qb * c * c / 2.0
         sigma_allow = x("fy") / x("fos")
         t_plate_req = math.sqrt(6.0 * m_plate / sigma_allow)
@@ -74,7 +83,7 @@ def expectation(calc, scenario, raw):
         tau = v_bolt / a_s_sel
         interaction = math.sqrt((sigma_t / x("sigmaBolt")) ** 2 + (tau / (0.6 * x("sigmaBolt"))) ** 2)
         d_plate_min = x("bcd") + 2.0 * x("edgeSel")
-        return {
+        out = {
             "v": v,
             "rGov": r_gov / 1000.0,
             "nTotal": n_total / 1000.0,
@@ -94,11 +103,16 @@ def expectation(calc, scenario, raw):
             "interaction": interaction,
             "edgeMin": 2.0 * x("dBoltSel") * 1000.0,
             "dPlateMin": d_plate_min * 1000.0,
-            "checkPlate": 1.0 if x("tPlateSel") >= t_plate_req else 0.0,
-            "checkRib": 1.0 if x("tRibSel") >= t_rib_req else 0.0,
-            "checkBolt": 1.0 if interaction <= 1.0 else 0.0,
-            "checkPlateDia": 1.0 if x("dPlate") >= d_plate_min else 0.0,
         }
+        e = m / n_total
+        out.update({"eccentricity": e * 1000.0, "kernRadius": x("dPlate") * 1000.0 / 8.0})
+        if e <= x("dPlate") / 8.0:
+            bending_pressure = 32.0 * m / (math.pi * x("dPlate") ** 3)
+            out.update({"bearingMax": (qb + bending_pressure) / 1000.0,
+                        "bearingMin": (qb - bending_pressure) / 1000.0})
+        if "atBolt" in raw:
+            out["sigmaThread"] = t_max / x("atBolt") / 1e6
+        return out
 
     if calc == "pump-power":
         ph = x("rho") * G * x("q") * x("h") / 1000.0
@@ -113,7 +127,7 @@ def expectation(calc, scenario, raw):
 
     if calc == "heat-dissipation":
         cp = x("cp") if "cp" in raw else 1005.0
-        rho = x("rho") if "rho" in raw else 1.2
+        rho = site_air_density(raw)
         mdot = x("p") / (cp * x("dt"))
         q = mdot / rho
         out = {
@@ -172,19 +186,19 @@ def expectation(calc, scenario, raw):
         return {"npsha": head + x("hs") - x("hf"), "phead": head}
 
     if calc == "sensible-heat":
-        rho = x("rho") if "rho" in raw else 1.2
+        rho = site_air_density(raw)
         qs = rho * x("q") * CP_AIR * (x("tout") - x("tin"))
         return {"qs": qs, "qsBtuh": qs * BTUH_PER_KW}
 
     if calc == "total-cooling-load":
-        rho = x("rho") if "rho" in raw else 1.2
+        rho = site_air_density(raw)
         m = rho * x("q")
         qs = m * CP_AIR * (x("tout") - x("tin"))
         ql = m * H_FG * (x("wout") - x("win")) if "win" in raw else 0.0
         return {"qs": qs, "ql": ql, "qt": qs + ql}
 
     if calc == "latent-heat":
-        rho = x("rho") if "rho" in raw else 1.2
+        rho = site_air_density(raw)
         return {"ql": rho * x("q") * H_FG * (x("wout") - x("win")),
                 "dw": x("wout") - x("win")}
 
@@ -278,7 +292,7 @@ def expectation(calc, scenario, raw):
         if "class" in raw:
             # option order: 4.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9, A2/A4-70 (proof strength Sp, ISO 898-1)
             sp = {0: 225.0, 1: 380.0, 2: 440.0, 3: 580.0, 4: 650.0, 5: 830.0, 6: 970.0, 7: 450.0}[int(x("class"))]
-            if int(x("class")) == 3 and d * 1000.0 >= 16.0:
+            if int(x("class")) == 3 and d > 0.016:
                 sp = 600.0
         if at is not None and force is not None:
             out["sigma"] = force / at / 1e6
@@ -300,7 +314,7 @@ def expectation(calc, scenario, raw):
         if "n" in raw:
             out["l10h"] = l10 / (60.0 * x("n"))
         # ISO 281 reliability factors a1 and the life modification factor a_ISO
-        a1 = {0: 1.0, 1: 0.64, 2: 0.55, 3: 0.47, 4: 0.37, 5: 0.25, 6: 0.22, 7: 0.06}[int(x("rel"))] if "rel" in raw else 1.0
+        a1 = {0: 1.0, 1: 0.64, 2: 0.55, 3: 0.47, 4: 0.37, 5: 0.25, 6: 0.22, 7: 0.093}[int(x("rel"))] if "rel" in raw else 1.0
         a_iso = x("aiso") if "aiso" in raw else 1.0
         if a1 != 1.0 or a_iso != 1.0:
             lnm = a1 * a_iso * l10
@@ -360,7 +374,7 @@ def expectation(calc, scenario, raw):
                 "w": math.sqrt(a * ratio) * 1000.0, "h": math.sqrt(a / ratio) * 1000.0}
 
     if calc == "duct-pressure-loss":
-        rho = x("rho") if "rho" in raw else 1.2
+        rho = site_air_density(raw)
         nu = x("nu") if "nu" in raw else 1.5e-5
         eps = x("eps") if "eps" in raw else 9e-5
         dh = x("d") if "d" in raw else 2.0 * x("w") * x("h") / (x("w") + x("h"))
@@ -406,12 +420,12 @@ def expectation(calc, scenario, raw):
         return res
 
     if calc == "pipe-wall-thickness":
-        # ASME B31.3 form: t = PD/(2(SE + PY)) + CA, then /(1 - mill tolerance) for the nominal
+        # ASME B31.3 form: t = PD/(2(SEW + PY)) + CA + MA, then /(1 - mill tolerance) for the nominal
         e = x("e") if "e" in raw else 1.0
         y = x("y") if "y" in raw else 0.4
         mill = x("mill") if "mill" in raw else 0.125
-        tp = x("p") * x("d") / (2.0 * (x("sigma") * e + x("p") * y))
-        t_min = tp + x("ca")
+        tp = x("p") * x("d") / (2.0 * (x("sigma") * e * raw.get("weld", 1.0) + x("p") * y))
+        t_min = tp + raw.get("ca", 0.0) + raw.get("ma", 0.0)
         return {"tp": tp * 1000.0, "t": t_min * 1000.0, "tNom": t_min / (1.0 - mill) * 1000.0}
 
     if calc == "thermal-expansion":
@@ -468,11 +482,13 @@ def expectation(calc, scenario, raw):
         shaft = hyd / x("eta")
         motors = [0.55, 0.75, 1.1, 1.5, 2.2, 3.0, 4.0, 5.5, 7.5, 11.0, 15.0, 18.5, 22.0, 30.0,
                   37.0, 45.0, 55.0, 75.0, 90.0, 110.0, 132.0, 160.0, 200.0, 250.0, 315.0, 355.0]
-        driver = max(shaft, x("bhp150") / 1000.0) if "bhp150" in raw else shaft
-        motor = next((m for m in motors if m >= driver), None)
-        out = {"hydraulic": hyd, "shaft": shaft, "driver": driver}
-        if motor is not None:
-            out["motor"] = motor
+        out = {"hydraulic": hyd, "shaft": shaft}
+        if "bhpmax" in raw:
+            driver = x("bhpmax") / 1000.0
+            out["driver"] = driver
+            motor = next((m for m in motors if m >= driver), None)
+            if motor is not None:
+                out["motor"] = motor
         return out
 
     if calc == "water-hammer":
@@ -549,7 +565,7 @@ def expectation(calc, scenario, raw):
                "sUsed": s, "cUsed": c, "vnet": v}
         if "vgross" in raw:
             out["vexcl"] = max(0.0, x("vgross") - v)
-        if "mcyl" in raw:
+        if all(k in raw for k in ("mcyl", "s", "c")):
             charge = x("mcyl")
             n = math.ceil(w / charge)
             out["cylinders"] = float(n)
@@ -569,19 +585,25 @@ def expectation(calc, scenario, raw):
         f_clean_agent_form = rho * (c / (100.0 - c))
         f = x("ftable") if "ftable" in raw else f_theory
         v = x("v")
-        w_basic = v * f
+        w_basic = max(v * f, raw.get("wmin", 0.0))
         extra = x("addkg") if "addkg" in raw else 0.0
         w = w_basic + extra
         charge = x("mcyl") if "mcyl" in raw else 45.0
         n = math.ceil(w / charge)
-        return {"w": w, "wLb": w / 0.45359237, "wbasic": w_basic, "wadd": extra,
-                "f": f, "fIdeal": f_clean_agent_form, "fLb": f / 16.0184634, "rhoVapour": rho,
-                "cylinders": float(n), "installed": n * charge, "margin": n * charge - w,
-                "marginPct": (n * charge - w) / w * 100.0, "cUsed": c, "vnet": v}
+        out = {"w": w, "wLb": w / 0.45359237, "wbasic": w_basic, "wadd": extra,
+               "f": f, "fIdeal": f_clean_agent_form, "fLb": f / 16.0184634, "rhoVapour": rho,
+               "cUsed": c, "vnet": v}
+        if "ftable" in raw and "mcyl" in raw:
+            out.update({"cylinders": float(n), "installed": n * charge, "margin": n * charge - w,
+                        "marginPct": (n * charge - w) / w * 100.0})
+        return out
 
     if calc == "compression-ratio":
         ratio = x("p2") / x("p1")
-        crmax = x("crmax") if "crmax" in raw else 4.0
+        crmax = raw.get("crmax", float("inf") if "t2max" in raw else 4.0)
+        if "t1" in raw and "t2max" in raw:
+            exponent = raw.get("n", 1.3)
+            crmax = min(crmax, (x("t2max") / x("t1")) ** (exponent / (exponent - 1.0)))
         n = 1 if ratio <= crmax else math.ceil(math.log(ratio) / math.log(crmax))
         per = ratio ** (1.0 / n)
         return {"cr": ratio, "n": float(n), "crStage": per, "pint": x("p1") * per / 1e5}
@@ -686,7 +708,7 @@ def main(dump_path):
                 tol = max(1e-9, abs(exp_val) * 1e-4)
             checked += 1
             per_calc[calc] = per_calc.get(calc, 0) + 1
-            if abs(got - exp_val) > tol:
+            if not math.isfinite(got) or abs(got - exp_val) > tol:
                 failures.append((calc, scenario, key,
                                  f"expected {exp_val:.10g}, engine {got:.10g}, delta {abs(got-exp_val):.3e}"))
 

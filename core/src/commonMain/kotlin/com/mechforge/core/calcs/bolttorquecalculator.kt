@@ -31,7 +31,7 @@ import kotlin.math.PI
  * previously taken from the 0.2 % yield stresses of the same classes, which are 10 to 13 %
  * higher and therefore not conservative - the targeted tension, and with it the 90 % and
  * 40 % limits, moved with them. Class 8.8 depends on the diameter: 580 MPa up to M16 and
- * 600 MPa from M16 upward, applied in the calculation below.
+ * 600 MPa above M16, applied in the calculation below.
  */
 private val PropertyClasses: List<Pair<InputOption, Double>> = listOf(
     InputOption("4.6", "4.6 - low carbon steel") to 225.0,
@@ -89,6 +89,7 @@ object BoltTorqueCalculator : Calculator(Def) {
             hasPitch -> {
                 val pitch = value(inputs, "pitch")
                 val minor = d - 0.9382 * pitch
+                if (minor <= 0.0) throw ValidationException(listOf(InputError("pitch", "Thread pitch is too large for this diameter.")))
                 PI / 4.0 * minor * minor
             }
             else -> null
@@ -99,7 +100,7 @@ object BoltTorqueCalculator : Calculator(Def) {
                 listOf(InputError("at", "Give the tensile stress area A_t or the thread pitch so the preload can be calculated.")),
             )
         }
-        if (hasF == hasT && !(hasClass && stressArea != null)) {
+        if ((hasF && hasT) || (!hasF && !hasT && !(hasClass && stressArea != null))) {
             throw ValidationException(
                 listOf(
                     InputError(
@@ -113,7 +114,7 @@ object BoltTorqueCalculator : Calculator(Def) {
         val preloadPct = optionalValue(inputs, "preloadpct", 0.65)
         // ISO 898-1: the proof strength of class 8.8 is 580 MPa up to M16 and 600 MPa above it.
         var proofStress = propertyClass?.second // MPa
-        if (propertyClass?.first?.id == "8.8" && d * 1000.0 >= 16.0) proofStress = 600.0
+        if (propertyClass?.first?.id == "8.8" && d > 0.016) proofStress = 600.0
 
         val results = mutableListOf<com.mechforge.core.engine.ResultValue>()
         val steps = mutableListOf<String>()

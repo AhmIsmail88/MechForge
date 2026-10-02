@@ -25,7 +25,7 @@ object FanCoverage {
     /** Airflow selected by [count] fans of [capacityPerFan], or null when either is missing. */
     fun provided(count: Double?, capacityPerFan: Double?): Double? {
         if (count == null || capacityPerFan == null) return null
-        if (count <= 0.0 || capacityPerFan <= 0.0) return null
+        if (count < 0.0 || capacityPerFan <= 0.0) return null
         return count * capacityPerFan
     }
 

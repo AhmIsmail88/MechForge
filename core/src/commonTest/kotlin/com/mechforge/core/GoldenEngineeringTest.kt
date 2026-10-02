@@ -48,7 +48,7 @@ class GoldenEngineeringTest {
                 }
                 comparisons++
                 val tolerance = maxOf(1e-9, abs(expectedValue) * case.relativeTolerance)
-                if (abs(got - expectedValue) > tolerance) {
+                if (!got.isFinite() || abs(got - expectedValue) > tolerance) {
                     failures += "${case.calculatorId}/${case.scenario}.$id: expected " +
                         "$expectedValue, engine $got, delta ${abs(got - expectedValue)}"
                 }
@@ -64,6 +64,7 @@ class GoldenEngineeringTest {
                 "golden mismatches (${failures.size}):\n" + failures.joinToString("\n")
             )
         }
+        assertTrue(calculators == CalculatorRegistry.all.map { it.def.id }.toSet(), "Every registered calculator needs a golden case")
         assertTrue(comparisons >= 400, "expected at least 400 golden comparisons, got $comparisons")
     }
 

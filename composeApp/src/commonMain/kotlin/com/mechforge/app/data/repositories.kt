@@ -32,7 +32,7 @@ class HistoryRepository(private val db: MechForgeDatabase) {
         calculationNumber: String? = null,
         revision: String? = null,
         status: String? = null,
-    ) {
+    ): Calculation_history = db.transactionWithResult {
         db.historyQueries.insertHistoryFull(
             calculator_id = calculatorId,
             title = title,
@@ -45,6 +45,11 @@ class HistoryRepository(private val db: MechForgeDatabase) {
             revision = revision,
             status = status,
         )
+        val id = db.historyQueries.lastInsertedHistoryId().executeAsOne()
+        if (calculationNumber.isNullOrBlank()) {
+            db.historyQueries.updateHistoryNumber("CAL-${id.toString().padStart(6, '0')}", id)
+        }
+        db.historyQueries.getHistoryById(id).executeAsOne()
     }
 
     /** Every calculation saved under one project, newest first (the project register). */

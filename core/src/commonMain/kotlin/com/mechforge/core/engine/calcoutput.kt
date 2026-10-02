@@ -14,6 +14,8 @@ data class ResultValue(
 
 @Serializable
 data class CalcOutput(
+    /** Empty for legacy/unstamped records; set only by Calculator.run after calculation. */
+    val calculationRevision: String = "",
     val results: List<ResultValue> = emptyList(),
     val steps: List<String> = emptyList(),
     val warnings: List<String> = emptyList(),

@@ -39,7 +39,7 @@ object PipeSizingCalculator : Calculator(Def) {
 
         val warnings = buildList {
             if (v > 3.0) add("Selected velocity is above 3 m/s: typical water practice keeps the suction at 0.6-1.8 m/s and the discharge at 1.5-3.0 m/s, and abrasive or slurry services are lower still.")
-            if (v < 0.6) add("Selected velocity below 0.6 m/s — sedimentation and undersizing risk in water lines.")
+            if (v < 0.6) add("Selected velocity below 0.6 m/s — sedimentation and oversizing risk in water lines.")
             add("Result is the theoretical internal diameter; select the next standard pipe size (schedule/series) above it.")
         }
 

@@ -37,12 +37,12 @@ private val Def = CalculatorDefinition(
     inputs = listOf(
         InputSpec("p", "Heat dissipation (sensible heat load)", "P", UnitFamily.POWER, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kw"),
         InputSpec("dt", "Allowable air temperature rise", "dT", UnitFamily.TEMPERATURE_DIFFERENCE, minValue = 0.0, exclusiveMin = true, defaultUnitId = "delk"),
-        InputSpec("rho", "Air density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density", assumedWhenOmitted = "Air density assumed as 1.2 kg/m3 (20 C, sea level) - correct it for the actual temperature and altitude."),
-                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, defaultUnitId = "c"),
+        InputSpec("rho", "Air density", "rho", UnitFamily.DENSITY, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "kgm3", libraryKey = "density"),
+                InputSpec("tair", "Air temperature (for the density)", "T_air", UnitFamily.TEMPERATURE, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "c"),
                 InputSpec("alt", "Site altitude (for the density)", "alt", UnitFamily.LENGTH, required = false, defaultUnitId = "m"),
         InputSpec("cp", "Specific heat of air", "c_p", UnitFamily.SPECIFIC_HEAT, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "jkgk", assumedWhenOmitted = "Specific heat assumed as 1005 J/(kg.K) (air at 20 C) - use the value for the gas actually handled."),
         InputSpec("fancap", "Fan capacity (per fan)", "Q_fan", UnitFamily.FLOW, required = false, minValue = 0.0, exclusiveMin = true, defaultUnitId = "m3h"),
-        InputSpec("nfans", "Number of fans selected", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash"),
+        InputSpec("nfans", "Number of fans selected", "n_fan", UnitFamily.DIMENSIONLESS, required = false, minValue = 0.0, exclusiveMin = false, defaultUnitId = "dash", integerOnly = true),
     ),
 )
 
@@ -51,21 +51,8 @@ object HeatDissipationCalculator : Calculator(Def) {
     override fun calculate(inputs: Map<String, InputValue>): CalcOutput {
         val p = value(inputs, "p") // W
         val dt = value(inputs, "dt") // K
-        // Air density: an explicit input wins; otherwise, when the site conditions are given,
-        // the density is computed from them. Without either, the 1.2 kg/m3 shorthand stays.
-        val rhoFromSite = if (has(inputs, "tair") && has(inputs, "alt")) {
-            airDensity(value(inputs, "tair"), value(inputs, "alt"))
-        } else null
-        val rho = if (has(inputs, "rho")) value(inputs, "rho") else (rhoFromSite ?: 1.2)
-        val rhoSiteWarning = rhoFromSite?.let { r ->
-            "Air density from " + Fmt.n(value(inputs, "tair"), 1) + " C at " + Fmt.n(value(inputs, "alt"), 0) +
-                " m = " + Fmt.n(r, 4) + " kg/m3" +
-                (if (abs(r - 1.2) / 1.2 > 0.05) {
-                    " - differs from the 1.2 shorthand by more than 5 percent: the airflow scales with it."
-                } else {
-                    ""
-                })
-        }
+        val air = resolveAirDensity(inputs)
+        val rho = air.value
         val cp = optionalValue(inputs, "cp", CP_AIR) // J/(kg.K)
 
         val mDot = p / (cp * dt) // kg/s
@@ -119,6 +106,7 @@ object HeatDissipationCalculator : Calculator(Def) {
                 }
             },
             warnings = buildList {
+                addAll(air.warnings)
                 if (dt < 5.0) {
                     add("Allowable rise below 5 K needs a large airflow - confirm the design temperature and the duct space it implies.")
                 }
@@ -144,6 +132,7 @@ object HeatDissipationCalculator : Calculator(Def) {
                 }
             },
             warningsAr = buildList {
+                addAll(air.warningsAr)
                 if (dt < 5.0) {
                     add("فرق الحرارة المسموح أقل من 5 K يحتاج تدفقًا كبيرًا - راجع حرارة التصميم والمساحة التي يتطلبها مسار الهواء.")
                 }

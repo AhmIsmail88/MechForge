@@ -79,6 +79,13 @@ android {
     namespace = "com.mechforge.app"
     compileSdk = 36
 
+    // Arabic/English switching must work offline in an installed App Bundle.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     defaultConfig {
         applicationId = "com.mechforge.app"
         minSdk = 26

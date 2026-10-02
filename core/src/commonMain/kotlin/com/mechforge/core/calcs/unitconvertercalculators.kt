@@ -22,7 +22,7 @@ private fun converterDefinition(id: String, name: String, family: UnitFamily, de
         name = name,
         category = CalculatorCategory.UNIT_CONVERSION,
         description = "Converts a ${family.displayName.lowercase()} value into every supported unit of the same family.",
-        formulaDisplay = "value × (factor to SI) ÷ (factor from SI)",
+        formulaDisplay = if (family == UnitFamily.TEMPERATURE) "K = C + 273.15 ; F = 1.8*C + 32" else "value × (factor to SI) ÷ (factor from SI)",
         reference = "Exact unit definitions (ISO 80000 / NIST); see the unit registry for factors.",
         notes = "Uses the shared unit registry, so results are identical to the global converter screen.",
         keywords = listOf("convert", "converter", "unit", family.displayName.lowercase()),

@@ -25,7 +25,7 @@ class AssumptionWarningTest {
         val assumed = run("compression-ratio", Triple("p1", 4.0e5, "bar"), Triple("p2", 16.0e5, "bar"))
         val hits = assumed.warnings.filter { it.contains("Maximum per-stage ratio assumed as 4.0") }
         assertTrue(hits.size == 1, "expected exactly one CR_max caveat, got ${assumed.warnings}")
-        assertTrue(assumed.warnings.first() == hits.first(), "the assumption must lead the warnings")
+        // Conditional defaults are declared by the calculation, after static input assumptions.
 
         // CR_max supplied: no assumption, no caveat
         val supplied = run(
@@ -58,8 +58,8 @@ class AssumptionWarningTest {
                 "${annotated.size}: $annotated",
         )
         assertTrue(
-            annotated.any { it == "compression-ratio.crmax" },
-            "compression-ratio.crmax lost its caveat: $annotated",
+            annotated.any { it == "pipe-wall-thickness.weld" },
+            "pipe-wall-thickness.weld lost its caveat: $annotated",
         )
     }
 }

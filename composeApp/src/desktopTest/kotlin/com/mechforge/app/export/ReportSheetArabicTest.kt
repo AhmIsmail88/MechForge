@@ -80,4 +80,22 @@ class ReportSheetArabicTest {
         assertTrue(text.contains("Flow rate"), "the English label must remain when nothing is localized: $text")
         assertTrue(!text.contains("معدل السريان"), "nothing Arabic should appear without the localizer")
     }
+
+    @Test
+    fun arabicSheetKeepsOmittedInputAssumptions() {
+        val wall = CalculatorRegistry.byIdOrThrow("pipe-wall-thickness")
+        val wallInputs = mapOf(
+            "p" to InputValue("p", 1_000_000.0, "bar"),
+            "d" to InputValue("d", 0.1, "mm"),
+            "sigma" to InputValue("sigma", 100_000_000.0, "mpa"),
+        )
+        val output = wall.run(wallInputs)
+        val warnings = CalcText.warnings(wall.def, wallInputs, output, isArabic = true)
+        assertTrue(warnings.any { it.contains("Weld joint quality factor E assumed") })
+        assertTrue(warnings.any { it.contains("S يجب") })
+
+        val sheet = ReportSheet.build(wall, wallInputs, output, null, labels)
+        val printed = sheet.filterIsInstance<ReportBlock.Warning>().map { it.text }
+        assertTrue(printed.containsAll(warnings), "Arabic report dropped warnings: $printed")
+    }
 }

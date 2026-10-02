@@ -149,7 +149,7 @@ class FirePumpPowerTest {
         )
         assertEquals(38.05, out.results.first { it.id == "hydraulic" }.value, 0.3)
         assertEquals(50.73, out.results.first { it.id == "shaft" }.value, 0.4)
-        assertEquals(55.0, out.results.first { it.id == "motor" }.value, 1e-9)
+        assertTrue(out.results.none { it.id == "motor" || it.id == "driver" }, "Duty point alone must not select a fire pump motor")
     }
 
     @Test

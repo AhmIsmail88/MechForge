@@ -49,12 +49,12 @@ object BeamSsUdlCalculator : Calculator(Def) {
         val stepsAr = mutableListOf<String>()
         val steps = mutableListOf(
             "Flexural rigidity: E·I = ${Fmt.n(e / 1e6, 1)} MPa × ${Fmt.n(i, 12)} m⁴ = ${Fmt.n(ei / 1000.0, 1)} kN·m²",
-            "δ_max = 5·w·L⁴/(384·E·I) = 5 × ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}⁴ / (384 × ${Fmt.n(ei / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm",
+            "δ_max = 5·w·L⁴/(384·E·I) = 5 × ${Fmt.n(w / 1000.0, 4)} kN/m × ${Fmt.n(l, 2)}⁴ / (384 × ${Fmt.n(ei / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm",
             "M_max = w·L²/8 = ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}² / 8 = ${Fmt.n(moment, 1)} N·m",
             "Deflection ratio: L/${Fmt.n(l / defl, 0)}",
         )
         stepsAr += "الصلابة الانثنائية: E·I = ${Fmt.n(e / 1e6, 1)} MPa × ${Fmt.n(i, 12)} m⁴ = ${Fmt.n(ei / 1000.0, 1)} kN·m²"
-        stepsAr += "δ_max = 5·w·L⁴/(384·E·I) = 5 × ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}⁴ / (384 × ${Fmt.n(ei / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm"
+        stepsAr += "δ_max = 5·w·L⁴/(384·E·I) = 5 × ${Fmt.n(w / 1000.0, 4)} kN/m × ${Fmt.n(l, 2)}⁴ / (384 × ${Fmt.n(ei / 1000.0, 1)} kN·m²) = ${Fmt.n(defl * 1000.0, 2)} mm"
         stepsAr += "M_max = w·L²/8 = ${Fmt.n(w, 1)} × ${Fmt.n(l, 2)}² / 8 = ${Fmt.n(moment, 1)} N·m"
         stepsAr += "نسبة الانحراف: L/${Fmt.n(l / defl, 0)}"
         if (has(inputs, "z")) {

@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mechforge.app.AppDependencies
+import com.mechforge.app.ui.CalcText
 import com.mechforge.app.data.ProjectInfo
 import com.mechforge.app.ui.i18n.LocalStrings
 import com.mechforge.app.data.Snapshots
@@ -320,7 +321,9 @@ fun ProjectsScreen(deps: AppDependencies) {
                         val disciplines = ProjectSummary.disciplines(
                             calculatorIds = rows.map { it.calculator_id },
                             disciplineOf = { calcId ->
-                                runCatching { CalculatorRegistry.byIdOrThrow(calcId).def.category.displayName }.getOrNull()
+                                runCatching {
+                                    CalcText.categoryName(CalculatorRegistry.byIdOrThrow(calcId).def.category, strings.isRtl)
+                                }.getOrNull()
                             },
                             unknownLabel = labels.registerNoStatus,
                         )
